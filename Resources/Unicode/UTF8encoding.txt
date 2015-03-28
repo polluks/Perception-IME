@@ -1,0 +1,7 @@
+http://www.fileformat.info/info/unicode/utf8.htm
+
+Octet encoded,
+ Head  
+ Body
+ Tail
+

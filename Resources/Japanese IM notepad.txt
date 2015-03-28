@@ -1,0 +1,10 @@
+Romaji-Hiragana (Complete)
+Romaji-Hiragana-Katakana (To do)
+
+Romaji-Hiragana+Kanji
+  Kanji Table Data,
+Need to index all this data with key by reading
+
+
+Reversable Tables!!!
+
