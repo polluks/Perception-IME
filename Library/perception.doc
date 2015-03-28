@@ -1,0 +1,76 @@
+TABLE OF CONTENTS
+
+perception.library/-Background-
+perception.library/-RexxHost-
+perception.library/GetPerceptionObjectAttr()
+perception.library/ObtainPerceptionObject()
+perception.library/OptionTagList()
+perception.library/ReleasePerceptionObject()
+perception.library/SetPerceptionObjectAttr()
+perception.library/-Background-               perception.library/-Background-
+---------------------------------------------------------------------------*
+
+   BACKGROUND
+
+	I began this project in an attempt to create a modular expansion to the
+	 L10n support on AmigaOS 4.1 and newer to have Japanese support.
+
+perception.library/-RexxHost-                   perception.library/-RexxHost-
+---------------------------------------------------------------------------*
+
+   REXXHOST
+
+	ARexx is supported through the -30 Library Vector Offset
+
+perception.library/GetPerceptionObjectAttr()library/GetPerceptionObjectAttr()
+---------------------------------------------------------------------------*
+
+	NAME
+		GetPerceptionObjectAttr()
+
+	SYNOPSIS
+
+	DESCRIPTION
+
+perception.library/ObtainPerceptionObject()n.library/ObtainPerceptionObject()
+---------------------------------------------------------------------------*
+
+	NAME
+		ObtainPerceptionObject()
+
+	SYNOPSIS
+
+	DESCRIPTION
+
+perception.library/OptionTagList()         perception.library/OptionTagList()
+---------------------------------------------------------------------------*
+
+	NAME
+		PerceptionOptionTags()
+		PerceptionOptionTagList()
+
+	SYNOPSIS
+
+	DESCRIPTION
+
+perception.library/ReleasePerceptionObject()library/ReleasePerceptionObject()
+---------------------------------------------------------------------------*
+
+	NAME
+		ReleasePerceptionObject()
+
+	SYNOPSIS
+
+	DESCRIPTION
+
+perception.library/SetPerceptionObjectAttr()library/SetPerceptionObjectAttr()
+---------------------------------------------------------------------------*
+
+	NAME
+		SetPerceptionObjectAttr()
+
+	SYNOPSIS
+
+	DESCRIPTION
+
+

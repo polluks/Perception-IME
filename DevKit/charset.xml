@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE library SYSTEM "library.dtd">
+<library name="charset" basename="CharsetBase" openname="Charset.library">
+	<include>exec/types.h</include>
+	<include>exec/ports.h</include>
+	<include>dos/dos.h</include>
+	<include>libraries/perception.h</include>
+	<include>utility/tagitem.h</include>
+	<include>utility/hooks.h</include>
+	<include>rexx/storage.h</include>
+	<interface name="main" version="1.0" struct="CharsetIFace" prefix="_Charset_" asmprefix="ICharset" global="ICharset">
+		<method name="Obtain" result="uint32"/>
+		<method name="Release" result="uint32"/>
+		<method name="Expunge" result="void" status="unimplemented"/>
+		<method name="Clone" result="struct Interface *" status="unimplemented"/>
+		<method name="GetDriverInfo" result="int32">
+		</method>
+		<method name="ConvToLower" result="int32">
+			<arg name="c" type="int32"/>
+		</method>
+		<method name="ConvToUpper" result="int32">
+			<arg name="c" type="int32"/>
+		</method>
+		<method name="GetCodeSet" result="int32">
+		</method>
+		<method name="GetLocaleStr" result="APTR">
+			<arg name="StringID" type="int32"/>
+		</method>
+		<method name="IsAlNum" result="int32">
+			<arg name="c" type="int32"/>
+		</method>
+		<method name="IsAlpha" result="int32">
+			<arg name="c" type="int32"/>
+		</method>
+		<method name="IsCntrl" result="int32">
+			<arg name="c" type="int32"/>
+		</method>
+		<method name="IsDigit" result="int32">
+			<arg name="c" type="int32"/>
+		</method>
+		<method name="IsLower" result="int32">
+			<arg name="c" type="int32"/>
+		</method>
+		<method name="IsPrint" result="int32">
+			<arg name="c" type="int32"/>
+		</method>
+		<method name="IsPunct" result="int32">
+			<arg name="c" type="int32"/>
+		</method>
+		<method name="IsSpace" result="int32">
+			<arg name="c" type="int32"/>
+		</method>
+		<method name="IsUpper" result="int32">
+			<arg name="c" type="int32"/>
+		</method>
+		<method name="IsXDigit" result="int32">
+			<arg name="c" type="int32"/>
+		</method>
+		<method name="StrConvert" result="APTR">
+			<arg name="srcLength" type="int32"/>
+			<arg name="dstLength" type="int32"/>
+			<arg name="srcString" type="STRPTR"/>
+			<arg name="dstString" type="STRPTR"/>
+		</method>
+		<method name="StrnCmp" result="APTR">
+			<arg name="srcLength" type="int32"/>
+			<arg name="dstLength" type="int32"/>
+			<arg name="srcString" type="STRPTR"/>
+			<arg name="dstString" type="STRPTR"/>
+		</method>
+		<method name="IsBlank" result="int32">
+			<arg name="c" type="int32"/>
+		</method>
+	</interface>
+</library>

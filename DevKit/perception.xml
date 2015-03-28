@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE library SYSTEM "library.dtd">
+<library name="perception" basename="PerceptionBase" openname="perception.library">
+	<include>exec/types.h</include>
+	<include>exec/ports.h</include>
+	<include>dos/dos.h</include>
+	<include>libraries/perception.h</include>
+	<include>utility/tagitem.h</include>
+	<include>utility/hooks.h</include>
+	<include>rexx/storage.h</include>
+	<interface name="main" version="1.0" struct="PerceptionIFace" prefix="_Perception_" asmprefix="IPerception" global="IPerception">
+		<method name="Obtain" result="uint32"/>
+		<method name="Release" result="uint32"/>
+		<method name="Expunge" result="void" status="unimplemented"/>
+		<method name="Clone" result="struct Interface *" status="unimplemented"/>
+		<method name="ScriptExec" result="LONG" status="private">
+			<arg name="rmsg" type="struct RexxMsg *"/>
+			<arg name="result" type="STRPTR *"/>
+		</method>
+		<method name="OptionTagList" result="ULONG">
+			<arg name="options" type="struct TagItem *"/>
+		</method>
+		<method name="ObtainLanguageContext" result="APTR">
+			<arg name="name" type="APTR"/>
+			<arg name="hook" type="APTR"/>
+		</method>
+		<method name="ReleaseLanguageContext" result="int32">
+			<arg name="object" type="APTR"/>
+		</method>
+		<method name="GetLanguageContextAttr" result="int32">
+			<arg name="object" type="APTR"/>
+			<arg name="message" type="APTR"/>
+		</method>
+		<method name="SetLanguageContextAttr" result="int32">
+			<arg name="object" type="APTR"/>
+			<arg name="message" type="APTR"/>
+		</method>
+	</interface>
+</library>

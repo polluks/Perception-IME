@@ -1,0 +1,46 @@
+Short:        Perception InputMethodEnvironment
+Author:       Jeremy Sutherland (AKA Belxjander Serechai)
+Uploader:     Belxjander@gmail.com (AbH Belxjander Draconis Serechai // Jeremy sutherland)
+Type:         drivers/input
+Version:      1.0alpha
+Architecture: ppc-amigaos >= 4.1.0
+
+The original aim of this project was to provide a basis for extending the existing locale.library
+  support from just providing language strings into also providing a means where "extended"
+  Ideographic Symbols also become available.
+
+Each "language" provided by Perception-IME is a standard locale.library language driver as a base
+  and installs into the normal Locale:Languages/ heirarchy.
+
+Where Perception-IME "language" libraries differ is that when they are opened...
+  they open and register with the "perception.library" when it is present. (this is optional).
+
+When first installing or selecting a language...
+
+Install the language libraries provided into Locale:Languages/
+
+Open the Sys:Prefs/Locale editor and select which preferred languages you wish to use.
+	the only requirement is to have a Perception provided library first in the list for IME startup.
+
+The last thing to do is install the perception.library and then restart.
+
+It will automatically be running in the background once you see Workbench again.
+
+You can actively enable/disable the IME at any time through Commodities.
+
+
+This is a general framework for Asian and other "expanded" languages.
+	( It is perfectly valid to provide a "word to heiroglyph" language mode...)
+
+There are no restrictions placed on the language modes themselves.
+
+All Language Modules return Unicode CodePoint values which will be given to the system as UTF8 characters.
+
+Chinese and Korean languages are currently little more than example working skeletons with debug output.
+
+Japanese.Language support is the most complete (with an active TagItem based lookup table for "Kana")
+
+If you are interested in adding more languages...
+
+I will be quite happy to include additional language libraries into the project and provide access
+  to the source repository as well.

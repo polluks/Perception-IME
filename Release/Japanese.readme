@@ -1,0 +1,35 @@
+Short:        Japanese/Nihongo language support for OS4
+Author:       Jeremy Sutherland (AKA Belxjander Serechai)
+Uploader:     Belxjander@gmail.com (AbH Belxjander Draconis Serechai // Jeremy sutherland)
+Type:         misc/misc
+Version:      0.75beta
+Architecture: ppc-amigaos >= 4.0.0
+
+Created due to a lack of any Asian Language support,  and I relocated from New Zealand to Japan.
+This is being staged out and modularized so that instead of multiple implimentations for each language,
+there is a central stack arrangement for Input in addition to materials for display.
+
+Keymap support alone is not enough (Japanese keyboards start with a basic layout for Japanese),
+  as for Japanese there is no less than 3 sets of glyphs used in addition to English glyphs.
+
+Due to the fact that Japanese is a "side by side" language display choice with an immediate use of
+ additional language support,  I have had to write this Language support using UTF-8 encoding for all
+ strings in the primary japanese.language driver,  additional encodings are to be provided from drivers
+ that locale will recognise for "charset"(character set) encodings.
+
+Hiragana, Katakana and Kanji Translations will occur based on user selection of mode and whether to
+ actively translate or not.
+
+The presented materials here is still "incomplete" with regards to IME functionality.
+ despite this state it should be functional without interference with normal operations.
+
+Fonts will need to be the full unicode enabled OpenType/TrueType/PostScript variants.
+
+Original sources will always be made available where practical for anyone to add additional IME plugin
+ support to any language driver beyond the base Locale.Library driver specification.
+
+INSTALLATION
+------------
+Copy the locale and devs directories to the root of SYS:
+(alternatively, copy the contents to the respective directories in SYS:)
+

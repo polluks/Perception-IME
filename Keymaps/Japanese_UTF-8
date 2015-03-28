@@ -1,0 +1,103 @@
+; KeymapFileMagicCookie
+
+; $VER: Japanese_ISO-2022-jp 1.7 (06.2.2012)
+; Electrified Nardicles, seriously painful!
+; Written by Jeremy Kajikawa-Sutherland (Belxjander@gmail.com)
+; With Testing by Krister "Kicko" Skrtic
+
+CHARSET="UTF-8"
+ENGLISHINFOTEXT="Japanese ISO-2022-JP"
+LOCALINFOCHARSET="iso-2022-jp"
+LOCALINFOTEXT="Japanese"
+CAPSLOCKMODE="Default"
+KEYBOARDTYPE="PC"
+
+; -----------------------------------------------------------------------------
+
+;KEY 00 ALONE "" SHIFT ""		;; Zenkaku_Hankaku Maps here (IMEF1)
+KEY 01 ALONE "1" SHIFT "!"
+KEY 02 ALONE "2" SHIFT "*""
+KEY 03 ALONE "3" SHIFT "#"
+KEY 04 ALONE "4" SHIFT "$"
+KEY 05 ALONE "5" SHIFT "%"
+KEY 06 ALONE "6" SHIFT "&"
+KEY 07 ALONE "7" SHIFT "'"
+KEY 08 ALONE "8" SHIFT "("
+KEY 09 ALONE "9" SHIFT ")"
+KEY 0A ALONE "0"
+KEY 0B ALONE "-" SHIFT "="
+KEY 0C ALONE "^" SHIFT "~"
+KEY 0D ALONE "]" SHIFT "}"	;;	Inconsistent Mapping on some keyboard models
+KEY 0E ALONE "\" SHIFT "|"
+KEY 0F ALONE "0"			;;	Numeric Pad
+
+KEY 10 ALONE "q" SHIFT "Q"
+KEY 11 ALONE "w" SHIFT "W"
+KEY 12 ALONE "e" SHIFT "E"
+KEY 13 ALONE "r" SHIFT "R"
+KEY 14 ALONE "t" SHIFT "T"
+KEY 15 ALONE "y" SHIFT "Y"
+KEY 16 ALONE "u" SHIFT "U"
+KEY 17 ALONE "i" SHIFT "I"
+KEY 18 ALONE "o" SHIFT "O"
+KEY 19 ALONE "p" SHIFT "P"
+KEY 1A ALONE "@" SHIFT "`"
+KEY 1B ALONE "[" SHIFT "{"
+;
+KEY 1D ALONE "1"			;; Numpad
+KEY 1E ALONE "2"			;; Numpad
+KEY 1F ALONE "3"			;; Numpad
+
+KEY 20 ALONE "a" SHIFT "A"
+KEY 21 ALONE "s" SHIFT "S"
+KEY 22 ALONE "d" SHIFT "D"
+KEY 23 ALONE "f" SHIFT "F" ALT "DeadAcute" SHIFT_ALT "DeadAcute"
+KEY 24 ALONE "g" SHIFT "G" ALT "DeadGrave" SHIFT_ALT "DeadGrave"
+KEY 25 ALONE "h" SHIFT "H" ALT "DeadCircumflex" SHIFT_ALT "DeadCaron"
+KEY 26 ALONE "j" SHIFT "J" ALT "DeadTilde" SHIFT_ALT "DeadTilde"
+KEY 27 ALONE "k" SHIFT "K" ALT "DeadDiaeresis" SHIFT_ALT "DeadDiaeresis"
+KEY 28 ALONE "l" SHIFT "L"
+KEY 29 ALONE ";" SHIFT "+"
+KEY 2A ALONE ":" SHIFT "**"	;;	[ Escaped * ]
+KEY 2B ALONE "]" SHIFT "}"	;;	Inconsistent Mapping on some keyboard models
+;
+KEY 2D ALONE "4"			;;	Numpad
+KEY 2E ALONE "5"			;;	Numpad
+KEY 2F ALONE "6"			;;	Numpad
+
+;KEY 30 ALONE "" SHIFT ""
+KEY 31 ALONE "z" SHIFT "Z"
+KEY 32 ALONE "x" SHIFT "X"
+KEY 33 ALONE "c" SHIFT "C"
+KEY 34 ALONE "v" SHIFT "V"
+KEY 35 ALONE "b" SHIFT "B"
+KEY 36 ALONE "n" SHIFT "N"
+KEY 37 ALONE "m" SHIFT "M"
+KEY 38 ALONE "," SHIFT "<"
+KEY 39 ALONE "." SHIFT ">"
+KEY 3A ALONE "/" SHIFT "?"
+KEY 3B ALONE "\" SHIFT "_"
+KEY 3C ALONE "."			;;	Numpad
+KEY 3D ALONE "7"			;;	Numpad
+KEY 3E ALONE "8"			;;	Numpad
+KEY 3F ALONE "9"			;;	Numpad
+
+KEY 4A ALONE "-"			;;	Numpad
+
+KEY 5C ALONE "/"			;;	Numpad
+KEY 5D ALONE "**"			;;	Numpad	[ Escaped * ]
+KEY 5E ALONE "+"			;;	Numpad
+
+; KEY 6C is missing (Brazil ABNT keyboard only)
+
+; Japanese Extended Mappings (Not to be mapped as display capable here for reference only)
+
+;KEY 00 ALONE "" SHIFT ""	; IME Function 1 [ JP1==Zenkaku_Hankaku ]
+;KEY 78 ALONE "" SHIFT ""	; IME Function 2 [ JP2 == MuHenkan ]
+;KEY 79 ALONE "" SHIFT ""	; IME Function 3 [ JP3 == Henkan ]
+;KEY 7A ALONE "" SHIFT ""	; IME Function 4 [ JP4 == Hiragana/Katakana ]
+
+;
+;  There is no "ClassicAmiga" Equivalent to this Keyboard Type
+KEYBOARDTYPE="ClassicAmiga"
+;

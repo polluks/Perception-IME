@@ -1,0 +1,55 @@
+****
+
+Japanese.Language
+
+****
+
+This particular library is a standard "locale.library" Language Extension,
+  providing the basic catalog strings as required for locale compliance.
+
+UTF-8 is the defined Encoding for this language and there is a related Keyboard mapping
+  for using a Japanese Layout Keyboard (this may require small changes for particular keyboards).
+
+The main focus of this particular language library is the connection with Perception-IME.
+
+There IS a registered Japanese Language Hook when the perception.library is installed,
+  Perception-IME allows for "chord"s of Key combinations to be used for extended Unicode selections.
+
+****
+Keyboard Chording...
+
+The following chords listed below are what the Japanese.Language currently recognises,
+  additionally typing the first consonant letter twice will add a prefix character.
+All chording combinations end at vowels with the nn chord exception.
+  multiple-consonants select an extended Unicode sequence.
+
+	a i u e o
+	ka ki ku ke ko
+	kya kyu kyo
+	ga ga gu ge go
+	gya gyu gyo
+	sa si shi su se so
+	sha/sya shu/syu sho/syo
+	za ji zi  zu ze zo
+	jya/dya jyu/dyu jyo/dyo
+	ta chi/ci/ti tsu te to
+	cha/cya chu/cyu cho/cyo
+	da di dzu/du de do
+	na ni nu ne no
+	nya nyu nyo
+	ha hi fu/hu he ho
+	hya hyu hyo
+	ba bi bu be bo
+	bya byu byo
+	pa pi pu pe po
+	pya pyu pyo
+	ma mi mu me mo
+	mya myu myo
+	ya yu yo
+	ra ri ru re ro
+	rya ryu ryo
+	wa wi we wo
+	nn
+	vu va vi ve vo
+
+****
