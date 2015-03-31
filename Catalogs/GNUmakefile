@@ -2,17 +2,17 @@
 #	'Perception.Library' Build Scripting
 #
 MAKE		=	make
-REXX		=	@ RX
-UNICODE 	=	@ $(REXX) Unicode.rexx
+REXX		=	RX
+UNICODE 	=	$(REXX) Unicode.rexx
 MKDIR		=	Makedir
 RM 			=	Delete >Nil:
 
 main:
-#	@ Echo "Generating [Language=Chinese] Datasets"
+	@ Echo "Generating [Language=Chinese] Datasets"
 #	$(REXX) Chinese.rexx Chinese
 	@ Echo "Generating [Language=Japanese] Datasets"
-	$(REXX) Japanese.rexx Japanese
-#	@ Echo "Generating [Language=Korean] Datasets"
+#	$(REXX) Japanese.rexx Japanese
+	@ Echo "Generating [Language=Korean] Datasets"
 #	$(REXX) Korean.rexx Korean
 
 clean:

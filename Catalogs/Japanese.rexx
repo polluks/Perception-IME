@@ -4,7 +4,7 @@
 Options Results
 Parse Arg CatFname Vector
 /**/
-CMD='XadUnFile //Resources/Unicode/Unihan.zip /Catalogs/'
+CMD='XadUnFile /Resources/Unicode/Unihan.zip /Catalogs/'
 Address COMMAND 'C:Delete >Nil: #?.txt Japanese ALL QUIET'
 Echo CMD
 Address COMMAND CMD
