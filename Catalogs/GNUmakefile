@@ -11,7 +11,8 @@ main:
 	@ Echo "Generating [Language=Chinese] Datasets"
 #	$(REXX) Chinese.rexx Chinese
 	@ Echo "Generating [Language=Japanese] Datasets"
-	$(REXX) Japanese.rexx Japanese >Kanji-Readings.txt
+	@ XadUnFile /Resources/Unicode/Unihan.zip /Catalogs/ OW >Nil:
+	$(REXX) Japanese.rexx Japanese >Kanji-Readings.text
 	@ Echo "Generating [Language=Korean] Datasets"
 #	$(REXX) Korean.rexx Korean
 
