@@ -11,7 +11,7 @@ main:
 	@ Echo "Generating [Language=Chinese] Datasets"
 #	$(REXX) Chinese.rexx Chinese
 	@ Echo "Generating [Language=Japanese] Datasets"
-#	$(REXX) Japanese.rexx Japanese
+	$(REXX) Japanese.rexx Japanese >Kanji-Readings.txt
 	@ Echo "Generating [Language=Korean] Datasets"
 #	$(REXX) Korean.rexx Korean
 

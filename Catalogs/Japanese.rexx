@@ -4,7 +4,7 @@
 Options Results
 Parse Arg CatFname Vector
 /**/
-CMD='XadUnFile /Resources/Unicode/Unihan.zip /Catalogs/'
+CMD='XadUnFile /Resources/Unicode/Unihan.zip /Catalogs/ >Nil:'
 Address COMMAND 'C:Delete >Nil: #?.txt Japanese ALL QUIET'
 Echo CMD
 Address COMMAND CMD
@@ -17,14 +17,21 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 		Parse Var L With 'U+' CodePoint '09'x  dbEntryType '09'x Vector
 		Vector=Translate(Vector,'20'x,'09'x);
 		If dbEntryType='kJapaneseKun' Then Do
-			Echo 'U'||CodePoint||' K='||Translate(Vector,alpha,Upper(alpha));
+			Echo 'U+'||CodePoint||' ['||EncodeUTF8(CodePoint)||'] K='||Translate(Vector,alpha,Upper(alpha));
 		End;
 		If dbEntryType='kJapaneseOn' Then Do
-			Echo 'U'||CodePoint||' O='||Translate(Vector,Upper(alpha),alpha);
+			Echo 'U+'||CodePoint||' ['||EncodeUTF8(CodePoint)||'] O='||Translate(Vector,Upper(alpha),alpha);
 		End;
 	End;
 End;
 Return();
+
+EncodeUTF8:
+	Options Results;
+	Parse Arg CodePoint ARGV;
+	B=C2B(D2C(X2D(CodePoint)));
+	R=B2C('1100'||SubStr(B,1,4)||'10'||SubStr(B,4,6)||'10'||SubStr(B,11,6));
+Return(R);
 
 /*
 \\	Primary Activity is to generate the template datasets in the first pass
