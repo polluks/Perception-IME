@@ -9,7 +9,7 @@ RM		= Delete
 MAKE	= make
 
 CWFLAGS	= -Wall -Wundef -Wshadow -Wpointer-arith -Wbad-function-cast -Wconversion -Waggregate-return
-INCLUDE	= -I/SDK/includes/include_h/ -I../../DevKit/Include/
+INCLUDE	= -I/SDK/includes/include_h/ -I../DevKit/Include/
 CFLAGS	= -O2 $(CWFLAGS) -gstabs $(INCLUDE) -fno-builtin -fPIC -shared
 
 LDFLAGS	= -nostartfiles -nostdlib -mcrt=newlib
@@ -26,7 +26,7 @@ clean:
 	$(RM) $(OBJECTS) $(LNAME).debug $(LNAME) ALL QUIET
 
 devkit:
-	$(MAKE) -C ../../DevKit -f GNUmakefile
+	$(MAKE) -C ../DevKit -f GNUmakefile
 
 install: $(LNAME)
 	C:Copy	$(LNAME).debug	$(DRAWER)/$(LNAME)
