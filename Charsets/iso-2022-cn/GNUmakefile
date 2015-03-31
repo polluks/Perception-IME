@@ -9,7 +9,7 @@ COPY	= Copy
 RM		= Delete
 
 CWFLAGS	= -Wall -Wundef -Wshadow -Wpointer-arith -Wbad-function-cast -Wconversion -Waggregate-return
-INCLUDE	= -I/SDK/includes/include_h/ -I../../../DevKit/Include/
+INCLUDE	= -I/SDK/includes/include_h/ -I../../DevKit/Include/
 CFLAGS	= -O2 $(CWFLAGS) -gstabs $(INCLUDE) -fno-builtin -fPIC -shared
 
 LDFLAGS	= -nostartfiles -nostdlib -mcrt=newlib
@@ -28,7 +28,7 @@ install:
 	$(COPY)	$(LNAME).debug LOCALE:Charsets/$(LNAME)
 
 devkit:
-	$(MAKE) -C ../../../DevKit -f GNUmakefile
+	$(MAKE) -C ../../DevKit -f GNUmakefile
 
 %.o:	%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
