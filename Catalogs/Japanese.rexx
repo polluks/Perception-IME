@@ -11,11 +11,16 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 	If SubStr(L,1,2)='U+' Then Do
 		Parse Var L With 'U+' CodePoint '09'x  dbEntryType '09'x Vector
 		Vector=Translate(Vector,'20'x,'09'x);
+        B=C2B(X2C(CodePoint));L=Length(B);
+		Select
+			When L=8  Then Glyph=B2C('110000'||SubStr(B,1,2))||B2C('10'||SubStr(B,3,6));
+			When L=16 Then Glyph=B2C('1110'||SubStr(B,1,4))||B2C('10'||SubStr(B,5,6))||B2C('10'||SubStr(B,11,6));
+        End;
 		If dbEntryType='kJapaneseKun' Then Do
-			Echo 'U+'||CodePoint||'='||Translate(Vector,alpha,Upper(alpha));
+			Echo 'U+'||CodePoint||'=['||Glyph||']='||Translate(Vector,alpha,Upper(alpha));
 		End;
 		If dbEntryType='kJapaneseOn' Then Do
-			Echo 'U+'||CodePoint||'='||Translate(Vector,Upper(alpha),alpha);
+			Echo 'U+'||CodePoint||'=['||Glyph||']='||Translate(Vector,Upper(alpha),alpha);
 		End;
 	End;
 End;
