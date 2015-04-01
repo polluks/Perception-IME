@@ -11,12 +11,19 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 	If SubStr(L,1,2)='U+' Then Do
 		Parse Var L With 'U+' CodePoint '09'x  dbEntryType '09'x Vector
 		Vector=Translate(Vector,'20'x,'09'x);
-        B=C2B(X2C(CodePoint));L=Length(B);
 		Select
-			When L=8  Then Glyph=B2C('110000'||SubStr(B,1,2))||B2C('10'||SubStr(B,3,6));
-			When L=16 Then Glyph=B2C('1110'||SubStr(B,1,4))||B2C('10'||SubStr(B,5,6))||B2C('10'||SubStr(B,11,6));
-			Otherwise Glyph='Not Encoded';
-        End;
+			When CodePoint<X2D('80') Then Glyph=X2C(CodePoint);
+			When CodePoint<X2D('100') Then Glyph=B2C('110000'||SubStr(C2B(X2C(CodePoint)),1,2))||B2C('10'||SubStr(C2B(X2C(CodePoint)),3,6));
+/*			When CodePoint<X2D('800') Then Glyph=B2C('110'||SubStr(C2B(SubStr(X2C(CodePoint),1,1)),6,3)||SubStr(C2B(SubStr(X2C(CodePoint),2,1)),1,2))||B2C('10'||SubStr(C2B(SubStr(D2C(CodePointc),2,1)),3,6))
+			When CodePoint<X2D('10000') Then Glyph=B2C('1110'||SubStr(C2B(SubStr(X2C(CodePoint),1,1)),1,4))||B2C('10'||SubStr(C2B(SubStr(X2C(CodePoint),1,1)),5,4)||SubStr(C2B(SubStr(X2C(CodePoint),2,1)),1,2))||B2C('10'||SubStr(C2B(SubStr(X2C(CodePoint),2,1)),3,6))
+			When CodePoint<X2D('200000') Then If Length(X2C(CodePoint))=4 Then Do
+					Glyph=B2C('11110'||SubStr(C2B(SubStr(X2C(CodePoint),1,1)),6,3)))||B2C('10'||SubStr(C2B(SubStr(X2C(CodePoint),2,1)),1,6))||B2C('10'||SubStr(C2B(SubStr(X2C(CodePoint),2,1)),7,2)||SubStr(C2B(SubStr(X2C(CodePoint),3,1)),1,4))||B2C('10'||SubStr(C2B(SubStr(X2C(CodePoint),3,1)),5,4)||SubStr(C2B(SubStr(X2C(CodePoint),4,1)),1,2))||B2C('10'||SubStr(C2B(SubStr(X2C(CodePoint),4,1)),3,6))
+				End;Else If Length(X2C(CodePoint))=3 Then Do
+					Glyph=B2C('11110'||SubStr(C2B(SubStr(X2C(CodePoint),1,1)),4,3))||B2C('10'||SubStr(C2B(SubStr(X2C(CodePoint),1,1)),7,2)||SubStr(C2B(SubStr(X2C(CodePoint),2,1)),1,4))||B2C('10'||SubStr(C2B(SubStr(X2C(CodePoint),2,1)),5,4)||SubStr(C2B(SubStr(X2C(CodePoint),3,1)),1,2))||B2C('10'||SubStr(C2B(SubStr(X2C(CodePoint),3,1)),3,6))
+				End;
+*/			Otherwise Exit();
+		End;
+		Echo Glyph
 		If dbEntryType='kJapaneseKun' Then Do
 			Echo 'U+'||CodePoint||'=['||Glyph||']='||Translate(Vector,alpha,Upper(alpha));
 		End;
