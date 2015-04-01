@@ -2,7 +2,7 @@
 \\	Japanese.rexx
 **/
 Options Results
-Parse Arg CatFname Vector
+Parse Arg ArgVec
 /**/
 alpha='abcdefghijklmnopqrstuvwxyz'
 /**/
@@ -12,20 +12,14 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 		Parse Var L With 'U+' CodePoint '09'x  dbEntryType '09'x Vector
 		Vector=Translate(Vector,'20'x,'09'x);
 		If dbEntryType='kJapaneseKun' Then Do
-			'EmitReading' CodePoint Translate(Vector,alpha,Upper(alpha))
+			Echo 'U+'||CodePoint||'='||Translate(Vector,alpha,Upper(alpha));
 		End;
 		If dbEntryType='kJapaneseOn' Then Do
-			'EmitReading' CodePoint Translate(Vector,Upper(alpha),alpha)
+			Echo 'U+'||CodePoint||'='||Translate(Vector,Upper(alpha),alpha);
 		End;
 	End;
 End;
 Return;
-
-EmitReading:
-	Options Results
-	Parse Arg CodePoint Readings
-	Echo 'U+'||CodePoint||'='||Readings;
-	Return
 
 /*
 \\	Primary Activity is to generate the template datasets in the first pass

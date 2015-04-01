@@ -8,13 +8,14 @@ MKDIR		=	Makedir
 RM 			=	Delete >Nil:
 
 main:
-	@ Echo "Generating [Language=Chinese] Datasets"
-#	$(REXX) Chinese.rexx Chinese
-	@ Echo "Generating [Language=Japanese] Datasets"
-	@ XadUnFile /Resources/Unicode/Unihan.zip /Catalogs/ OW >Nil:
-	$(REXX) Japanese.rexx Japanese >Kanji-Readings.text
+	@ Echo "Unpacking Unihan Datasets"
+	XadUnFile /Resources/Unicode/Unihan.zip /Catalogs/ OW >Nil:
+	@ Echo "Generating [Language=Chinese] Dataset"
+#	$(REXX) Chinese.rexx
+	@ Echo "Generating [Language=Japanese] Dataset"
+	$(REXX) Japanese.rexx
 	@ Echo "Generating [Language=Korean] Datasets"
-#	$(REXX) Korean.rexx Korean
+#	$(REXX) Korean.rexx
 
 clean:
 	@ Echo >dummy.txt " "
