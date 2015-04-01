@@ -25,7 +25,7 @@ Return;
 
 EmitReading:
 	Options Results
-	Parse Arg CodePoints Readings
+	Parse Arg CodePoint Readings
 	Echo 'U+'||CodePoint||'='||Readings;
 Return;
 
