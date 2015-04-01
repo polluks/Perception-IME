@@ -12,21 +12,22 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 		Parse Var L With 'U+' CodePoint '09'x  dbEntryType '09'x Vector
 		Vector=Translate(Vector,'20'x,'09'x);
 		If dbEntryType='kJapaneseKun' Then Do
-			Echo 'U+'||CodePoint||' ['||EncodeUTF8(CodePoint)||'] K='||Translate(Vector,alpha,Upper(alpha));
+			'Unicode' 'Japanese.'||CodePoint CodePoint CodePoint
+			EmitReading(CodePoint,Translate(Vector,alpha,Upper(alpha));
 		End;
 		If dbEntryType='kJapaneseOn' Then Do
-			Echo 'U+'||CodePoint||' ['||EncodeUTF8(CodePoint)||'] O='||Translate(Vector,Upper(alpha),alpha);
+			'Unicode' 'Japanese.'||CodePoint CodePoint CodePoint
+			EmitReading(CodePoint,Translate(Vector,Upper(alpha),alpha));
 		End;
 	End;
 End;
-Return();
+Return;
 
-EncodeUTF8:
-	Options Results;
-	Parse Arg CodePoint ARGV;
-	B=C2B(D2C(X2D(CodePoint)));
-	R=B2C('1100'||SubStr(B,1,4)||'10'||SubStr(B,4,6)||'10'||SubStr(B,11,6));
-Return(R);
+EmitReading:
+	Options Results
+	Parse Arg CodePoints Readings
+	Echo 'U+'||CodePoint||'='||Readings;
+Return;
 
 /*
 \\	Primary Activity is to generate the template datasets in the first pass
