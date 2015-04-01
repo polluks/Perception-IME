@@ -15,6 +15,7 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 		Select
 			When L=8  Then Glyph=B2C('110000'||SubStr(B,1,2))||B2C('10'||SubStr(B,3,6));
 			When L=16 Then Glyph=B2C('1110'||SubStr(B,1,4))||B2C('10'||SubStr(B,5,6))||B2C('10'||SubStr(B,11,6));
+			Otherwise Glyph='Not Encoded';
         End;
 		If dbEntryType='kJapaneseKun' Then Do
 			Echo 'U+'||CodePoint||'=['||Glyph||']='||Translate(Vector,alpha,Upper(alpha));
