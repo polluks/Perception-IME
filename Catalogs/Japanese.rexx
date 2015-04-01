@@ -13,11 +13,11 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 		Vector=Translate(Vector,'20'x,'09'x);
 		If dbEntryType='kJapaneseKun' Then Do
 			'Unicode' 'Japanese.'||CodePoint CodePoint CodePoint
-			EmitReading(CodePoint,Translate(Vector,alpha,Upper(alpha));
+			EmitReading(CodePoint,Translate(Vector,alpha,Upper(alpha)));
 		End;
 		If dbEntryType='kJapaneseOn' Then Do
 			'Unicode' 'Japanese.'||CodePoint CodePoint CodePoint
-			EmitReading(CodePoint,Translate(Vector,Upper(alpha),alpha));
+			EmitReading(CodePoint,Translate(Vector,Upper(alpha),alpha)));
 		End;
 	End;
 End;
