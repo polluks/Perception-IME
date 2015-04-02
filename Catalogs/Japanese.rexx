@@ -6,6 +6,8 @@ Parse Arg ArgVec
 /**/
 alpha='abcdefghijklmnopqrstuvwxyz'
 /**/
+If Open(OFH,'Japanese-Kanji-Readings.dataset',WRITE) Then NOP;Else Exit(-1);
+/**/
 If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 	L=ReadLn(DBFH);
 	If SubStr(L,1,2)='U+' Then Do
@@ -22,7 +24,11 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 			End;
 			OtherWise O=NULL;
 		End;
-		If O='NULL' Then NOP;Else Echo O;
+		If O='NULL' Then NOP;
+		Else Do;
+			WriteLn(OFH,O);
+			Echo O;
+		End;
 	End;
 End;
 Return;
