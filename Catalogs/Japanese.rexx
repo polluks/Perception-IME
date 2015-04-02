@@ -6,15 +6,20 @@ Parse Arg ArgVec
 /**/
 alpha='abcdefghijklmnopqrstuvwxyz'
 /**/
-If Open(OFH,'Japanese-Kanji.dataset',WRITE) Then NOP;Else Exit(-1);
-/**/
 If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 	L=ReadLn(DBFH);
 	If SubStr(L,1,2)='U+' Then Do
 		Parse Var L With 'U+' CodePoint '09'x  dbEntryType '09'x Vector
 		Vector=Translate(Vector,'20'x,'09'x);
 		B=C2B(X2C(CodePoint))
-		Glyph=B2C('1110'||SubStr(B,1,4))||B2C('10'||SubStr(B,5,6))||B2C('10'||SubStr(B,11,6));
+		Select
+			When X2D(CodePoint) < X2D('80') Then Glyph=X2C(CodePoint)
+			When X2D(CodePoint) < X2D('100') Then Glyph=B2C('110000'||SubStr(CodePoint,1,2))||B2C('10'||SubStr(CodePoint,3,6));
+			When X2D(CodePoint) < X2D('800') Then NOP;
+			When X2D(CodePoint) < X2D('10000') Then	Glyph=B2C('1110'||SubStr(B,1,4))||B2C('10'||SubStr(B,5,6))||B2C('10'||SubStr(B,11,6));
+			When X2D(CodePoint) < X2D('200000') Then NOP;
+			Otherwise Glyph=' ';
+		End;
 		Select
 			When dbEntryType='kJapaneseKun' Then Do
 				O='U+'||CodePoint||'=['||Glyph||']='||Translate(Vector,alpha,Upper(alpha))
@@ -23,10 +28,6 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 				O='U+'||CodePoint||'=['||Glyph||']='||Translate(Vector,Upper(alpha),alpha)
 			End;
 			OtherWise O=NULL;
-		End;
-		If O='NULL' Then NOP;
-		Else Do;
-			Echo CodePoint C2X(Glyph) ;
 		End;
 	End;
 End;
