@@ -26,8 +26,7 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 		End;
 		If O='NULL' Then NOP;
 		Else Do;
-			WriteLn(OFH,O);
-			Echo CodePoint;
+			Echo CodePoint C2X(Glyph) ;
 		End;
 	End;
 End;
