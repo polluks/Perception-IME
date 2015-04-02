@@ -11,11 +11,11 @@ main:
 	@ Echo "Unpacking Unihan Datasets"
 	XadUnFile /Resources/Unicode/Unihan.zip /Catalogs/ OW >Nil:
 	@ Echo "Generating [Language=Chinese] Dataset"
-#	$(REXX) Chinese.rexx >Chinese-Pinyin.dataset
+#	$(REXX) Chinese.rexx
 	@ Echo "Generating [Language=Japanese] Dataset"
-	$(REXX) Japanese.rexx >Japanese-Romaji-Readings.dataset
+	$(REXX) Japanese.rexx
 	@ Echo "Generating [Language=Korean] Dataset"
-#	$(REXX) Korean.rexx >Korean-Hangul.dataset
+#	$(REXX) Korean.rexx
 
 clean:
 	@ Echo >dummy.txt " "

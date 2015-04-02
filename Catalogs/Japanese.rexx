@@ -6,7 +6,7 @@ Parse Arg ArgVec
 /**/
 alpha='abcdefghijklmnopqrstuvwxyz'
 /**/
-If Open(OFH,'Japanese-Kanji-Readings.dataset',WRITE) Then NOP;Else Exit(-1);
+If Open(OFH,'Japanese-Kanji.dataset',WRITE) Then NOP;Else Exit(-1);
 /**/
 If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 	L=ReadLn(DBFH);
@@ -27,7 +27,7 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 		If O='NULL' Then NOP;
 		Else Do;
 			WriteLn(OFH,O);
-			Echo O;
+			Echo CodePoint;
 		End;
 	End;
 End;
