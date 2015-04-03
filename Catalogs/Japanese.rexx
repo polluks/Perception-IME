@@ -24,8 +24,8 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 			When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1
 				Echo 'U='||CodePoint||'=['||C2X(Glyph)||']='||Translate(Word(Vector,i),alpha,Upper(alpha))
 			End;
-			When dbEntryType='kJapaneseOn' Then Do
-				Echo 'U='||CodePoint||'=['||C2X(Glyph)||']='||Translate(Vector,Upper(alpha),alpha)
+			When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1
+				Echo 'U='||CodePoint||'=['||C2X(Glyph)||']='||Translate(Word(Vector,i),Upper(alpha),alpha)
 			End;
 			OtherWise NOP;
 		End;
