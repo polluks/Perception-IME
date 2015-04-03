@@ -22,12 +22,12 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 		End;
 		Select
 			When dbEntryType='kJapaneseKun' Then Do
-				O='U+'||CodePoint||'=['||Glyph||']='||Translate(Vector,alpha,Upper(alpha))
+				Echo 'U='||CodePoint||'=['||C2X(Glyph)||']='||Translate(Vector,alpha,Upper(alpha))
 			End;
 			When dbEntryType='kJapaneseOn' Then Do
-				O='U+'||CodePoint||'=['||Glyph||']='||Translate(Vector,Upper(alpha),alpha)
+				Echo 'U='||CodePoint||'=['||C2X(Glyph)||']='||Translate(Vector,Upper(alpha),alpha)
 			End;
-			OtherWise O=NULL;
+			OtherWise NOP;
 		End;
 	End;
 End;

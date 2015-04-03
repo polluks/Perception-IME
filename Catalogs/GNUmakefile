@@ -13,7 +13,7 @@ main:
 	@ Echo "Generating [Language=Chinese] Dataset"
 #	$(REXX) Chinese.rexx
 	@ Echo "Generating [Language=Japanese] Dataset"
-	$(REXX) Japanese.rexx
+	$(REXX) Japanese.rexx >Japanese-Readings.Dataset
 	@ Echo "Generating [Language=Korean] Dataset"
 #	$(REXX) Korean.rexx
 
