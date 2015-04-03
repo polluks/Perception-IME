@@ -15,9 +15,9 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 		Select
 			When X2D(CodePoint) < X2D('80') Then Glyph=X2C(B)
 			When X2D(CodePoint) < X2D('100') Then Glyph=B2C('110000'||SubStr(B,1,2))||B2C('10'||SubStr(B,3,6));
-			When X2D(CodePoint) < X2D('800') Then Glyph=B2C('110'||SubStr(B,1,1)||'10'||SubStr(B,2,1))||'10'||SubStr(B,3,1));
+			When X2D(CodePoint) < X2D('800') Then Glyph=B2C('110'||SubStr(B,1,1)||'10'||SubStr(B,2,1)||'10'||SubStr(B,3,1));
 			When X2D(CodePoint) < X2D('10000') Then	Glyph=B2C('1110'||SubStr(B,1,4)||'10'||SubStr(B,5,6)||'10'||SubStr(B,11,6));
-			When X2D(CodePoint) < X2D('200000') Then Glyph=B2C('11110'||SubStr(B,1,1)||'10'||SubStr(B,2,1))||'10'||SubStr(B,2,1))||'10'||SubStr(B,2,1))||'10'||SubStr(B,2,1))||'10'||SubStr(B,2,1));
+			When X2D(CodePoint) < X2D('200000') Then Glyph=B2C('11110'||SubStr(B,1,1)||'10'||SubStr(B,2,1)||'10'||SubStr(B,2,1)||'10'||SubStr(B,2,1)||'10'||SubStr(B,2,1)||'10'||SubStr(B,2,1));
 			Otherwise Glyph=' ';
 		End;
 		Select
