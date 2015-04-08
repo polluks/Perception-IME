@@ -17,21 +17,29 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 /*			When X2D(CodePoint) < X2D('100') Then Glyph=B2C('110000'||SubStr(B,1,2))||B2C('10'||SubStr(B,3,6));*/
 /*			When X2D(CodePoint) < X2D('800') Then Glyph=B2C('110'||SubStr(B,1,1)||'10'||SubStr(B,2,1)||'10'||SubStr(B,3,1));*/
 			When X2D(CodePoint) < X2D('10000') Then	Glyph=B2C('1110'||SubStr(B,1,4)||'10'||SubStr(B,5,6)||'10'||SubStr(B,11,6));
-/*			When X2D(CodePoint) < X2D('200000') Then Glyph=B2C('11110'||SubStr(B,1,3)||'100'||SubStr(B,4,5)||'10'||SubStr(B,9,6)||'10'||SubStr(B,14,6)||'10'||SubStr(B,20,6)||'10'||SubStr(B,27,6));*/
+			When X2D(CodePoint) < X2D('200000') Then Glyph=B2C('11110'||SubStr(B,1,3)||'100'||SubStr(B,4,5)||'10'||SubStr(B,9,6)||'10'||SubStr(B,14,6)||'10'||SubStr(B,20,6)||'10'||SubStr(B,27,6));
 			Otherwise Glyph=' ';
 		End;
 		Select
 			When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1
-				Echo 'U='||CodePoint||'=['||C2X(Glyph)||']='||Translate(Word(Vector,i),alpha,Upper(alpha))
+				K=KanaConvert(CodePoint,Glyph,Translate(Word(Vector,i),alpha,Upper(alpha)));
+				Echo 'U='||CodePoint||'=['||C2X(Glyph)||']='||Translate(Word(Vector,i),alpha,Upper(alpha))||'=['||C2X(K)||']'
 			End;
 			When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1
-				Echo 'U='||CodePoint||'=['||C2X(Glyph)||']='||Translate(Word(Vector,i),Upper(alpha),alpha)
+				K=KanaConvert(CodePoint,Glyph,Translate(Word(Vector,i),Upper(alpha),alpha));
+				Echo 'U='||CodePoint||'=['||C2X(Glyph)||']='||Translate(Word(Vector,i),Upper(alpha),alpha)||'=['||C2X(K)||']'
 			End;
 			OtherWise NOP;
 		End;
 	End;
 End;
 Return;
+
+KanaConvert: PROCEDURE
+	Options Results
+	Parse Arg CodePoint Glyph Reading
+	RC='NULL'
+	Return RC;
 
 /*
 \\	Primary Activity is to generate the template datasets in the first pass
