@@ -22,12 +22,10 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 		End;
 		Select
 			When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1
-				K=KanaConvert(CodePoint,Glyph,Translate(Word(Vector,i),alpha,Upper(alpha)));
-				Echo 'U='||CodePoint||'=['||C2X(Glyph)||']='||Translate(Word(Vector,i),alpha,Upper(alpha))||'=['||C2X(K)||']'
+				Echo HiraganaConvert(CodePoint,Glyph,Word(Vector,i));
 			End;
 			When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1
-				K=KanaConvert(CodePoint,Glyph,Translate(Word(Vector,i),Upper(alpha),alpha));
-				Echo 'U='||CodePoint||'=['||C2X(Glyph)||']='||Translate(Word(Vector,i),Upper(alpha),alpha)||'=['||C2X(K)||']'
+				Echo KatakanaConvert(CodePoint,Glyph,Word(Vector,i));
 			End;
 			OtherWise NOP;
 		End;
@@ -35,10 +33,16 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 End;
 Return;
 
-KanaConvert: PROCEDURE
+HiraganaConvert: PROCEDURE
 	Options Results
 	Parse Arg CodePoint Glyph Reading
-	RC='NULL'
+	RC='U='||CodePoint||'=['||C2X(Glyph)||']='||Translate(Reading,alpha,Upper(alpha))
+	Return RC;
+
+KatakanaConvert: PROCEDURE
+	Options Results
+	Parse Arg CodePoint Glyph Reading
+	RC='U='||CodePoint||'=['||C2X(Glyph)||']='||Translate(Reading,Upper(alpha),alpha)
 	Return RC;
 
 /*
