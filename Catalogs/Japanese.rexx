@@ -22,10 +22,10 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 		End;
 		Select
 			When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1
-				Echo HiraganaConvert(CodePoint,Glyph,Word(Vector,i));
+				Echo 'U='||CodePoint||'=['||Glyph||']='||HiraganaConvert(Word(Vector,i));
 			End;
 			When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1
-				Echo KatakanaConvert(CodePoint,Glyph,Word(Vector,i));
+				Echo 'U='||CodePoint||'=['||Glyph||']='||KatakanaConvert(Word(Vector,i));
 			End;
 			OtherWise NOP;
 		End;
@@ -35,15 +35,41 @@ Return;
 
 HiraganaConvert: PROCEDURE
 	Options Results
-	Parse Arg CodePoint Glyph Reading
-	RC='U='||CodePoint||'=['||C2X(Glyph)||']='||Translate(Reading,alpha,Upper(alpha))
-	Return RC;
+	Parse Arg Reading
+	chord='';B=1;Do i=1 To Length(Reading) By 1;
+		c=SubStr(Reading,i,1);
+		Select
+			When c='a' Then chord=SubStr(Reading,B,i)
+			When c='i' Then chord=SubStr(Reading,B,i)
+			When c='u' Then chord=SubStr(Reading,B,i)
+			When c='e' Then chord=SubStr(Reading,B,i)
+			When c='o' Then chord=SubStr(Reading,B,i)
+			Otherwise NOP;
+		End
+		If chord='' Then Do; NOP; End;Else Do
+			B=i;Echo chord
+		End
+	End;
+	Return Translate(Reading,alpha,Upper(alpha));
 
 KatakanaConvert: PROCEDURE
 	Options Results
-	Parse Arg CodePoint Glyph Reading
-	RC='U='||CodePoint||'=['||C2X(Glyph)||']='||Translate(Reading,Upper(alpha),alpha)
-	Return RC;
+	Parse Arg Reading
+	chord='';B=1;Do i=1 To Length(Reading) By 1;
+		c=SubStr(Reading,i,1);
+		Select
+			When c='A' Then chord=SubStr(Reading,B,i)
+			When c='I' Then chord=SubStr(Reading,B,i)
+			When c='U' Then chord=SubStr(Reading,B,i)
+			When c='E' Then chord=SubStr(Reading,B,i)
+			When c='o' Then chord=SubStr(Reading,B,i)
+			Otherwise NOP;
+		End
+		If chord='' Then Do; NOP; End;Else Do
+			B=i;Echo chord
+		End
+	End;
+	Return Translate(Reading,Upper(alpha),alpha);
 
 /*
 \\	Primary Activity is to generate the template datasets in the first pass
