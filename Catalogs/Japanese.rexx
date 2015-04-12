@@ -22,10 +22,10 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 		End;
 		Select
 			When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1
-				Echo 'U='||CodePoint||'=['||Glyph||']='||HiraganaConvert(Word(Vector,i));
+				Echo 'U='||CodePoint||'=['||C2X(Glyph)||']='||KanaConvert(Upper(Word(Vector,i)),X2D('3040'));
 			End;
 			When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1
-				Echo 'U='||CodePoint||'=['||Glyph||']='||KatakanaConvert(Word(Vector,i));
+				Echo 'U='||CodePoint||'=['||C2X(Glyph)||']='||KanaConvert(Upper(Word(Vector,i)),X2D('30A0'));
 			End;
 			OtherWise NOP;
 		End;
@@ -33,44 +33,27 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 End;
 Return;
 
-HiraganaConvert: PROCEDURE
+KanaConvert: PROCEDURE
 	Options Results
-	Parse Arg Reading
-	chord='';B=1;Do i=1 To Length(Reading) By 1;
-		c=SubStr(Reading,i,1);
+	Parse Arg Reading Base
+	rc='';Syllable='';Do i=1 To Length(Reading) By 1;
+        c=SubStr(Reading,i,1);Syllable=Syllable||c
 		Select
-			When c='a' Then chord=SubStr(Reading,B,i)
-			When c='i' Then chord=SubStr(Reading,B,i)
-			When c='u' Then chord=SubStr(Reading,B,i)
-			When c='e' Then chord=SubStr(Reading,B,i)
-			When c='o' Then chord=SubStr(Reading,B,i)
+			When c='A' Then Do; rc=rc||KanaCandidate(Syllable,Base); Syllable=''; End;
+			When c='I' Then Do; rc=rc||KanaCandidate(Syllable,Base); Syllable=''; End;
+			When c='U' Then Do; rc=rc||KanaCandidate(Syllable,Base); Syllable=''; End;
+			When c='E' Then Do; rc=rc||KanaCandidate(Syllable,Base); Syllable=''; End;
+			When c='O' Then Do; rc=rc||KanaCandidate(Syllable,Base); Syllable=''; End;
 			Otherwise NOP;
-		End
-		If chord='' Then Do; NOP; End;Else Do
-			B=i;Echo chord
-		End
+		End;
 	End;
-	Return Translate(Reading,alpha,Upper(alpha));
+	Return rc
 
-KatakanaConvert: PROCEDURE
+KanaCandidate: PROCEDURE
 	Options Results
-	Parse Arg Reading
-	chord='';B=1;Do i=1 To Length(Reading) By 1;
-		c=SubStr(Reading,i,1);
-		Select
-			When c='A' Then chord=SubStr(Reading,B,i)
-			When c='I' Then chord=SubStr(Reading,B,i)
-			When c='U' Then chord=SubStr(Reading,B,i)
-			When c='E' Then chord=SubStr(Reading,B,i)
-			When c='o' Then chord=SubStr(Reading,B,i)
-			Otherwise NOP;
-		End
-		If chord='' Then Do; NOP; End;Else Do
-			B=i;Echo chord
-		End
-	End;
-	Return Translate(Reading,Upper(alpha),alpha);
-
+	Parse Arg Romaji Key
+	Echo Romaji
+	Return Romaji;
 /*
 \\	Primary Activity is to generate the template datasets in the first pass
 //		This is a CodePoint listing with Emitted character contained in []s following
