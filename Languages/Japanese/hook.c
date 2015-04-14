@@ -26,7 +26,7 @@ ULONG FindKanaCandidate(ULONG key,struct TagItem *ChordBuffer,struct UtilityIFac
 ULONG FindKanjiCandidate(struct TagItem *ChordBuffer,struct UtilityIFace *IUtility);
 ULONG QueueCodePoint(ULONG key,struct TagItem *qVector,ULONG idx,struct UtilityIFace *IUtility);
 
-/*	The SyllableCandidate Table has TagItems mapping Romaji to Hiragana and the Reverse.
+/*	The SyllableCandidate Table has TagItems mapping Romaji to Hiragana
 */
 STATIC CONST struct TagItem SyllableCandidates[] =
 {
@@ -58,13 +58,13 @@ STATIC CONST struct TagItem SyllableCandidates[] =
 	{0x80006E69,0x0000306B},													/* NI			*/
 	{0x80006E75,0x0000306C},													/* NU			*/
 	{0x80006E65,0x0000306D},													/* NE			*/
-	{0x80006E6F,0x0000306E},													/* NO			*/													/* NO			*/
-	{0x80006861,0x0000306F},
-	{0x80006869,0x00003072},
-	{0x80006675,0x00003075},
-	{0x80006875,0x00003075},
-	{0x80006865,0x00003078},
-	{0x8000686F,0x0000307B},
+	{0x80006E6F,0x0000306E},													/* NO			*/
+	{0x80006861,0x0000306F},{0x80006261,0x00003070},{0x80007061,0x00003071},	/* HA/BA/PA		*/
+	{0x80006869,0x00003072},{0x80006269,0x00003073},{0x80007069,0x00003074},	/* HI/BI/PI		*/
+	{0x80006675,0x00003075},													/* FU			*/
+	{0x80006875,0x00003075},{0x80006275,0x00003076},{0x80007075,0x00003077},	/* HU/BU/PU		*/
+	{0x80006865,0x00003078},{0x80006265,0x00003079},{0x80007065,0x0000307A},	/* HE/BE/PE		*/
+	{0x8000686F,0x0000307B},{0x8000626F,0x0000307C},{0x8000706F,0x0000307D},	/* HO/BO/PO		*/
 
 	{0x806B7961,0x304D3083},{0x80677961,0x304E3083},    						/* KYA/GYA		*/
 	{0x806B7975,0x304D3085},{0x80677975,0x304E3085},    						/* KYU/GYU		*/
@@ -82,9 +82,9 @@ STATIC CONST struct TagItem SyllableCandidates[] =
 	{0x806E7961,0x306B3083},													/* NYA			*/
 	{0x806E7975,0x306B3085},													/* NYU			*/
 	{0x806E796F,0x306B3087},													/* NYO			*/
-	{0x80687961,0x30723083},
-	{0x80687975,0x30723085},
-	{0x8068796F,0x30723087},
+	{0x80687961,0x30723083},{0x80627961,0x30733083},{0x80707961,0x30743083},	/* HYA/BYA/PYA	*/
+	{0x80687975,0x30723085},{0x80627975,0x30733085},{0x80707975,0x30743085},	/* HYU/BYU/PYU	*/
+	{0x8068796F,0x30723087},{0x8062796F,0x30733087},{0x8070796F,0x30743087},	/* HYO/BYO/PYO	*/
 
 	{TAG_END,	TAG_END}
 };
@@ -94,13 +94,6 @@ STATIC CONST struct TagItem SyllableCandidates[] =
 **
 **
 
-	ha hi fu/hu he ho	^^
-	hya hyu hyo			^
-
-	ba bi bu be bo
-	bya byu byo
-	pa pi pu pe po
-	pya pyu pyo
 	ma mi mu me mo
 	mya myu myo
 	ya yu yo
@@ -115,10 +108,6 @@ STATIC CONST struct TagItem ChordCandidates[] =		/* From Romaji To Hiragana,
 	 Hiragana=TransformHiraganaKatakana(Katakana);
  */
 {
-	{0x80006261,0x00003070},{0x80006269,0x00003073},{0x80006275,0x00003076},{0x80006265,0x00003079},{0x8000626F,0x0000307C},
-	{0x80627961,0x30733083},{0x80627975,0x30733085},{0x8062796F,0x30733087},
-	{0x80007061,0x00003071},{0x80007069,0x00003074},{0x80007075,0x00003077},{0x80007065,0x0000307A},{0x8000706F,0x0000307D},
-	{0x80707961,0x30743083},{0x80707975,0x30743085},{0x8070796F,0x30743087},
 	{0x80006D61,0x0000307E},{0x80006D69,0x0000307F},{0x80006D75,0x00003080},{0x80006D65,0x00003081},{0x80006D6F,0x00003082},
 	{0x806D7961,0x307F3083},{0x806D7975,0x307F3085},{0x806D796F,0x307F3087},
 	{0x80007961,0x00003084},{0x80007975,0x00003086},{0x8000796F,0x00003088},
