@@ -17,8 +17,16 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 /*			When X2D(CodePoint) < X2D('100') Then Glyph=B2C('110000'||SubStr(B,1,2))||B2C('10'||SubStr(B,3,6));*/
 /*			When X2D(CodePoint) < X2D('800') Then Glyph=B2C('110'||SubStr(B,1,1)||'10'||SubStr(B,2,1)||'10'||SubStr(B,3,1));*/
 			When X2D(CodePoint) < X2D('10000') Then	Glyph=B2C('1110'||SubStr(B,1,4)||'10'||SubStr(B,5,6)||'10'||SubStr(B,11,6));
-/*			When X2D(CodePoint) < X2D('200000') Then Glyph=B2C()*/
-			Otherwise Glyph=C2B(X2C(CodePoint));
+			When X2D(CodePoint) < X2D('200000') Then Glyph=B2C('11110'||SubStr(4,3)||'10'||SubStr(B,7,6)||'10'||SubStr(B,13,6)||'10'||SubStr(B,19,6));
+/*			When X2D(CodePoint) < X2D('1000000') Then Glyph=B2C(
+'111110'||SubStr(B,,2)||
+'10'||SubStr(B,,6)||
+'10'||SubStr(B,,6)||
+'10'||SubStr(B,,6)||
+'10'||SubStr(B,,6)||
+'10'||SubStr(B,,6));
+*/
+			Otherwise Glyph='#UTF8 Encode Range Error#';
 		End;
 		Select
 			When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1
@@ -36,27 +44,25 @@ Return;
 KanaConvert: PROCEDURE
 	Options Results
 	Parse Arg Reading Type ArgV
-	rc='';Syllable='';Do i=1 To Length(Reading) By 1;
+	rc='';Syllable='';
+	Do i=1 To Length(Reading) By 1;
         c=SubStr(Reading,i,1);
-		If Syllable=c Then Do;
-			rc=rc||KanaCandidate('tsu'||' '||Type);
-		End;Else
-			Syllable=Syllable||c;
-		End;
+		If Syllable=c Then rc=rc||KanaCandidate('tsu'||' '||Type);Else Syllable=Syllable||c;
 		Select
 			When c='A' Then Do; rc=rc||KanaCandidate(Syllable||' '||Type); Syllable=''; End;
 			When c='I' Then Do; rc=rc||KanaCandidate(Syllable||' '||Type); Syllable=''; End;
 			When c='U' Then Do; rc=rc||KanaCandidate(Syllable||' '||Type); Syllable=''; End;
 			When c='E' Then Do; rc=rc||KanaCandidate(Syllable||' '||Type); Syllable=''; End;
 			When c='O' Then Do; rc=rc||KanaCandidate(Syllable||' '||Type); Syllable=''; End;
-			When c='N' Then Select;
-				When 'A'=SubStr(Reading,i+1,1) Then NOP;
-				When 'I'=SubStr(Reading,i+1,1) Then NOP;
-				When 'U'=SubStr(Reading,i+1,1) Then NOP;
-				When 'E'=SubStr(Reading,i+1,1) Then NOP;
-				When 'O'=SubStr(Reading,i+1,1) Then NOP;
-				When 'Y'=SubStr(Reading,i+1,1) Then NOP;
-                Otherwise Do; rc=rc||KanaCandidate(Syllable||' '||Type); Syllable=''; End;
+			When c='N' Then Do;
+				If 'A'=SubStr(Reading,i+1,1) Then Leave;
+				If 'I'=SubStr(Reading,i+1,1) Then Leave;
+				If 'U'=SubStr(Reading,i+1,1) Then Leave;
+				If 'E'=SubStr(Reading,i+1,1) Then Leave;
+				If 'O'=SubStr(Reading,i+1,1) Then Leave;
+				If 'Y'=SubStr(Reading,i+1,1) Then Leave;
+                rc=rc||KanaCandidate(Syllable||' '||Type);
+				Syllable='';
 			End;
 			Otherwise NOP;
 		End;
@@ -66,9 +72,10 @@ KanaConvert: PROCEDURE
 KanaCandidate: PROCEDURE	/* Encoded UTF8 Hiragana Sequences are output as rc */
 	Options Results
 	Parse Arg Romaji Key
-
+/*
 	If Key='Hiragana' Then Transform=0;
 	If Key='Katakana' Then Transform=1;
+*/
 	Select
 		When Romaji='A'		Then rc=X2C('E38182');
 		When Romaji='I'		Then rc=X2C('E38184');
@@ -147,7 +154,6 @@ KanaCandidate: PROCEDURE	/* Encoded UTF8 Hiragana Sequences are output as rc */
 		When Romaji='WO'	Then rc=X2C('E38292');
 		When Romaji='N'		Then rc=X2C('E38292');
 		When Romaji='VU'	Then rc=X2C('E38293');
-
 		When Romaji='KYA'	Then rc=X2C('E3818DE38283');
 		When Romaji='GYA'	Then rc=X2C('E3818EE38283');
 		When Romaji='KYU'	Then rc=X2C('E3818DE38285');
@@ -182,10 +188,9 @@ KanaCandidate: PROCEDURE	/* Encoded UTF8 Hiragana Sequences are output as rc */
 		When Romaji='RYA'	Then rc=X2C('E3828AE38283');
 		When Romaji='RYU'	Then rc=X2C('E3828AE38285');
 		When Romaji='RYO'	Then rc=X2C('E3828AE38287');
-
 		Otherwise rc=' @@ ';
 	End;
-	If Transform Then NOP;
+
 	Return rc;
 /*
 \\	Primary Activity is to generate the template datasets in the first pass
