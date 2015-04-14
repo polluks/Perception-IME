@@ -22,10 +22,10 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 		End;
 		Select
 			When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1
-				Echo 'U='||CodePoint||'['||C2X(Glyph)||']='||Word(Vector,i)||'['||KanaConvert(Upper(Word(Vector,i))||' Hiragana')||']';
+				Echo 'U='||CodePoint||'['||Glyph||']='||Word(Vector,i)||'['||KanaConvert(Upper(Word(Vector,i))||' Hiragana')||']';
 			End;
 			When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1
-				Echo 'U='||CodePoint||'['||C2X(Glyph)||']='||Word(Vector,i)||'['||KanaConvert(Upper(Word(Vector,i))||' Katakana')||']';
+				Echo 'U='||CodePoint||'['||Glyph||']='||Word(Vector,i)||'['||KanaConvert(Upper(Word(Vector,i))||' Katakana')||']';
 			End;
 			OtherWise NOP;
 		End;
@@ -143,6 +143,42 @@ KanaCandidate: PROCEDURE	/* Encoded UTF8 Hiragana Sequences are output as rc */
 		When Romaji='WO'	Then rc=X2C('E38292');
 		When Romaji='N'		Then rc=X2C('E38292');
 		When Romaji='VU'	Then rc=X2C('E38293');
+
+		When Romaji='KYA' Then rc=X2C('KYA');
+		When Romaji='GYA' Then rc=X2C(''GYA);
+		When Romaji='KYU' Then rc=X2C('KYU');
+		When Romaji='GYU' Then rc=X2C('GYU');
+		When Romaji='KYO' Then rc=X2C('KYO');
+		When Romaji='GYO' Then rc=X2C('GYO');
+		When Romaji='SHA' Then rc=X2C('SHA');
+		When Romaji='JA' Then rc=X2C(''JA);
+		When Romaji='SHU' Then rc=X2C('SHU');
+		When Romaji='JU' Then rc=X2C('JU');
+		When Romaji='JE' Then rc=X2C('JE');
+		When Romaji='SHO' Then rc=X2C('SHO');
+		When Romaji='JO' Then rc=X2C('JO');
+		When Romaji='CHA' Then rc=X2C('');
+		When Romaji='CHU' Then rc=X2C('');
+		When Romaji='CHO' Then rc=X2C('');
+		When Romaji='NYA' Then rc=X2C('');
+		When Romaji='NYU' Then rc=X2C('');
+		When Romaji='NYO' Then rc=X2C('');
+		When Romaji='HYA' Then rc=X2C('');
+		When Romaji='BYA' Then rc=X2C('');
+		When Romaji='PYA' Then rc=X2C('');
+		When Romaji='HYU' Then rc=X2C('');
+		When Romaji='BYU' Then rc=X2C('');
+		When Romaji='PYU' Then rc=X2C('');
+		When Romaji='HYO' Then rc=X2C('');
+		When Romaji='BYO' Then rc=X2C('');
+		When Romaji='PYO' Then rc=X2C('');
+		When Romaji='MYA' Then rc=X2C('');
+		When Romaji='MYU' Then rc=X2C('');
+		When Romaji='MYO' Then rc=X2C('');
+		When Romaji='RYA' Then rc=X2C('');
+		When Romaji='RYU' Then rc=X2C('');
+		When Romaji='RYO' Then rc=X2C('');
+
 		Otherwise rc=' @@ ';
 	End;
 	If Transform Then NOP;
