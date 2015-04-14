@@ -88,11 +88,9 @@ STATIC CONST struct TagItem SyllableCandidates[] =
 	{0x80007669,0x000030F8},													/* VI			*/
 	{0x80007665,0x000030F9},													/* VE			*/
 	{0x8000766F,0x000030FA},													/* RO			*/
-	{TAG_END,	TAG_END}
-};
-
-STATIC CONST struct TagItem SyllableChordCandidates[] =
-{
+/*
+		Syllable Chords follow
+*/
 	{0x806B7961,0x304D3083},{0x80677961,0x304E3083},    						/* KYA/GYA		*/
 	{0x806B7975,0x304D3085},{0x80677975,0x304E3085},    						/* KYU/GYU		*/
 	{0x806B796F,0x304D3087},{0x8067796F,0x304E3087},    						/* KYO/GYO		*/
