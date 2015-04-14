@@ -194,7 +194,7 @@ ULONG FindKanaCandidate(ULONG key, struct TagItem *ChordBuffer,struct UtilityIFa
 			if(prefix)
 				chord=(chord & 0x800000FF);
 		};
-		Buffer=IUtility->FindTagItem(chord,ChordCandidates);
+		Buffer=IUtility->FindTagItem(chord,SyllableCandidates);
 		if(Buffer)
 		{
 			chord=0L;
@@ -268,7 +268,7 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 			LMode=IUtility->FindTagItem(LCSTATE_LMODE,Vector);
 			emit=IUtility->FindTagItem(LCSTATE_EMIT,Vector);
 			ideograph=IUtility->FindTagItem(LCSTATE_IDEOGRAPH_IDX,Vector);
-			chBuffer=IUtility->FindTagItem(LCSTATE_CHORDBUFF,Vector);
+			chBuffer=IUtility->FindTagItem(LCSTATE_SYLLABLE,Vector);
 			icBuffer=IUtility->FindTagItem(LCSTATE_IDEOGRAPH_BUFF,Vector);
 		};
 	};
@@ -279,7 +279,7 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
             if((Message[1] & 0xFF000000) == Message[1])
 				switch(Message[1] >> 24)
 				{
-//	Unofficial Mappings used with a Developer only Keymap.Library.Kmod (Limited to P-IME dev usage)
+//	Unofficial Mappings used with Developer Restricted Keymap.Library.Kmod
 					case	0x00:	//	Change the Constant here for this Key when officially mapped
 						KDEBUG("Perception-IME//Japanese.Language::Hankaku~Zenkaku\n");
 						break;
