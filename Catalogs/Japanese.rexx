@@ -14,26 +14,22 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 		B=C2B(X2C(CodePoint))
 		Select
 			When X2D(CodePoint) < X2D('80') Then Glyph=X2C(B)
-/*			When X2D(CodePoint) < X2D('100') Then Glyph=B2C('110000'||SubStr(B,1,2))||B2C('10'||SubStr(B,3,6));*/
-/*			When X2D(CodePoint) < X2D('800') Then Glyph=B2C('110'||SubStr(B,1,1)||'10'||SubStr(B,2,1)||'10'||SubStr(B,3,1));*/
+			When X2D(CodePoint) < X2D('100') Then Glyph=B2C('110000'||SubStr(B,1,2))||B2C('10'||SubStr(B,3,6));
+			When X2D(CodePoint) < X2D('800') Then Glyph=B2C('110'||SubStr(B,1,1)||'10'||SubStr(B,2,1)||'10'||SubStr(B,3,1));
 			When X2D(CodePoint) < X2D('10000') Then	Glyph=B2C('1110'||SubStr(B,1,4)||'10'||SubStr(B,5,6)||'10'||SubStr(B,11,6));
-			When X2D(CodePoint) < X2D('200000') Then Glyph=B2C('11110'||SubStr(4,3)||'10'||SubStr(B,7,6)||'10'||SubStr(B,13,6)||'10'||SubStr(B,19,6));
-/*			When X2D(CodePoint) < X2D('1000000') Then Glyph=B2C(
-'111110'||SubStr(B,,2)||
-'10'||SubStr(B,,6)||
-'10'||SubStr(B,,6)||
-'10'||SubStr(B,,6)||
-'10'||SubStr(B,,6)||
-'10'||SubStr(B,,6));
+/*			When X2D(CodePoint) < X2D('200000') Then Glyph=B2C('11110'||SubStr(4,3)||'10'||SubStr(B,7,6)||'10'||SubStr(B,13,6)||'10'||SubStr(B,19,6));
+			When X2D(CodePoint) < X2D('1000000') Then Glyph=C2B(
+'111110'||SubStr(B,,2)||'10'||SubStr(B,,6)||'10'||SubStr(B,,6)||
+'10'||SubStr(B,,6)||'10'||SubStr(B,,6)||'10'||SubStr(B,,6));
 */
-			Otherwise Glyph='#UTF8 Encode Range Error#';
+			Otherwise Glyph='#'||C2B(X2C(CodePoint))||'#';
 		End;
 		Select
 			When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1
-				Echo 'U='||CodePoint||'['||Glyph||']='||Word(Vector,i)||'['||KanaConvert(Upper(Word(Vector,i))||' Hiragana')||']';
+				Echo 'U='||CodePoint||'['||Glyph||']='||Translate(Word(Vector,i),alpha,Upper(alpha))||'['||KanaConvert(Upper(Word(Vector,i))||' Hiragana')||']';
 			End;
 			When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1
-				Echo 'U='||CodePoint||'['||Glyph||']='||Word(Vector,i)||'['||KanaConvert(Upper(Word(Vector,i))||' Katakana')||']';
+				Echo 'U='||CodePoint||'['||Glyph||']='||Translate(Word(Vector,i),alpha,Upper(alpha))||'['||KanaConvert(Upper(Word(Vector,i))||' Katakana')||']';
 			End;
 			OtherWise NOP;
 		End;
@@ -46,7 +42,7 @@ KanaConvert: PROCEDURE
 	Parse Arg Reading Type ArgV
 	rc='';Syllable='';
 	Do i=1 To Length(Reading) By 1;
-        c=SubStr(Reading,i,1);
+        c=SubStr(Reading,i,1);cx=SubStr(Reading,i+1,1);
 		If Syllable=c Then rc=rc||KanaCandidate('tsu'||' '||Type);Else Syllable=Syllable||c;
 		Select
 			When c='A' Then Do; rc=rc||KanaCandidate(Syllable||' '||Type); Syllable=''; End;
@@ -54,15 +50,13 @@ KanaConvert: PROCEDURE
 			When c='U' Then Do; rc=rc||KanaCandidate(Syllable||' '||Type); Syllable=''; End;
 			When c='E' Then Do; rc=rc||KanaCandidate(Syllable||' '||Type); Syllable=''; End;
 			When c='O' Then Do; rc=rc||KanaCandidate(Syllable||' '||Type); Syllable=''; End;
-			When c='N' Then Do;
-				If 'A'=SubStr(Reading,i+1,1) Then Leave;
-				If 'I'=SubStr(Reading,i+1,1) Then Leave;
-				If 'U'=SubStr(Reading,i+1,1) Then Leave;
-				If 'E'=SubStr(Reading,i+1,1) Then Leave;
-				If 'O'=SubStr(Reading,i+1,1) Then Leave;
-				If 'Y'=SubStr(Reading,i+1,1) Then Leave;
-                rc=rc||KanaCandidate(Syllable||' '||Type);
-				Syllable='';
+			When c='N' Then Select;
+				When cx='A' Then NOP;
+				When cx='I' Then NOP;
+				When cx='U' Then NOP;
+				When cx='E' Then NOP;
+				When cx='O' Then NOP;
+				Otherwise rc=rc||KanaCandidate(Syllable||' '||Type); Syllable='';
 			End;
 			Otherwise NOP;
 		End;
@@ -152,8 +146,8 @@ KanaCandidate: PROCEDURE	/* Encoded UTF8 Hiragana Sequences are output as rc */
 		When Romaji='WI'	Then rc=X2C('E38290');
 		When Romaji='WE'	Then rc=X2C('E38291');
 		When Romaji='WO'	Then rc=X2C('E38292');
-		When Romaji='N'		Then rc=X2C('E38292');
-		When Romaji='VU'	Then rc=X2C('E38293');
+		When Romaji='N'		Then rc=X2C('E38293');
+		When Romaji='VU'	Then rc=X2C('E38294');
 		When Romaji='KYA'	Then rc=X2C('E3818DE38283');
 		When Romaji='GYA'	Then rc=X2C('E3818EE38283');
 		When Romaji='KYU'	Then rc=X2C('E3818DE38285');
