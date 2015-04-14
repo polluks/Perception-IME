@@ -17,15 +17,15 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 /*			When X2D(CodePoint) < X2D('100') Then Glyph=B2C('110000'||SubStr(B,1,2))||B2C('10'||SubStr(B,3,6));*/
 /*			When X2D(CodePoint) < X2D('800') Then Glyph=B2C('110'||SubStr(B,1,1)||'10'||SubStr(B,2,1)||'10'||SubStr(B,3,1));*/
 			When X2D(CodePoint) < X2D('10000') Then	Glyph=B2C('1110'||SubStr(B,1,4)||'10'||SubStr(B,5,6)||'10'||SubStr(B,11,6));
-			When X2D(CodePoint) < X2D('200000') Then Glyph=C2B(X2C(CodePoint));
-			Otherwise Glyph=' ';
+/*			When X2D(CodePoint) < X2D('200000') Then Glyph=B2C()*/
+			Otherwise Glyph=C2B(X2C(CodePoint));
 		End;
 		Select
 			When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1
-				Echo 'U='||CodePoint||'['||C2X(Glyph)||']='||Word(Vector,i)||'['||C2X(KanaConvert(Upper(Word(Vector,i))||' Hiragana'))||']';
+				Echo 'U='||CodePoint||'['||C2X(Glyph)||']='||Word(Vector,i)||'['||KanaConvert(Upper(Word(Vector,i))||' Hiragana')||']';
 			End;
 			When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1
-				Echo 'U='||CodePoint||'['||C2X(Glyph)||']='||Word(Vector,i)||'['||C2X(KanaConvert(Upper(Word(Vector,i))||' Katakana'))||']';
+				Echo 'U='||CodePoint||'['||C2X(Glyph)||']='||Word(Vector,i)||'['||KanaConvert(Upper(Word(Vector,i))||' Katakana')||']';
 			End;
 			OtherWise NOP;
 		End;

@@ -65,7 +65,34 @@ STATIC CONST struct TagItem SyllableCandidates[] =
 	{0x80006875,0x00003075},{0x80006275,0x00003076},{0x80007075,0x00003077},	/* HU/BU/PU		*/
 	{0x80006865,0x00003078},{0x80006265,0x00003079},{0x80007065,0x0000307A},	/* HE/BE/PE		*/
 	{0x8000686F,0x0000307B},{0x8000626F,0x0000307C},{0x8000706F,0x0000307D},	/* HO/BO/PO		*/
+	{0x80006D61,0x0000307E},													/* MA			*/
+	{0x80006D69,0x0000307F},													/* MI			*/
+	{0x80006D75,0x00003080},													/* MU			*/
+	{0x80006D65,0x00003081},													/* ME			*/
+	{0x80006D6F,0x00003082},													/* MO			*/
+	{0x80007961,0x00003084},													/* YA			*/
+	{0x80007975,0x00003086},													/* YU			*/
+	{0x8000796F,0x00003088},													/* YO			*/
+	{0x80007261,0x00003089},													/* RA			*/
+	{0x80007269,0x0000308A},													/* RI			*/
+	{0x80007275,0x0000308B},													/* RU			*/
+	{0x80007265,0x0000308C},													/* RE			*/
+	{0x8000726F,0x0000308D},													/* RO			*/
+	{0x80007761,0x0000308F},													/* WA			*/
+	{0x80007769,0x00003090},													/* WI			*/
+	{0x80007765,0x00003091},													/* WE			*/
+	{0x8000776F,0x00003092},													/* WO			*/
+	{0x80006E6E,0x00003093},													/* N			*/
+	{0x80007675,0x00003094},													/* VU			*/
+	{0x80007661,0x000030F7},													/* VA			*/
+	{0x80007669,0x000030F8},													/* VI			*/
+	{0x80007665,0x000030F9},													/* VE			*/
+	{0x8000766F,0x000030FA},													/* RO			*/
+	{TAG_END,	TAG_END}
+};
 
+STATIC CONST struct TagItem SyllableChordCandidates[] =
+{
 	{0x806B7961,0x304D3083},{0x80677961,0x304E3083},    						/* KYA/GYA		*/
 	{0x806B7975,0x304D3085},{0x80677975,0x304E3085},    						/* KYU/GYU		*/
 	{0x806B796F,0x304D3087},{0x8067796F,0x304E3087},    						/* KYO/GYO		*/
@@ -85,58 +112,32 @@ STATIC CONST struct TagItem SyllableCandidates[] =
 	{0x80687961,0x30723083},{0x80627961,0x30733083},{0x80707961,0x30743083},	/* HYA/BYA/PYA	*/
 	{0x80687975,0x30723085},{0x80627975,0x30733085},{0x80707975,0x30743085},	/* HYU/BYU/PYU	*/
 	{0x8068796F,0x30723087},{0x8062796F,0x30733087},{0x8070796F,0x30743087},	/* HYO/BYO/PYO	*/
-
+	{0x806D7961,0x307F3083},													/* MYA			*/
+	{0x806D7975,0x307F3085},													/* MYU			*/
+	{0x806D796F,0x307F3087},													/* MYO			*/
+	{0x80727961,0x308A3083},													/* RYA			*/
+	{0x80727975,0x308A3085},													/* RYU			*/
+	{0x8072796F,0x308A3087},													/* RYO			*/
 	{TAG_END,	TAG_END}
 };
 
-/*
-**	The ChordCandidates Table has TagItems in the same order as the following Kana Table
-**
-**
-
-	ma mi mu me mo
-	mya myu myo
-	ya yu yo
-	ra ri ru re ro
-	rya ryu ryo
-	wa wi we wo
-	nn
-	vu va vi ve vo
-*/
-STATIC CONST struct TagItem ChordCandidates[] =		/* From Romaji To Hiragana,
-	 Katakana=TransformHiraganaKatakana(Hiragana);
-	 Hiragana=TransformHiraganaKatakana(Katakana);
- */
+STATIC CONST struct TagItem SyllableMiniCandidates[] =
 {
-	{0x80006D61,0x0000307E},{0x80006D69,0x0000307F},{0x80006D75,0x00003080},{0x80006D65,0x00003081},{0x80006D6F,0x00003082},
-	{0x806D7961,0x307F3083},{0x806D7975,0x307F3085},{0x806D796F,0x307F3087},
-	{0x80007961,0x00003084},{0x80007975,0x00003086},{0x8000796F,0x00003088},
-	{0x80007261,0x00003089},{0x80007269,0x0000308A},{0x80007275,0x0000308B},{0x80007265,0x0000308C},{0x8000726F,0x0000308D},
-	{0x80727961,0x308A3083},{0x80727975,0x308A3085},{0x8072796F,0x308A3087},
-	{0x80007761,0x0000308F},{0x80007769,0x00003090},{0x80007765,0x00003091},{0x8000776F,0x00003092},
-	{0x80006E6E,0x00003093},
-	{0x80007675,0x00003094},{0x80007661,0x000030F7},{0x80007669,0x000030F8},{0x80007665,0x000030F9},{0x8000766F,0x000030FA},
-	{TAG_END,	TAG_END}
-};
-
-/* These are the "double-mora" timing markers for various sound combinations *
-STATIC CONST struct TagItem ChordExtensions[] =
-{
-	* mini a i u e o *
+	/* mini a i u e o */
 	{0x80000041,0x00003041},
 	{0x80000049,0x00003043},
 	{0x80000055,0x00003045},
 	{0x80000045,0x00003047},
 	{0x8000004F,0x00003049},
-	* mini tsu *
+	/* mini tsu */
 	{0x80545355,0x00003063},
-	* mini ya yu yo *
+	/* mini ya yu yo */
 	{0x80005941,0x00003083},
 	{0x80007955,0x00003085},
 	{0x8000594F,0x00003087},
-	* mini wa *
+	/* mini wa */
 	{0x80005741,0x0000308E},
-	* mini ka ke *
+	/* mini ka ke */
 	{0x8000B441,0x00003095},
 	{0x8000B445,0x00003096},
 	{TAG_END,	TAG_END}
@@ -240,6 +241,9 @@ ULONG QueueCodePoint(ULONG key,struct TagItem *qVector,ULONG idx,struct UtilityI
 	CodePoints are given using a full 32bit value as EmitBuffer ti_Data points for UTF8 conversion.
 
 	the return value is the number of Emitted CodePoints
+
+	DEBUG: RE-FACTORING IN PROGRESS... THIS FUNCTION IS ACTIVELY BROKEN...
+
 */
 ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageContext,APTR m)
 {
