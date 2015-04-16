@@ -30,120 +30,125 @@ ULONG QueueCodePoint(ULONG key,struct TagItem *qVector,ULONG idx,struct UtilityI
 */
 STATIC CONST struct TagItem SyllableCandidates[] =
 {
-	{0X80000000,0x00000000},{0X8000003D,0x000030A0},		    				/* NULL, EQUALS */
-	{0x80000061,0x00003042},                            						/* A			*/
-	{0x80000069,0x00003044},                            						/* I			*/
-	{0x80000075,0x00003046},                            						/* U			*/
-	{0x80000065,0x00003048},                            						/* E	 		*/
-	{0x8000006F,0x0000304A},                            						/* O			*/
-	{0x80006B61,0x0000304B},{0x80006761,0x0000304C},    						/* KA/GA		*/
-	{0x80006B69,0x0000304D},{0x80006769,0x0000304E},    						/* KI/GI		*/
-	{0x80006B75,0x0000304F},{0x80006775,0x00003050},    						/* KU/GU		*/
-	{0x80006B65,0x00003051},{0x80006765,0x00003052},    						/* KE/GE		*/
-	{0x80006B6F,0x00003053},{0x8000676F,0x00003054},    						/* KO/GO		*/
-    {0x80007361,0x00003055},{0x80007A61,0x00003056},							/* SA/ZA		*/
-	{0x80736869,0x00003057},{0x80006A69,0x00003058},							/* SHI/JI		*/
-	{0x80007369,0x00003057},{0x80007A69,0x00003058},							/* SI/ZI		*/
-	{0x80007375,0x00003059},{0x80007A75,0x0000305A},							/* SU/ZU		*/
-	{0x80007365,0x0000305B},{0x80007A65,0x0000305C},            				/* SE/ZE		*/
-	{0x8000736F,0x0000305D},{0x80007A6F,0x0000305E},							/* SO/ZO		*/
-	{0x80007461,0x0000305F},{0x80006461,0x00003060},							/* TA/DA		*/
-	{0x80636869,0x00003061},{0x80006469,0x00003062},							/* CHI/DI		*/
-	{0x80006369,0x00003061},{0x80007469,0x00003061},							/* CI/TI		*/
-	{0x80747375,0x00003064},{0x80647A75,0x00003065},							/* TSU/DZU		*/
-	{0x80007475,0x00003064},{0x80006475,0x00003065},							/* TU/DU		*/
-	{0x80007465,0x00003066},{0x80006465,0x00003067},							/* TE/DE		*/
-	{0x8000746F,0x00003068},{0x8000646F,0x00003069},							/* TO/DO		*/
-	{0x80006E61,0x0000306A},													/* NA			*/
-	{0x80006E69,0x0000306B},													/* NI			*/
-	{0x80006E75,0x0000306C},													/* NU			*/
-	{0x80006E65,0x0000306D},													/* NE			*/
-	{0x80006E6F,0x0000306E},													/* NO			*/
-	{0x80006861,0x0000306F},{0x80006261,0x00003070},{0x80007061,0x00003071},	/* HA/BA/PA		*/
-	{0x80006869,0x00003072},{0x80006269,0x00003073},{0x80007069,0x00003074},	/* HI/BI/PI		*/
-	{0x80006675,0x00003075},													/* FU			*/
-	{0x80006875,0x00003075},{0x80006275,0x00003076},{0x80007075,0x00003077},	/* HU/BU/PU		*/
-	{0x80006865,0x00003078},{0x80006265,0x00003079},{0x80007065,0x0000307A},	/* HE/BE/PE		*/
-	{0x8000686F,0x0000307B},{0x8000626F,0x0000307C},{0x8000706F,0x0000307D},	/* HO/BO/PO		*/
-	{0x80006D61,0x0000307E},													/* MA			*/
-	{0x80006D69,0x0000307F},													/* MI			*/
-	{0x80006D75,0x00003080},													/* MU			*/
-	{0x80006D65,0x00003081},													/* ME			*/
-	{0x80006D6F,0x00003082},													/* MO			*/
-	{0x80007961,0x00003084},													/* YA			*/
-	{0x80007975,0x00003086},													/* YU			*/
-	{0x8000796F,0x00003088},													/* YO			*/
-	{0x80007261,0x00003089},													/* RA			*/
-	{0x80007269,0x0000308A},													/* RI			*/
-	{0x80007275,0x0000308B},													/* RU			*/
-	{0x80007265,0x0000308C},													/* RE			*/
-	{0x8000726F,0x0000308D},													/* RO			*/
-	{0x80007761,0x0000308F},													/* WA			*/
-	{0x80007769,0x00003090},													/* WI			*/
-	{0x80007765,0x00003091},													/* WE			*/
-	{0x8000776F,0x00003092},													/* WO			*/
-	{0x80006E6E,0x00003093},													/* N			*/
-	{0x80007675,0x00003094},													/* VU			*/
-	{0x80007661,0x000030F7},													/* VA			*/
-	{0x80007669,0x000030F8},													/* VI			*/
-	{0x80007665,0x000030F9},													/* VE			*/
-	{0x8000766F,0x000030FA},													/* RO			*/
+	{0X00000000,0x00000000},{0X0000003D,0x000030A0},		    				/* NULL, EQUALS */
+	{0X00000061,0x00003042},                            						/* A			*/
+	{0X00000069,0x00003044},                            						/* I			*/
+	{0X00000075,0x00003046},                            						/* U			*/
+	{0X00000065,0x00003048},                            						/* E	 		*/
+	{0X0000006F,0x0000304A},                            						/* O			*/
+	{0X00006B61,0x0000304B},{0X00006761,0x0000304C},    						/* KA/GA		*/
+	{0X00006B69,0x0000304D},{0X00006769,0x0000304E},    						/* KI/GI		*/
+	{0X00006B75,0x0000304F},{0X00006775,0x00003050},    						/* KU/GU		*/
+	{0X00006B65,0x00003051},{0X00006765,0x00003052},    						/* KE/GE		*/
+	{0X00006B6F,0x00003053},{0X0000676F,0x00003054},    						/* KO/GO		*/
+    {0X00007361,0x00003055},{0X00007A61,0x00003056},							/* SA/ZA		*/
+	{0X00736869,0x00003057},{0X00006A69,0x00003058},							/* SHI/JI		*/
+	{0X00007369,0x00003057},{0X00007A69,0x00003058},							/* SI/ZI		*/
+	{0X00007375,0x00003059},{0X00007A75,0x0000305A},							/* SU/ZU		*/
+	{0X00007365,0x0000305B},{0X00007A65,0x0000305C},            				/* SE/ZE		*/
+	{0X0000736F,0x0000305D},{0X00007A6F,0x0000305E},							/* SO/ZO		*/
+	{0X00007461,0x0000305F},{0X00006461,0x00003060},							/* TA/DA		*/
+	{0X00636869,0x00003061},{0X00006469,0x00003062},							/* CHI/DI		*/
+	{0X00006369,0x00003061},{0X00007469,0x00003061},							/* CI/TI		*/
+	{0X00747375,0x00003064},{0X00647A75,0x00003065},							/* TSU/DZU		*/
+	{0X00007475,0x00003064},{0X00006475,0x00003065},							/* TU/DU		*/
+	{0X00007465,0x00003066},{0X00006465,0x00003067},							/* TE/DE		*/
+	{0X0000746F,0x00003068},{0X0000646F,0x00003069},							/* TO/DO		*/
+	{0X00006E61,0x0000306A},													/* NA			*/
+	{0X00006E69,0x0000306B},													/* NI			*/
+	{0X00006E75,0x0000306C},													/* NU			*/
+	{0X00006E65,0x0000306D},													/* NE			*/
+	{0X00006E6F,0x0000306E},													/* NO			*/
+	{0X00006861,0x0000306F},{0X00006261,0x00003070},{0X00007061,0x00003071},	/* HA/BA/PA		*/
+	{0X00006869,0x00003072},{0X00006269,0x00003073},{0X00007069,0x00003074},	/* HI/BI/PI		*/
+	{0X00006675,0x00003075},													/* FU			*/
+	{0X00006875,0x00003075},{0X00006275,0x00003076},{0X00007075,0x00003077},	/* HU/BU/PU		*/
+	{0X00006865,0x00003078},{0X00006265,0x00003079},{0X00007065,0x0000307A},	/* HE/BE/PE		*/
+	{0X0000686F,0x0000307B},{0X0000626F,0x0000307C},{0X0000706F,0x0000307D},	/* HO/BO/PO		*/
+	{0X00006D61,0x0000307E},													/* MA			*/
+	{0X00006D69,0x0000307F},													/* MI			*/
+	{0X00006D75,0x00003080},													/* MU			*/
+	{0X00006D65,0x00003081},													/* ME			*/
+	{0X00006D6F,0x00003082},													/* MO			*/
+	{0X00007961,0x00003084},													/* YA			*/
+	{0X00007975,0x00003086},													/* YU			*/
+	{0X0000796F,0x00003088},													/* YO			*/
+	{0X00007261,0x00003089},													/* RA			*/
+	{0X00007269,0x0000308A},													/* RI			*/
+	{0X00007275,0x0000308B},													/* RU			*/
+	{0X00007265,0x0000308C},													/* RE			*/
+	{0X0000726F,0x0000308D},													/* RO			*/
+	{0X00007761,0x0000308F},													/* WA			*/
+	{0X00007769,0x00003090},													/* WI			*/
+	{0X00007765,0x00003091},													/* WE			*/
+	{0X0000776F,0x00003092},													/* WO			*/
+	{0X00006E6E,0x00003093},													/* N			*/
+	{0X00007675,0x00003094},													/* VU			*/
+	{0X00007661,0x000030F7},													/* VA			*/
+	{0X00007669,0x000030F8},													/* VI			*/
+	{0X00007665,0x000030F9},													/* VE			*/
+	{0X0000766F,0x000030FA},													/* RO			*/
+/*
+        Special Double-Consonant Syllable marker "tsu"
+*/
+	{0X00545355,0x00003063},
 /*
 		Syllable Chords follow
 */
-	{0x806B7961,0x304D3083},{0x80677961,0x304E3083},    						/* KYA/GYA		*/
-	{0x806B7975,0x304D3085},{0x80677975,0x304E3085},    						/* KYU/GYU		*/
-	{0x806B796F,0x304D3087},{0x8067796F,0x304E3087},    						/* KYO/GYO		*/
-	{0x80736861,0x30573083},{0x80006A61,0x30583083},{0x80647961,0x30583083},	/* SHA/JA/DYA	*/
-	{0x80737961,0x30573083},{0x806A7961,0x30583083},							/* SYA/JYA		*/
-	{0x80736875,0x30573085},{0x80006A75,0x30583085},{0x80647975,0x30583085},	/* SHU/JU/DYU	*/
-	{0x80737975,0x30573085},{0x806A7975,0x30583085},							/* SYU/JYU		*/
-	{0x80006A65,0x30583047},													/* JE			*/
-	{0x8073686F,0x30573087},{0x80006A6F,0x30583087},{0x8064796F,0x30583087},	/* SHO/JO/DYO	*/
-    {0x8073796F,0x30573087},{0x806A796F,0x30583087},							/* SYO/JYO		*/
-	{0x80636861,0x30613083},{0x80637961,0x30613083},							/* CHA/CYA		*/
-	{0x80636875,0x30613085},{0x80637975,0x30613085},							/* CHU/CYU		*/
-	{0x8063686F,0x30613087},{0x8063796F,0x30613087},							/* CHO/CYO		*/
-	{0x806E7961,0x306B3083},													/* NYA			*/
-	{0x806E7975,0x306B3085},													/* NYU			*/
-	{0x806E796F,0x306B3087},													/* NYO			*/
-	{0x80687961,0x30723083},{0x80627961,0x30733083},{0x80707961,0x30743083},	/* HYA/BYA/PYA	*/
-	{0x80687975,0x30723085},{0x80627975,0x30733085},{0x80707975,0x30743085},	/* HYU/BYU/PYU	*/
-	{0x8068796F,0x30723087},{0x8062796F,0x30733087},{0x8070796F,0x30743087},	/* HYO/BYO/PYO	*/
-	{0x806D7961,0x307F3083},													/* MYA			*/
-	{0x806D7975,0x307F3085},													/* MYU			*/
-	{0x806D796F,0x307F3087},													/* MYO			*/
-	{0x80727961,0x308A3083},													/* RYA			*/
-	{0x80727975,0x308A3085},													/* RYU			*/
-	{0x8072796F,0x308A3087},													/* RYO			*/
+	{0X006B7961,0x304D3083},{0X00677961,0x304E3083},    						/* KYA/GYA		*/
+	{0X006B7975,0x304D3085},{0X00677975,0x304E3085},    						/* KYU/GYU		*/
+	{0X006B796F,0x304D3087},{0X0067796F,0x304E3087},    						/* KYO/GYO		*/
+	{0X00736861,0x30573083},{0X00006A61,0x30583083},{0X00647961,0x30583083},	/* SHA/JA/DYA	*/
+	{0X00737961,0x30573083},{0X006A7961,0x30583083},							/* SYA/JYA		*/
+	{0X00736875,0x30573085},{0X00006A75,0x30583085},{0X00647975,0x30583085},	/* SHU/JU/DYU	*/
+	{0X00737975,0x30573085},{0X006A7975,0x30583085},							/* SYU/JYU		*/
+	{0X00006A65,0x30583047},													/* JE			*/
+	{0X0073686F,0x30573087},{0X00006A6F,0x30583087},{0X0064796F,0x30583087},	/* SHO/JO/DYO	*/
+    {0X0073796F,0x30573087},{0X006A796F,0x30583087},							/* SYO/JYO		*/
+	{0X00636861,0x30613083},{0X00637961,0x30613083},							/* CHA/CYA		*/
+	{0X00636875,0x30613085},{0X00637975,0x30613085},							/* CHU/CYU		*/
+	{0X0063686F,0x30613087},{0X0063796F,0x30613087},							/* CHO/CYO		*/
+	{0X006E7961,0x306B3083},													/* NYA			*/
+	{0X006E7975,0x306B3085},													/* NYU			*/
+	{0X006E796F,0x306B3087},													/* NYO			*/
+	{0X00687961,0x30723083},{0X00627961,0x30733083},{0X00707961,0x30743083},	/* HYA/BYA/PYA	*/
+	{0X00687975,0x30723085},{0X00627975,0x30733085},{0X00707975,0x30743085},	/* HYU/BYU/PYU	*/
+	{0X0068796F,0x30723087},{0X0062796F,0x30733087},{0X0070796F,0x30743087},	/* HYO/BYO/PYO	*/
+	{0X006D7961,0x307F3083},													/* MYA			*/
+	{0X006D7975,0x307F3085},													/* MYU			*/
+	{0X006D796F,0x307F3087},													/* MYO			*/
+	{0X00727961,0x308A3083},													/* RYA			*/
+	{0X00727975,0x308A3085},													/* RYU			*/
+	{0X0072796F,0x308A3087},													/* RYO			*/
 	{TAG_END,	TAG_END}
 };
 
 STATIC CONST struct TagItem SyllableMiniCandidates[] =
 {
 	/* mini a i u e o */
-	{0x80000041,0x00003041},
-	{0x80000049,0x00003043},
-	{0x80000055,0x00003045},
-	{0x80000045,0x00003047},
-	{0x8000004F,0x00003049},
-	/* mini tsu */
-	{0x80545355,0x00003063},
+	{0X00000041,0x00003041},
+	{0X00000049,0x00003043},
+	{0X00000055,0x00003045},
+	{0X00000045,0x00003047},
+	{0X0000004F,0x00003049},
 	/* mini ya yu yo */
-	{0x80005941,0x00003083},
-	{0x80007955,0x00003085},
-	{0x8000594F,0x00003087},
+	{0X00005941,0x00003083},
+	{0X00007955,0x00003085},
+	{0X0000594F,0x00003087},
 	/* mini wa */
-	{0x80005741,0x0000308E},
+	{0X00005741,0x0000308E},
 	/* mini ka ke */
-	{0x8000B441,0x00003095},
-	{0x8000B445,0x00003096},
+	{0X0000B441,0x00003095},
+	{0X0000B445,0x00003096},
 	{TAG_END,	TAG_END}
 };
-*/
 
 /*	Set the Primary System Input Language	*/
-STATIC CONST struct TagItem DefaultSystemLanguage = { DEFAULT_SYSTEM_LANGUAGE, TRUE };
+STATIC CONST struct TagItem DefaultSystemLanguage[] =
+{
+	{DEFAULT_SYSTEM_LANGUAGE, TRUE},
+	{TAG_END, NULL}
+};
 STATIC CONST unsigned char LanguageKanjiCatalog[] = "Ideographs";
 STATIC CONST unsigned char LanguageVocabCatalog[] = "Vocabulary";
 
@@ -157,7 +162,7 @@ void InitPerceptionHook(struct LIBRARY_CLASS *Self)
 		Language=Self->IPerception->ObtainLanguageContext((APTR)LanguageName,(APTR)&ExecLanguageContextHook);
 	if(Language)
 	{
-        Self->IPerception->SetLanguageContextAttr(Language,(APTR)&DefaultSystemLanguage);
+        Self->IPerception->SetLanguageContextAttr(Language,(APTR)DefaultSystemLanguage);
 		Self->HPerception=Language;
 	}
 
@@ -231,6 +236,22 @@ ULONG QueueCodePoint(ULONG key,struct TagItem *qVector,ULONG idx,struct UtilityI
 	return(rc);
 }
 
+ULONG FindSyllableCandidate(ULONG Key,struct TagItem *cBuffer,struct UtilityIFace *IUtility)
+{
+	ULONG rc = 0L, chord = 0L;
+
+	if((Key & 0x000000FF)==(Key & 0x0000007F))
+	{
+		if((key-0x00000061)<0x0000001B)
+			chord=TAG_USER|(ChordBuffer->ti_Data << 8)|key;
+		if((key-0x00000041)<0x0000001B)
+			chord=(TAG_USER|(ChordBuffer->ti_Data << 8)|key)+0x20;
+	};
+
+
+	return(rc);
+}
+
 /*
 	This is where ALL of the Language Specific "Magic" happens...
 
@@ -245,91 +266,129 @@ ULONG QueueCodePoint(ULONG key,struct TagItem *qVector,ULONG idx,struct UtilityI
 */
 ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageContext,APTR m)
 {
-	ULONG rc=0L, *Message=m, glyph=0L, emIndex=LCSTATE_EMITBUFF;
+	ULONG rc=0L, *Message=m, c=0L, Syllable=0L;
 	struct PerceptionIFace	*IPerception= lch->PerceptionLib;
-	struct UtilityIFace 	*IUtility	= lch->UtilityLib;
-	struct TagItem *Vector=NULL, *chBuffer=NULL, *icBuffer=NULL;
-	struct TagItem *LMode=NULL,  *emit=NULL,     *ideograph=NULL;
-	struct TagItem VCommand;
+	struct TagItem *Vector = NULL, VCommand;
 
 	if(LanguageContext)
 	{
-		VCommand.ti_Tag  = LCSTATE_CATALOG1;
-		VCommand.ti_Data = (ULONG)&LanguageKanjiCatalog;
-		Vector=(APTR)IPerception->GetLanguageContextAttr(LanguageContext,(APTR)&VCommand);
-		VCommand.ti_Tag  = LCSTATE_CATALOG2;
-		VCommand.ti_Data = (ULONG)&LanguageVocabCatalog;
-		Vector=(APTR)IPerception->GetLanguageContextAttr(LanguageContext,(APTR)&VCommand);
-		VCommand.ti_Tag  = LCSTATE_VECTOR;
-		VCommand.ti_Data = 0L;
-		Vector=(APTR)IPerception->GetLanguageContextAttr(LanguageContext,(APTR)&VCommand);
-		if(Vector)
-		{
-			LMode=IUtility->FindTagItem(LCSTATE_LMODE,Vector);
-			emit=IUtility->FindTagItem(LCSTATE_EMIT,Vector);
-			ideograph=IUtility->FindTagItem(LCSTATE_IDEOGRAPH_IDX,Vector);
-			chBuffer=IUtility->FindTagItem(LCSTATE_SYLLABLE,Vector);
-			icBuffer=IUtility->FindTagItem(LCSTATE_IDEOGRAPH_BUFF,Vector);
-		};
+		VCommand.ti_Tag = LCSTATE_VECTOR;
+		VCommand.ti_Data= 0L;
+        Vector=(APTR)IPerception->GetLanguageContextAttr(LanguageContext,(APTR)&VCommand);
 	};
+
+	if(Message)
+	{
+	    if((Message[1] & 0xFF000000) == Message[1])
+    	{
+			if(((Message[1] >> 24)-0x00000061)<0x0000001B)
+				c = Message[1] >> 24;
+			if(((Message[1] >> 24)-0x00000041)<0x0000001B)
+				c = Message[1] >> 24+0x20;
+		}
+	}
+
+	if(c)
+	{
+		/* Get Saved Syllable Chording State */
+	}
 
 	switch(Message[0])
 	{
 		case LANGUAGE_TRANSLATE_AMIGA:
-            if((Message[1] & 0xFF000000) == Message[1])
-				switch(Message[1] >> 24)
-				{
-//	Unofficial Mappings used with Developer Restricted Keymap.Library.Kmod
-					case	0x00:	//	Change the Constant here for this Key when officially mapped
-						KDEBUG("Perception-IME//Japanese.Language::Hankaku~Zenkaku\n");
-						break;
-					case	0x78:	//	Change the Constant here for this Key when officially mapped
-						KDEBUG("Perception-IME//Japanese.Language::Romaji~Hiragana~Katakana\n");
-						break;
-					case	0x79:	//	Change the Constant here for this Key when officially mapped
-						KDEBUG("Perception-IME//Japanese.Language::Henkan\n");
-						break;
-					case	0x7A:	//	Change the Constant here for this Key when officially mapped
-						KDEBUG("Perception-IME//Japanese.Language::MuHenkan\n");
-						break;
-//	Official Mappings that need to be recognised
-					case	0x08:	//  Official Key mapping
-						KDEBUG("Perception-IME//Japanese.Language::Backspace\n");
-						break;
-					case	0x40:	//  Official Key mapping
-						KDEBUG("Perception-IME//Japanese.Language::Space\n");
-						break;
-					case	0x43:	//  Official Key mapping
-						KDEBUG("Perception-IME//Japanese.Language::Enter\n");
-						break;
-					case	0x44:	//  Official Key mapping
-						KDEBUG("Perception-IME//Japanese.Language::Return\n");
-						break;
-					case	0x7F:	//  Official Key mapping
-						KDEBUG("Perception-IME//Japanese.Language::Delete\n");
-						break;
-//  Anything Unhandled as an AMIGA key translation					default:
-						KDEBUG("Perception-IME//Japanese.Language::[%lx] is Unknown!\n", Message[1]);
-						break;
-				}
-			break;
-		case LANGUAGE_TRANSLATE_ANSI:
-			if((Message[1] & 0xFF000000) == Message[1])
-				glyph=FindKanaCandidate(Message[1] >> 24,chBuffer,IUtility);
-			if(glyph)
+			switch(c)
 			{
-				if(glyph & 0x80000000)
-					emIndex=QueueCodePoint(0x00003063,Vector,emIndex,IUtility);
-				if(glyph & 0x7FFF0000)
-					emIndex=QueueCodePoint(((glyph & 0xFFFF0000) >> 16),Vector,emIndex,IUtility);
-				if(glyph & 0x0000FFFF)
-					emIndex=QueueCodePoint((glyph & 0x0000FFFF),Vector,emIndex,IUtility);
-				glyph=FindKanjiCandidate(chBuffer,IUtility);
-			};
-			rc=emIndex-LCSTATE_EMITBUFF;
+//	Unofficial Mappings used with Developer Restricted Keymap.Library.Kmod
+				case	0x00:	//	Change the Constant here for this Key when officially mapped
+					KDEBUG("Perception-IME//Japanese.Language::Hankaku~Zenkaku\n");
+					break;
+				case	0x78:	//	Change the Constant here for this Key when officially mapped
+					KDEBUG("Perception-IME//Japanese.Language::Romaji~Hiragana~Katakana\n");
+					break;
+				case	0x79:	//	Change the Constant here for this Key when officially mapped
+					KDEBUG("Perception-IME//Japanese.Language::Henkan\n");
+					break;
+				case	0x7A:	//	Change the Constant here for this Key when officially mapped
+					KDEBUG("Perception-IME//Japanese.Language::MuHenkan\n");
+					break;
+//	Official Mappings that need to be recognised
+				case	0x08:	//  Official Key mapping
+					KDEBUG("Perception-IME//Japanese.Language::Backspace\n");
+					break;
+				case	0x40:	//  Official Key mapping
+					KDEBUG("Perception-IME//Japanese.Language::Space\n");
+					break;
+				case	0x43:	//  Official Key mapping
+					KDEBUG("Perception-IME//Japanese.Language::Enter\n");
+					break;
+				case	0x44:	//  Official Key mapping
+					KDEBUG("Perception-IME//Japanese.Language::Return\n");
+					break;
+				case	0x7F:	//  Official Key mapping
+					KDEBUG("Perception-IME//Japanese.Language::Delete\n");
+					break;
+//  Anything Unhandled as an AMIGA key translation				default:
+  					KDEBUG("Perception-IME//Japanese.Language::[%lx] is Unknown!\n", Message[1]);
+					break;
+			};break;
+		case LANGUAGE_TRANSLATE_ANSI:
+			switch(Syllable)
+			{
+				case	0x00000000:	/* NULL */
+					switch(c)
+					{
+						case 0x00000061:
+						case 0x00000069:
+						case 0x00000075:
+						case 0x00000065:
+						case 0x0000006F:
+							Kana = FindSyllableCandidate(c,lch->UtilityLib);
+							break;
+						default:
+							Syllable = (Syllable << 8)+c;
+							break;
+					}
+					break;
+				case	0x0000006E:	/* 'N' */
+					switch(c)
+					{
+						case 0x00000061:
+						case 0x00000069:
+						case 0x00000075:
+						case 0x00000065:
+						case 0x0000006F:
+							Syllable = (Syllable << 8)+c;
+							Kana = FindSyllableCandidate(Syllable,lch->UtilityLib);
+							break;
+						case 0x0000006F:
+							Syllable = (Syllable << 8)+c;
+							break;
+						default:
+							Kana = FindSyllableCandidate(Syllable,lch->UtilityLib);
+							Syllable = c;
+							break;
+					}
+					break;
+				default:
+					if(Syllable==c)
+					{
+						Syllable = c;
+						Kana = FindSyllableCandidate(0x80545355);
+					}else{
+						Syllable = (Syllable << 8)+c;
+						Kana = FindSyllableCandidate(Syllable);
+					};
+					break;
+			}
+			if(Kana)
+			{
+				/* Set Saved Syllable Chording State */
+			}
+/*
+			Extended Kanji Processing and UI/UX calls
+*/
 			break;
 		default:
-			KDEBUG("Perception-IME//Japanese.Language::[%lx] is Unknown!\n", Message[0]);
 			break;
 	}
 
