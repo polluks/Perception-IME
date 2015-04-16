@@ -22,9 +22,11 @@ STATIC CONST BYTE LanguageName[] = LIBRARY_NAME;
 #define CODEPOINT_KATAKANA_KEY		0x30A0
 #define	CODEPOINT_KANATOGGLE_MASK	0x00E0	/* Reversible Hiragana<->Katakana Transform Key */
 
-ULONG FindKanaCandidate(ULONG key,struct TagItem *ChordBuffer,struct UtilityIFace *IUtility);
-ULONG FindKanjiCandidate(struct TagItem *ChordBuffer,struct UtilityIFace *IUtility);
-ULONG QueueCodePoint(ULONG key,struct TagItem *qVector,ULONG idx,struct UtilityIFace *IUtility);
+ULONG GetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility);
+void  SetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility,ULONG data);
+ULONG FindSyllableCandidate(ULONG Key,struct TagItem *cBuffer,struct UtilityIFace *IUtility);
+ULONG FindKanjiCandidates(void);
+ULONG FindVocabCandidates(void);
 
 /*	The SyllableCandidate Table has TagItems mapping Romaji to Hiragana
 */
@@ -89,7 +91,7 @@ STATIC CONST struct TagItem SyllableCandidates[] =
 	{0X00007665,0x000030F9},													/* VE			*/
 	{0X0000766F,0x000030FA},													/* RO			*/
 /*
-        Special Double-Consonant Syllable marker "tsu"
+        Special Doubled-Consonant Syllable Prefix Syllable
 */
 	{0X00545355,0x00003063},
 /*
@@ -176,6 +178,31 @@ void ExitPerceptionHook(struct LIBRARY_CLASS *Self)
 	return;
 }
 
+ULONG GetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility)
+{
+	ULONG rc=0L;
+	struct TagItem *Item = NULL;
+
+	if(Vector)
+		Item=IUtility->FindTagItem(Key,Vector);
+    if(Item)
+		rc=Item->ti_Data;
+
+	return(rc);
+};
+
+void  SetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility,ULONG data)
+{
+	struct TagItem *Item = NULL;
+
+	if(Vector)
+		Item=IUtility->FindTagItem(Key,Vector);
+    if(Item)
+		Item->ti_Data=data;
+
+	return;
+};
+
 ULONG FindKanaCandidate(ULONG key, struct TagItem *ChordBuffer,struct UtilityIFace *IUtility)
 {
 	ULONG rc=0L, chord=0L, prefix=0L;
@@ -218,24 +245,6 @@ ULONG FindKanaCandidate(ULONG key, struct TagItem *ChordBuffer,struct UtilityIFa
 	return(rc);
 }
 
-ULONG FindKanjiCandidate(struct TagItem *ChordBuffer,struct UtilityIFace *IUtility)
-{
-	ULONG rc=0L;
-	return(rc);
-}
-
-ULONG QueueCodePoint(ULONG key,struct TagItem *qVector,ULONG idx,struct UtilityIFace *IUtility)
-{
-	ULONG rc=idx;
-	struct TagItem *Buffer=IUtility->FindTagItem(idx,qVector);
-	if(Buffer)
-	{
-		Buffer->ti_Data=key;
-		rc++;
-	};
-	return(rc);
-}
-
 ULONG FindSyllableCandidate(ULONG Key,struct TagItem *cBuffer,struct UtilityIFace *IUtility)
 {
 	ULONG rc = 0L, chord = 0L;
@@ -248,9 +257,20 @@ ULONG FindSyllableCandidate(ULONG Key,struct TagItem *cBuffer,struct UtilityIFac
 			chord=(TAG_USER|(ChordBuffer->ti_Data << 8)|key)+0x20;
 	};
 
-
 	return(rc);
 }
+
+ULONG FindKanjiCandidates(void)
+{
+	ULONG rc=0L;
+	return(rc);
+};
+
+ULONG FindVocabCandidates(void)
+{
+	ULONG rc=0L;
+	return(rc);
+};
 
 /*
 	This is where ALL of the Language Specific "Magic" happens...
@@ -288,10 +308,8 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 		}
 	}
 
-	if(c)
-	{
-		/* Get Saved Syllable Chording State */
-	}
+	if(c)	/* Get Saved Syllable Chording State */
+		Syllable = GetLCSTATEbyValue(Vector,LCSTATE_Syllable,lch->UtilityLib);
 
 	switch(Message[0])
 	{
@@ -380,10 +398,8 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 					};
 					break;
 			}
-			if(Kana)
-			{
-				/* Set Saved Syllable Chording State */
-			}
+			if(Kana)	/* Set Saved Syllable Chording State */
+				SetLCSTATEbyValue(Vector,LCSTATE_Syllable,lch->UtilityLib,Kana);
 /*
 			Extended Kanji Processing and UI/UX calls
 */
