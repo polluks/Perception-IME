@@ -249,14 +249,6 @@ ULONG FindSyllableCandidate(ULONG Key,struct TagItem *cBuffer,struct UtilityIFac
 {
 	ULONG rc = 0L, chord = 0L;
 
-	if((Key & 0x000000FF)==(Key & 0x0000007F))
-	{
-		if((key-0x00000061)<0x0000001B)
-			chord=TAG_USER|(ChordBuffer->ti_Data << 8)|key;
-		if((key-0x00000041)<0x0000001B)
-			chord=(TAG_USER|(ChordBuffer->ti_Data << 8)|key)+0x20;
-	};
-
 	return(rc);
 }
 
@@ -308,8 +300,14 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 		}
 	}
 
-	if(c)	/* Get Saved Syllable Chording State */
+	if(((c & 0x0000007F)==(c & 0x000000FF)) && (c != 0L))
+	{
 		Syllable = GetLCSTATEbyValue(Vector,LCSTATE_Syllable,lch->UtilityLib);
+		if((c-0x00000041)<0x0000001B)
+			c=c+0x20;
+		if(!((c-0x00000061)<0x0000001B))
+			c=0L;
+	};
 
 	switch(Message[0])
 	{
@@ -399,12 +397,21 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 					break;
 			}
 			if(Kana)	/* Set Saved Syllable Chording State */
-				SetLCSTATEbyValue(Vector,LCSTATE_Syllable,lch->UtilityLib,Kana);
+			{
+				SetLCSTATEbyValue(Vector,LCSTATE_Syllable,lch->UtilityLib,Syllable);
 /*
-			Extended Kanji Processing and UI/UX calls
+				The Syllable set needs to be appended with the newly selected Kana Syllable.
+
+				The current Syllable Set needs to be processed into a UTF8 string for Multiple Searches.
+
+				Kanji Lookups are required and UI/UX protocol for optional GUI elements need to occur.
+
+				Vocabulary Lookups are required and UI/UX protocol for optional GUI elements to be display extended.
 */
+			}
 			break;
 		default:
+			KDEBUG()
 			break;
 	}
 
