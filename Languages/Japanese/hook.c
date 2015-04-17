@@ -25,9 +25,11 @@ STATIC CONST BYTE LanguageName[] = LIBRARY_NAME;
 ULONG GetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility);
 void  SetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility,ULONG data);
 ULONG FindSyllableCandidate(ULONG Key,struct TagItem *cBuffer,struct UtilityIFace *IUtility);
-ULONG FindKanjiCandidates(void);
-ULONG FindVocabCandidates(void);
-
+/*
+QueueSyllableCandidate(Kana,Vector,LanguageContext,lch);
+UpdateKanjiCandidacy(Vector,LanguageContext,lch);
+UpdateVocabCandidacy(Vector,LanguageContext,lch);
+*/
 /*	The SyllableCandidate Table has TagItems mapping Romaji to Hiragana
 */
 STATIC CONST struct TagItem SyllableCandidates[] =
@@ -91,10 +93,6 @@ STATIC CONST struct TagItem SyllableCandidates[] =
 	{0X00007665,0x000030F9},													/* VE			*/
 	{0X0000766F,0x000030FA},													/* RO			*/
 /*
-        Special Doubled-Consonant Syllable Prefix Syllable
-*/
-	{0X00545355,0x00003063},
-/*
 		Syllable Chords follow
 */
 	{0X006B7961,0x304D3083},{0X00677961,0x304E3083},    						/* KYA/GYA		*/
@@ -133,6 +131,8 @@ STATIC CONST struct TagItem SyllableMiniCandidates[] =
 	{0X00000055,0x00003045},
 	{0X00000045,0x00003047},
 	{0X0000004F,0x00003049},
+	/* mini tsu */
+	{0X00545355,0x00003063},
 	/* mini ya yu yo */
 	{0X00005941,0x00003083},
 	{0X00007955,0x00003085},
@@ -376,11 +376,11 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 							Syllable = (Syllable << 8)+c;
 							Kana = FindSyllableCandidate(Syllable,lch->UtilityLib);
 							break;
-						case 0x0000006F:
+						case 0x00000079:
 							Syllable = (Syllable << 8)+c;
 							break;
 						default:
-							Kana = FindSyllableCandidate(Syllable,lch->UtilityLib);
+							Kana = 0x00003093;
 							Syllable = c;
 							break;
 					}
@@ -388,25 +388,23 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 				default:
 					if(Syllable==c)
 					{
+						Kana = 0x00003063;
 						Syllable = c;
-						Kana = FindSyllableCandidate(0x80545355);
 					}else{
 						Syllable = (Syllable << 8)+c;
 						Kana = FindSyllableCandidate(Syllable);
 					};
 					break;
 			}
-			if(Kana)	/* Set Saved Syllable Chording State */
+/*			Set Saved Syllable Chording State
+*/			SetLCSTATEbyValue(Vector,LCSTATE_Syllable,lch->UtilityLib,Syllable);
+			if(Kana)
 			{
-				SetLCSTATEbyValue(Vector,LCSTATE_Syllable,lch->UtilityLib,Syllable);
 /*
-				The Syllable set needs to be appended with the newly selected Kana Syllable.
+				QueueSyllableCandidate(Kana,Vector,LanguageContext,lch);
+				UpdateKanjiCandidacy(Vector,LanguageContext,lch);
+				UpdateVocabCandidacy(Vector,LanguageContext,lch);
 
-				The current Syllable Set needs to be processed into a UTF8 string for Multiple Searches.
-
-				Kanji Lookups are required and UI/UX protocol for optional GUI elements need to occur.
-
-				Vocabulary Lookups are required and UI/UX protocol for optional GUI elements to be display extended.
 */
 			}
 			break;

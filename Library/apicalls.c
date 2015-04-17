@@ -175,6 +175,7 @@ ULONG LCALL_GetLanguageContextAttr(struct LIBIFACE_CLASS *iface, APTR lc, APTR m
 	ULONG rc=0L, *Method=m;
 	struct InputContext *LanguageContext=lc;
 
+	Self->IExec->ObtainSemaphore(Self->Lock);
 	switch(Method[0])
 	{
 		case DEFAULT_SYSTEM_LANGUAGE:
@@ -189,6 +190,7 @@ ULONG LCALL_GetLanguageContextAttr(struct LIBIFACE_CLASS *iface, APTR lc, APTR m
 		default:
 			break;
 	}
+	Self->IExec->ReleaseSemaphore(Self->Lock);
 
 	return(rc);
 }
@@ -211,15 +213,19 @@ ULONG LCALL_SetLanguageContextAttr(struct LIBIFACE_CLASS *iface, APTR lc, APTR m
 	ULONG rc=0L, *Method=m;
 	struct InputContext *LanguageContext=lc;
 
+	Self->IExec->ObtainSemaphore(Self->Lock);
 	switch(Method[0])
 	{
 		case DEFAULT_SYSTEM_LANGUAGE:
 			if(!Self->CurrentLanguage)
+			{
 				Self->CurrentLanguage=lc;
+			}
 			break;
 		default:
 			break;
 	}
+	Self->IExec->ReleaseSemaphore(Self->Lock);
 
 	return(rc);
 }
