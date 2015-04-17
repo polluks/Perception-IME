@@ -155,6 +155,7 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 				REGAPP_Description,				DaemonDescription,
 				NULL,							NULL);
 
+/*
 		if(dApplication->ILocale)
 			dApplication->hLocale=dApplication->ILocale->OpenLocale(NULL);
 		if(dApplication->hLocale)
@@ -164,6 +165,7 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 				OC_BuiltInCodeSet,		106L,
 				OC_PreferExternal,		TRUE,
 				TAG_END,NULL);
+*/
 
 		InitInputContext(&dApplication->DaemonContext,NULL);
 		dApplication->DaemonContext.Hook.PerceptionLib=(APTR)dApplication->IPerception;
@@ -192,12 +194,13 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 		ExitInputHandler(dApplication);
 		ExitInputContext(&dApplication->DaemonContext);
 
+/*
 		if(dApplication->hLocale)
 		{
 			dApplication->ILocale->CloseLocale(dApplication->hLocale);
 			dApplication->hLocale=NULL;
 		};
-
+*/
 		if(dApplication->ApplicationID)
 			dApplication->IApplication->UnregisterApplication(dApplication->ApplicationID, NULL);
 
