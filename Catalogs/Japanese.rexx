@@ -17,18 +17,41 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 			When X2D(CodePoint) < X2D('100') Then Glyph=B2C('110000'||SubStr(B,1,2))||B2C('10'||SubStr(B,3,6));
 			When X2D(CodePoint) < X2D('800') Then Glyph=B2C('110'||SubStr(B,1,1)||'10'||SubStr(B,2,1)||'10'||SubStr(B,3,1));
 			When X2D(CodePoint) < X2D('10000') Then	Glyph=B2C('1110'||SubStr(B,1,4)||'10'||SubStr(B,5,6)||'10'||SubStr(B,11,6));
-/*			When X2D(CodePoint) < X2D('200000') Then Glyph=B2C('11110'||SubStr(4,3)||'10'||SubStr(B,7,6)||'10'||SubStr(B,13,6)||'10'||SubStr(B,19,6));
+/*
+	The Following two conditions of Unicode need better encoding support from the input Hex length.
+
+    Run the script as it exists to see the issue at the end of the current ouput.
+
+			When X2D(CodePoint) < X2D('200000') Then Glyph=B2C(
+'11110'||SubStr(4,3)||
+'10'||SubStr(B,7,6)||
+'10'||SubStr(B,13,6)||
+'10'||SubStr(B,19,6));
+
 			When X2D(CodePoint) < X2D('1000000') Then Glyph=C2B(
-'111110'||SubStr(B,,2)||'10'||SubStr(B,,6)||'10'||SubStr(B,,6)||
-'10'||SubStr(B,,6)||'10'||SubStr(B,,6)||'10'||SubStr(B,,6));
+'111110'||SubStr(B,,2)||
+'10'||SubStr(B,,6)||
+'10'||SubStr(B,,6)||
+'10'||SubStr(B,,6)||
+'10'||SubStr(B,,6));
 */
 			Otherwise Glyph='#'||C2B(X2C(CodePoint))||'#';
 		End;
 		Select
 			When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1
+/*
+		REFACTOR: Change the Output into a file based on the Translated SYLLABLE CodePoint as well as the individual Kanji CodePoint.
+			Syllable CodePoint Text,	Append the Kanji
+			Kanji CodePoint Text,		Append the Reading in UTF8 Encoded Syllables ( Hiragana )
+*/
 				Echo 'U='||CodePoint||'['||Glyph||']='||Translate(Word(Vector,i),alpha,Upper(alpha))||'['||KanaConvert(Upper(Word(Vector,i))||' Hiragana')||']';
 			End;
 			When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1
+/*
+		REFACTOR: Change the Output into a file based on the Translated SYLLABLE CodePoint as well as the individual Kanji CodePoint.
+			Syllable CodePoint Text,	Append the Kanji
+			Kanji CodePoint Text,		Append the Reading in UTF8 Encoded Syllables ( Katakana )
+*/
 				Echo 'U='||CodePoint||'['||Glyph||']='||Translate(Word(Vector,i),alpha,Upper(alpha))||'['||KanaConvert(Upper(Word(Vector,i))||' Katakana')||']';
 			End;
 			OtherWise NOP;
