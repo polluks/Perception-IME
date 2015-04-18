@@ -8,7 +8,7 @@
 STATIC CONST BYTE LanguageName[] = LIBRARY_NAME;
 
 /* This is where the incoming ANSI characters get stored */
-#define	LCSTATE_SYLLABLE		(LCSTATE_EXPANDED)
+#define	LCSTATE_Syllable		(LCSTATE_EXPANDED)
 #define	LCSTATE_IDEOGRAPH_IDX	(LCSTATE_EXPANDED+1)
 #define	LCSTATE_IDEOGRAPH_BUFF	(LCSTATE_EXPANDED+2)
 #define	IDEOGRAPH_CNT			(32)
@@ -247,7 +247,7 @@ ULONG FindKanaCandidate(ULONG key, struct TagItem *ChordBuffer,struct UtilityIFa
 
 ULONG FindSyllableCandidate(ULONG Key,struct TagItem *cBuffer,struct UtilityIFace *IUtility)
 {
-	ULONG rc = 0L, chord = 0L;
+	ULONG rc = 0L;
 
 	return(rc);
 }
@@ -278,36 +278,28 @@ ULONG FindVocabCandidates(void)
 */
 ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageContext,APTR m)
 {
-	ULONG rc=0L, *Message=m, c=0L, Syllable=0L;
+	ULONG rc=0L, *Message=m, c=0L, Syllable=0L, Kana=0L;
 	struct PerceptionIFace	*IPerception= lch->PerceptionLib;
-	struct TagItem *Vector = NULL, VCommand;
+	struct TagItem *Vector = NULL, VCommand, kBuffer;
 
 	if(LanguageContext)
 	{
 		VCommand.ti_Tag = LCSTATE_VECTOR;
 		VCommand.ti_Data= 0L;
-        Vector=(APTR)IPerception->GetLanguageContextAttr(LanguageContext,(APTR)&VCommand);
+        Vector=(APTR)IPerception->GetLanguageContextAttr(LanguageContext,&VCommand);
 	};
 
 	if(Message)
 	{
 	    if((Message[1] & 0xFF000000) == Message[1])
     	{
+			Syllable = GetLCSTATEbyValue(Vector,LCSTATE_Syllable,lch->UtilityLib);
 			if(((Message[1] >> 24)-0x00000061)<0x0000001B)
 				c = Message[1] >> 24;
 			if(((Message[1] >> 24)-0x00000041)<0x0000001B)
-				c = Message[1] >> 24+0x20;
+				c = (Message[1] >> 24)+0x20;
 		}
 	}
-
-	if(((c & 0x0000007F)==(c & 0x000000FF)) && (c != 0L))
-	{
-		Syllable = GetLCSTATEbyValue(Vector,LCSTATE_Syllable,lch->UtilityLib);
-		if((c-0x00000041)<0x0000001B)
-			c=c+0x20;
-		if(!((c-0x00000061)<0x0000001B))
-			c=0L;
-	};
 
 	switch(Message[0])
 	{
@@ -358,7 +350,7 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 						case 0x00000075:
 						case 0x00000065:
 						case 0x0000006F:
-							Kana = FindSyllableCandidate(c,lch->UtilityLib);
+							Kana = FindSyllableCandidate(c,&kBuffer,lch->UtilityLib);
 							break;
 						default:
 							Syllable = (Syllable << 8)+c;
@@ -374,7 +366,7 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 						case 0x00000065:
 						case 0x0000006F:
 							Syllable = (Syllable << 8)+c;
-							Kana = FindSyllableCandidate(Syllable,lch->UtilityLib);
+							Kana = FindSyllableCandidate(Syllable,&kBuffer,lch->UtilityLib);
 							break;
 						case 0x00000079:
 							Syllable = (Syllable << 8)+c;
@@ -392,7 +384,7 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 						Syllable = c;
 					}else{
 						Syllable = (Syllable << 8)+c;
-						Kana = FindSyllableCandidate(Syllable);
+						Kana = FindSyllableCandidate(Syllable,&kBuffer,lch->UtilityLib);
 					};
 					break;
 			}
@@ -409,7 +401,7 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 			}
 			break;
 		default:
-			KDEBUG()
+			KDEBUG("Japanese.Language - Unknown Command Path");
 			break;
 	}
 
