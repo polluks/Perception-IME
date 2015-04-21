@@ -25,7 +25,7 @@ STATIC CONST BYTE LanguageName[] = LIBRARY_NAME;
 ULONG GetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility);
 void  SetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility,ULONG data);
 ULONG FindSyllableCandidate(ULONG Key,struct UtilityIFace *IUtility);
-void  QueueSyllableCandidate(ULONG c,struct TagItem *Vector,struct LanguageContext *lc,struct LanguageContextHook *lch);
+void  QueueSyllableCandidate(ULONG c,struct TagItem *Vector,APTR LanguageContext,struct LanguageContextHook *lch);
 /*
 UpdateKanjiCandidacy(Vector,LanguageContext,lch);
 UpdateVocabCandidacy(Vector,LanguageContext,lch);
@@ -216,8 +216,10 @@ ULONG FindSyllableCandidate(ULONG Key,struct UtilityIFace *IUtility)
 	return(rc);
 };
 
-void  QueueSyllableCandidate(ULONG c,struct TagItem *Vector,struct LanguageContext *lc,struct LanguageContextHook *lch)
+void  QueueSyllableCandidate(ULONG c,struct TagItem *Vector,APTR LanguageContext,struct LanguageContextHook *lch)
 {
+	struct TagItem *qBuffer;
+	KDEBUG("QueueSyllableCandidate[CodePoint=%lx]\n",c);
 	return;
 };
 
@@ -266,7 +268,7 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 			if(((Message[1] >> 24)-0x00000061)<0x0000001B)
 				c = TAG_USER | (Message[1] >> 24);
 			if(((Message[1] >> 24)-0x00000041)<0x0000001B)
-				c = TAG_USER | (Message[1] >> 24)+0x20;
+				c = TAG_USER | ((Message[1] >> 24)+0x20);
 		}
 	}
 
