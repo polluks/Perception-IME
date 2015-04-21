@@ -249,17 +249,19 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 	struct PerceptionIFace	*IPerception= lch->PerceptionLib;
 	struct TagItem *Vector = NULL, VCommand;
 
+	KDEBUG("Japanese.Language::ExecLanguageHook()[LanguageContext]\n");
 	if(LanguageContext)
 	{
 		VCommand.ti_Tag = LCSTATE_VECTOR;
 		VCommand.ti_Data= 0L;
         Vector=(APTR)IPerception->GetLanguageContextAttr(LanguageContext,&VCommand);
 	};
-
+	KDEBUG("Japanese.Language::ExecLanguageHook()[Message]\n");
 	if(Message)
 	{
 	    if((Message[1] & 0xFF000000) == Message[1])
     	{
+			KDEBUG("Japanese.Language::ExecLanguageHook()[LCSTATE 'Syllable' Read]\n");
 			Syllable = GetLCSTATEbyValue(Vector,LCSTATE_Syllable,lch->UtilityLib);
 			if(((Message[1] >> 24)-0x00000061)<0x0000001B)
 				c = TAG_USER | (Message[1] >> 24);
@@ -269,10 +271,10 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 	}
 	KDEBUG("ExecLanguageContextHook[Syllable =%lx]\n",Syllable);
 	KDEBUG("ExecLanguageContextHook[Character=%lx]\n",c);
-
 	switch(Message[0])
 	{
 		case LANGUAGE_TRANSLATE_AMIGA:
+			KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_AMIGA]\n");
 			switch(c)
 			{
 //	Unofficial Mappings used with Developer Restricted Keymap.Library.Kmod
@@ -309,6 +311,7 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 					break;
 			};break;
 		case LANGUAGE_TRANSLATE_ANSI:
+			KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_ANSI]\n");
 			switch(Syllable)
 			{
 				case	0x00000000:	/* NULL */
@@ -357,8 +360,9 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 					};
 					break;
 			}
-/*			Set Saved Syllable Chording State
-*/			SetLCSTATEbyValue(Vector,LCSTATE_Syllable,lch->UtilityLib,Syllable);
+			KDEBUG("Japanese.Language::ExecLanguageHook()[LCSTATE 'Syllable' Write]\n");
+			SetLCSTATEbyValue(Vector,LCSTATE_Syllable,lch->UtilityLib,Syllable);
+			KDEBUG("Japanese.Language::ExecLanguageHook()[%lx]\n",Kana);
 			if(Kana)
 			{
 				if(Kana && 0x7FFF0000)

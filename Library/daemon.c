@@ -527,12 +527,14 @@ void  ProcInputHandler(struct DaemonApplication *hDaemon)
 			Context->State[ICSTATE_FIFO_IR]=InputIndex;
 			Context->State[ICSTATE_FIFO_PR]=(ULONG)bInputItem;
 			Self->IExec->ReleaseSemaphore(&Self->Lock);
+			KDEBUG("ProcInputHandler()[Hook::PreEntry]\n");
 			if(Language->Hook.Hook.h_Entry)
 	        {
 				xc=hDaemon->IUtility->CallHookPkt((APTR)&Language->Hook,(APTR)Language,(APTR)Message);
 			}else{
 				xc=hDaemon->IUtility->CallHookPkt((APTR)&Context->Hook,(APTR)Language,(APTR)Message);
 			};
+			KDEBUG("ProcInputHandler()[Hook::PostEntry]\n");
 			for(OutputIndex=LCSTATE_EMITBUFF;OutputIndex<LCSTATE_EMITBMAX;OutputIndex++)
 			{
 				EmitGlyph=(APTR)hDaemon->IUtility->FindTagItem(OutputIndex,Vector);
