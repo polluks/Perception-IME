@@ -146,11 +146,7 @@ STATIC CONST struct TagItem SyllableMiniCandidates[] =
 };
 
 /*	Set the Primary System Input Language	*/
-STATIC CONST struct TagItem DefaultSystemLanguage[] =
-{
-	{DEFAULT_SYSTEM_LANGUAGE, TRUE},
-	{TAG_END, NULL}
-};
+STATIC CONST struct TagItem DefaultSystemLanguage =	{ DEFAULT_SYSTEM_LANGUAGE, TRUE };
 STATIC CONST unsigned char LanguageKanjiCatalog[] = "Ideographs";
 STATIC CONST unsigned char LanguageVocabCatalog[] = "Vocabulary";
 
@@ -271,6 +267,8 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 				c = TAG_USER | ((Message[1] >> 24)+0x20);
 		}
 	}
+	KDEBUG("ExecLanguageContextHook[Syllable =%lx]\n",Syllable);
+	KDEBUG("ExecLanguageContextHook[Character=%lx]\n",c);
 
 	switch(Message[0])
 	{
