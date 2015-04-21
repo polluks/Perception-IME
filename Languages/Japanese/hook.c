@@ -24,9 +24,9 @@ STATIC CONST BYTE LanguageName[] = LIBRARY_NAME;
 
 ULONG GetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility);
 void  SetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility,ULONG data);
-ULONG FindSyllableCandidate(ULONG Key,struct TagItem *cBuffer,struct UtilityIFace *IUtility);
+ULONG FindSyllableCandidate(ULONG Key,struct UtilityIFace *IUtility);
+void  QueueSyllableCandidate(ULONG c,struct TagItem *Vector,struct LanguageContext *lc,struct LanguageContextHook *lch);
 /*
-QueueSyllableCandidate(Kana,Vector,LanguageContext,lch);
 UpdateKanjiCandidacy(Vector,LanguageContext,lch);
 UpdateVocabCandidacy(Vector,LanguageContext,lch);
 */
@@ -203,54 +203,23 @@ void  SetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility,ULON
 	return;
 };
 
-ULONG FindKanaCandidate(ULONG key, struct TagItem *ChordBuffer,struct UtilityIFace *IUtility)
-{
-	ULONG rc=0L, chord=0L, prefix=0L;
-	struct TagItem *Buffer=NULL;
-
-	if((key & 0x000000FF)==(key & 0x0000007F))
-	{
-		if((key-0x00000061)<0x0000001B)
-			chord=TAG_USER|(ChordBuffer->ti_Data << 8)|key;
-		if((key-0x00000041)<0x0000001B)
-			chord=(TAG_USER|(ChordBuffer->ti_Data << 8)|key)+0x20;
-	};
-	if(chord & TAG_USER)
-	{
-		if((chord & 0x8000FFFF)==chord)
-		{
-			if((chord & 0x00007F00)==0x00006E00)
-				prefix=prefix|0x00003093;
-			if(((chord & 0x00007F00) >> 8)==(chord & 0x00007F))
-				prefix=prefix|0x30630000;
-			if(prefix)
-				chord=(chord & 0x800000FF);
-		};
-		Buffer=IUtility->FindTagItem(chord,SyllableCandidates);
-		if(Buffer)
-		{
-			chord=0L;
-			rc=Buffer->ti_Data;
-		}else{
-			ChordBuffer->ti_Data=chord;
-		};
-        if(rc)
-		{
-			if(prefix & 0x7FFF0000)
-				rc=0x80000000|rc;
-			if(prefix & 0x00007FFF)
-				rc=0x00008000|rc;
-		};
-    };
-	return(rc);
-}
-
-ULONG FindSyllableCandidate(ULONG Key,struct TagItem *cBuffer,struct UtilityIFace *IUtility)
+ULONG FindSyllableCandidate(ULONG Key,struct UtilityIFace *IUtility)
 {
 	ULONG rc = 0L;
+	struct TagItem *Candidate = NULL;
+
+	if(Key)
+		Candidate=IUtility->FindTagItem((Key & 0x7FFFFFFF),SyllableCandidates);
+	if(Candidate)
+		rc=Candidate->ti_Data;
 
 	return(rc);
-}
+};
+
+void  QueueSyllableCandidate(ULONG c,struct TagItem *Vector,struct LanguageContext *lc,struct LanguageContextHook *lch)
+{
+	return;
+};
 
 ULONG FindKanjiCandidates(void)
 {
@@ -280,7 +249,7 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 {
 	ULONG rc=0L, *Message=m, c=0L, Syllable=0L, Kana=0L;
 	struct PerceptionIFace	*IPerception= lch->PerceptionLib;
-	struct TagItem *Vector = NULL, VCommand, kBuffer;
+	struct TagItem *Vector = NULL, VCommand;
 
 	if(LanguageContext)
 	{
@@ -295,9 +264,9 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
     	{
 			Syllable = GetLCSTATEbyValue(Vector,LCSTATE_Syllable,lch->UtilityLib);
 			if(((Message[1] >> 24)-0x00000061)<0x0000001B)
-				c = Message[1] >> 24;
+				c = TAG_USER | (Message[1] >> 24);
 			if(((Message[1] >> 24)-0x00000041)<0x0000001B)
-				c = (Message[1] >> 24)+0x20;
+				c = TAG_USER | (Message[1] >> 24)+0x20;
 		}
 	}
 
@@ -350,10 +319,10 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 						case 0x00000075:
 						case 0x00000065:
 						case 0x0000006F:
-							Kana = FindSyllableCandidate(c,&kBuffer,lch->UtilityLib);
+							Kana = FindSyllableCandidate(c,lch->UtilityLib);
 							break;
 						default:
-							Syllable = (Syllable << 8)+c;
+							Syllable = (Syllable << 8)+(0x7F & c);
 							break;
 					}
 					break;
@@ -365,15 +334,15 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 						case 0x00000075:
 						case 0x00000065:
 						case 0x0000006F:
-							Syllable = (Syllable << 8)+c;
-							Kana = FindSyllableCandidate(Syllable,&kBuffer,lch->UtilityLib);
+							Syllable = (Syllable << 8)+(0x7F & c);
+							Kana = FindSyllableCandidate(Syllable,lch->UtilityLib);
 							break;
 						case 0x00000079:
-							Syllable = (Syllable << 8)+c;
+							Syllable = (Syllable << 8)+(0x7F & c);
 							break;
 						default:
 							Kana = 0x00003093;
-							Syllable = c;
+							Syllable = (0x7F && c);
 							break;
 					}
 					break;
@@ -383,8 +352,8 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 						Kana = 0x00003063;
 						Syllable = c;
 					}else{
-						Syllable = (Syllable << 8)+c;
-						Kana = FindSyllableCandidate(Syllable,&kBuffer,lch->UtilityLib);
+						Syllable = (Syllable << 8)+(0x7F & c);
+						Kana = FindSyllableCandidate(Syllable,lch->UtilityLib);
 					};
 					break;
 			}
@@ -392,8 +361,11 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 */			SetLCSTATEbyValue(Vector,LCSTATE_Syllable,lch->UtilityLib,Syllable);
 			if(Kana)
 			{
+				if(Kana && 0x7FFF0000)
+					QueueSyllableCandidate((Kana >> 16),Vector,LanguageContext,lch);
+				if(Kana && 0x00007FFF)
+					QueueSyllableCandidate((Kana & 0xFFFF),Vector,LanguageContext,lch);
 /*
-				QueueSyllableCandidate(Kana,Vector,LanguageContext,lch);
 				UpdateKanjiCandidacy(Vector,LanguageContext,lch);
 				UpdateVocabCandidacy(Vector,LanguageContext,lch);
 
