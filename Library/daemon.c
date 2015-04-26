@@ -399,91 +399,6 @@ void  ExitInputHandler(struct DaemonApplication *Self)
 	return;
 };
 
-void  ProcInputHandler(struct DaemonApplication *hDaemon)
-{
-	ULONG xc=0L, InputIndex=0L, OutputIndex=0L, OutputMask=0L;
-	struct LIBRARY_CLASS *Self=hDaemon->PerceptionBase;
-	struct InputContext *Context=Self->InputContext, *Language=Self->CurrentLanguage;
-	struct InputTagItem *bInputItem=NULL;
-	struct TagItem *Message=NULL, *Vector=NULL, *EmitGlyph=NULL;
-
-	if(hDaemon->CommodityFlags && PERCEPTION_STATE_ACTIVE)
-	{
-		KDEBUG("Perception[Commodity//ProcInputHandler]()\n");
-		if(Context)
-		{
-			InputIndex=Context->State[ICSTATE_FIFO_IR];
-			bInputItem=(APTR)Context->State[ICSTATE_FIFO_PR];
-			if(!bInputItem)
-				bInputItem=Context->Vector;
-			Self->IExec->ObtainSemaphore(&Self->Lock);
-			if(Language)
-            {
-				Language->Hook.Hook.h_Data=(APTR)Language;
-				Language->Hook.PerceptionLib=hDaemon->IPerception;
-				Language->Hook.UtilityLib=hDaemon->IUtility;
-		        Message=(struct TagItem *)Language->Message;
-				Vector=(struct TagItem *)Language->Vector;
-			};
-			switch(bInputItem->type)
-			{
-				case TRANSLATE_ANSI:
-					Message[0].ti_Tag	= LANGUAGE_TRANSLATE_ANSI;
-					Message[0].ti_Data	= bInputItem->glyph;
-					Message[1].ti_Tag	= LANGUAGE_TRANSLATE_ANSI_QUAL;
-					Message[1].ti_Data	= bInputItem->qual;
-					Message[2].ti_Tag	= 0L;
-					Message[2].ti_Data	= 0L;
-					Message[3].ti_Tag	= 0L;
-					Message[3].ti_Data	= 0L;
-					break;
-				case TRANSLATE_AMIGA:
-					Message[0].ti_Tag	= LANGUAGE_TRANSLATE_AMIGA;
-					Message[0].ti_Data	= bInputItem->glyph;
-					Message[1].ti_Tag	= LANGUAGE_TRANSLATE_AMIGA_QUAL;
-					Message[1].ti_Data	= bInputItem->qual;
-					Message[2].ti_Tag	= 0L;
-					Message[2].ti_Data	= 0L;
-					Message[3].ti_Tag	= 0L;
-					Message[3].ti_Data	= 0L;
-					break;
-				default:
-					break;
-			};
-			if(InputIndex<IME_VECTOR_SIZE)
-			{
-				InputIndex++; bInputItem++;
-			}else{
-				InputIndex=0L; bInputItem=NULL;
-			};
-			Context->State[ICSTATE_FIFO_IR]=InputIndex;
-			Context->State[ICSTATE_FIFO_PR]=(ULONG)bInputItem;
-			Self->IExec->ReleaseSemaphore(&Self->Lock);
-			KDEBUG("ProcInputHandler()[Hook::PreEntry]\n");
-			if(Language->Hook.Hook.h_Entry)
-	        {
-				xc=hDaemon->IUtility->CallHookPkt((APTR)&Language->Hook,(APTR)Language,(APTR)Message);
-			}else{
-				xc=hDaemon->IUtility->CallHookPkt((APTR)&Context->Hook,(APTR)Language,(APTR)Message);
-			};
-			for(OutputIndex=LCSTATE_EMITBUFF;OutputIndex<LCSTATE_EMITBMAX;OutputIndex++)
-			{
-				EmitGlyph=(APTR)hDaemon->IUtility->FindTagItem(OutputIndex,Vector);
-				if(EmitGlyph->ti_Data)
-				{
-					OutputMask = OutputMask || 1L << (OutputIndex-LCSTATE_EMITBUFF);
-					TranslateCP32UTF8((APTR)&EmitGlyph->ti_Data);
-					KDEBUG("[UTF8=%lx]\n",EmitGlyph->ti_Data);
-					InputForward(EmitGlyph,hDaemon);
-				}
-				EmitGlyph->ti_Data=0L;
-			};
-		};
-	};
-
-	return;
-}
-
 APTR  ExecInputHandler(struct DaemonApplication *hDaemon,APTR ieStream)
 {
 	ULONG InputIndex=0L, buffer=0L;
@@ -521,14 +436,100 @@ APTR  ExecInputHandler(struct DaemonApplication *hDaemon,APTR ieStream)
 				}else{
 					InputIndex=0L; bInputItem=NULL;
 				};
+				Self->IExec->ReleaseSemaphore(&Self->Lock);
 				Context->State[ICSTATE_FIFO_IW]=InputIndex;
 				Context->State[ICSTATE_FIFO_PW]=(ULONG)bInputItem;
-				Self->IExec->ReleaseSemaphore(&Self->Lock);
 				Self->IExec->Signal(Self->IExec->FindTask(NULL),hDaemon->ioSignal);
 			}
 			prev=hInputEvent;
 		}while((hInputEvent=hInputEvent->ie_NextEvent)!=NULL);
 	return((APTR)rc);
+}
+
+void  ProcInputHandler(struct DaemonApplication *hDaemon)
+{
+	ULONG xc=0L, InputIndex=0L, OutputIndex=0L, OutputMask=0L;
+	struct LIBRARY_CLASS *Self=hDaemon->PerceptionBase;
+	struct InputContext *Context=Self->InputContext, *Language=NULL;
+	struct InputTagItem *bInputItem=NULL;
+	struct TagItem *Message=NULL, *Vector=NULL, *EmitGlyph=NULL;
+
+	if(hDaemon->CommodityFlags && PERCEPTION_STATE_ACTIVE)
+	{
+		KDEBUG("Perception[Commodity//ProcInputHandler]()\n");
+		if(Context)
+		{
+			InputIndex=Context->State[ICSTATE_FIFO_IR];
+			bInputItem=(APTR)Context->State[ICSTATE_FIFO_PR];
+			if(!bInputItem)
+				bInputItem=Context->Vector;
+			Self->IExec->ObtainSemaphore(&Self->Lock);
+			if(Language=Self->CurrentLanguage)
+            {
+				Language->Hook.Hook.h_Data=(APTR)Language;
+				Language->Hook.PerceptionLib=hDaemon->IPerception;
+				Language->Hook.UtilityLib=hDaemon->IUtility;
+		        Message=(struct TagItem *)Language->Message;
+				Vector=(struct TagItem *)Language->Vector;
+			};
+			switch(bInputItem->type)
+			{
+				case TRANSLATE_ANSI:
+					Message[0].ti_Tag	= LANGUAGE_TRANSLATE_ANSI;
+					Message[0].ti_Data	= bInputItem->glyph;
+					Message[1].ti_Tag	= LANGUAGE_TRANSLATE_ANSI_QUAL;
+					Message[1].ti_Data	= bInputItem->qual;
+					Message[2].ti_Tag	= 0L;
+					Message[2].ti_Data	= 0L;
+					Message[3].ti_Tag	= 0L;
+					Message[3].ti_Data	= 0L;
+					break;
+				case TRANSLATE_AMIGA:
+					Message[0].ti_Tag	= LANGUAGE_TRANSLATE_AMIGA;
+					Message[0].ti_Data	= bInputItem->glyph;
+					Message[1].ti_Tag	= LANGUAGE_TRANSLATE_AMIGA_QUAL;
+					Message[1].ti_Data	= bInputItem->qual;
+					Message[2].ti_Tag	= 0L;
+					Message[2].ti_Data	= 0L;
+					Message[3].ti_Tag	= 0L;
+					Message[3].ti_Data	= 0L;
+					break;
+				default:
+					break;
+			};
+			Self->IExec->ReleaseSemaphore(&Self->Lock);
+			if(InputIndex<IME_VECTOR_SIZE)
+			{
+				InputIndex++; bInputItem++;
+			}else{
+				InputIndex=0L; bInputItem=NULL;
+			};
+			Context->State[ICSTATE_FIFO_IR]=InputIndex;
+			Context->State[ICSTATE_FIFO_PR]=(ULONG)bInputItem;
+			if(Language->Hook.Hook.h_Entry)
+	        {
+				xc=hDaemon->IUtility->CallHookPkt((APTR)&Language->Hook,(APTR)Language,(APTR)Message);
+			}else{
+				xc=hDaemon->IUtility->CallHookPkt((APTR)&Context->Hook,(APTR)Language,(APTR)Message);
+			};
+/*
+			for(OutputIndex=LCSTATE_EMITBUFF;OutputIndex<LCSTATE_EMITBMAX;OutputIndex++)
+			{
+				EmitGlyph=(APTR)hDaemon->IUtility->FindTagItem(OutputIndex,Vector);
+				if(EmitGlyph->ti_Data)
+				{
+					OutputMask = OutputMask || 1L << (OutputIndex-LCSTATE_EMITBUFF);
+					TranslateCP32UTF8((APTR)&EmitGlyph->ti_Data);
+					KDEBUG("[UTF8=%lx]\n",EmitGlyph->ti_Data);
+					InputForward(EmitGlyph,hDaemon);
+				}
+				EmitGlyph->ti_Data=0L;
+			};
+*/
+		};
+	};
+
+	return;
 }
 
 //	Refeed Octets through input.device with ignore marker for the filter ?
