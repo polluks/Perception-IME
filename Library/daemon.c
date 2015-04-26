@@ -44,14 +44,14 @@ struct	DaemonApplication
 /**/
 };
 
-void  InitCommodity(struct DaemonApplication *Self, LONG active);
+void  InitCommodity(struct DaemonApplication *Self);
 void  ExitCommodity(struct DaemonApplication *Self);
 void  PerceptionCommodityEvent(struct DaemonApplication *Self, APTR message);
 void  PerceptionRexxHostEvent(struct DaemonApplication *Self, APTR message);
 void  InitInputHandler(struct DaemonApplication *dapp);
 void  ExitInputHandler(struct DaemonApplication *dapp);
-APTR  ExecInputHandler(APTR ieStream, struct DaemonApplication *hDaemon);
 void  ProcInputHandler(struct DaemonApplication *hDaemon);
+APTR  ExecInputHandler(struct DaemonApplication *hDaemon,APTR ieStream);
 void  InputForward(struct TagItem *EGlyph,struct DaemonApplication *hDaemon);
 
 /*
@@ -140,10 +140,7 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 			dApplication->IApplication = (APTR)IExec->GetInterface(Base,"main",2L,NULL);
 
 		if(dApplication->ICX)
-		{
-			dApplication->CommodityFlags = dApplication->CommodityFlags | PERCEPTION_STATE_ACTIVE;
-			InitCommodity(dApplication, TRUE);
-		}
+			InitCommodity(dApplication);
 
 		if(dApplication->IApplication)
 			dApplication->ApplicationID=dApplication->IApplication->RegisterApplication((APTR)DaemonName,
@@ -154,18 +151,6 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 				REGAPP_AppIconInfo,				NULL,
 				REGAPP_Description,				DaemonDescription,
 				NULL,							NULL);
-
-/*
-		if(dApplication->ILocale)
-			dApplication->hLocale=dApplication->ILocale->OpenLocale(NULL);
-		if(dApplication->hLocale)
-			dApplication->hDataBase=dApplication->ILocale->OpenCatalog(
-				dApplication->hLocale,	"Perception",
-				OC_BuiltInLanguage,		"english",
-				OC_BuiltInCodeSet,		106L,
-				OC_PreferExternal,		TRUE,
-				TAG_END,NULL);
-*/
 
 		InitInputContext(&dApplication->DaemonContext,NULL);
 		dApplication->DaemonContext.Hook.PerceptionLib=(APTR)dApplication->IPerception;
@@ -194,13 +179,6 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 		ExitInputHandler(dApplication);
 		ExitInputContext(&dApplication->DaemonContext);
 
-/*
-		if(dApplication->hLocale)
-		{
-			dApplication->ILocale->CloseLocale(dApplication->hLocale);
-			dApplication->hLocale=NULL;
-		};
-*/
 		if(dApplication->ApplicationID)
 			dApplication->IApplication->UnregisterApplication(dApplication->ApplicationID, NULL);
 
@@ -259,7 +237,7 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 	return(rc);
 };
 
-void InitCommodity(struct DaemonApplication *Self, LONG active)
+void InitCommodity(struct DaemonApplication *Self)
 {
 	LONG	error=0L;
 	struct NewBroker NewCommodityDaemon;
@@ -280,14 +258,13 @@ void InitCommodity(struct DaemonApplication *Self, LONG active)
 			NULL,				NULL);
 	if(Self->cxPort)
 		Self->cxSignal=1L << Self->cxPort->mp_SigBit;
-	if(Self->ICX)
-	{
+	if(Self->cxSignal)
 		NewCommodityDaemon.nb_Port = Self->cxPort;
-		Self->CommodityKey=Self->ICX->CxBroker(&NewCommodityDaemon,&error);
-	}
+	Self->CommodityKey=Self->ICX->CxBroker(&NewCommodityDaemon,&error);
 	if(Self->CommodityKey)
-	{
-		Self->ICX->ActivateCxObj(Self->CommodityKey, active);
+    {
+		Self->ICX->ActivateCxObj(Self->CommodityKey, TRUE);
+		Self->CommodityFlags = Self->CommodityFlags | PERCEPTION_STATE_ACTIVE;
 	}
 	return;
 }
@@ -311,28 +288,29 @@ void ExitCommodity(struct DaemonApplication *Self)
 */
 void PerceptionCommodityEvent(struct DaemonApplication *Self, APTR message)
 {
+	KDEBUG("Perception[Commodity]");
 	if((Self->ICX->CxMsgType(message))==CXM_COMMAND)
 		switch(Self->ICX->CxMsgID(message))
 		{
 			case	CXCMD_DISABLE:
 				Self->CommodityFlags = Self->CommodityFlags & (!PERCEPTION_STATE_ACTIVE);
-				KDEBUG("Perception[Commodity::Disable(%x)]\n",Self->CommodityFlags);	break;
+				KDEBUG("::Disable(%x)\n",Self->CommodityFlags);	break;
 				break;
 			case	CXCMD_ENABLE:
 				Self->CommodityFlags = Self->CommodityFlags | PERCEPTION_STATE_ACTIVE;
-				KDEBUG("Perception[Commodity::Enable(%x)]\n",Self->CommodityFlags);	break;
+				KDEBUG("::Enable(%x)\n",Self->CommodityFlags);	break;
 				break;
 			case	CXCMD_APPEAR:   	/* External Forwarded */
-				KDEBUG("Perception[Commodity::Appear()]\n");	break;
+				KDEBUG("::Appear()\n");	break;
 				break;
 			case	CXCMD_DISAPPEAR:	/* External Forwarded */
-				KDEBUG("Perception[Commodity::Disappear()]\n");	break;
+				KDEBUG("::Disappear()\n");	break;
 				break;
 			case	CXCMD_KILL:			/* External then Internal */
-				KDEBUG("Perception[Commodity::Kill()]\n");		break;
+				KDEBUG("::Kill()\n");		break;
 				break;
 			case	CXCMD_UNIQUE:		/* Internal Special */
-				KDEBUG("Perception[Commodity::Unique()]\n");	break;
+				KDEBUG("::Unique()\n");	break;
 				break;
 			default:
 				KDEBUG("Perception[Commodity::Unknown()]\n");	break;
@@ -421,53 +399,6 @@ void  ExitInputHandler(struct DaemonApplication *Self)
 	return;
 };
 
-APTR  ExecInputHandler(APTR ieStream, struct DaemonApplication *hDaemon)
-{
-	ULONG InputIndex=0L, buffer=0L;
-	struct InputEvent *rc=ieStream, *prev=ieStream, *hInputEvent=ieStream;
-	struct LIBRARY_CLASS *Self=hDaemon->PerceptionBase;
-	struct InputContext *Context=NULL;
-	struct InputTagItem *bInputItem=NULL;
-
-	if(hDaemon->CommodityFlags && PERCEPTION_STATE_ACTIVE)
-		do{
-			if(hInputEvent->ie_Class==IECLASS_RAWKEY)
-				Context=Self->InputContext;
-			if(hInputEvent->ie_Class==IECLASS_EXTENDEDRAWKEY)
-				Context=Self->InputContext;
-			if(Context)
-			{
-				InputIndex=Context->State[ICSTATE_FIFO_IW];
-				bInputItem=(APTR)Context->State[ICSTATE_FIFO_PW];
-				if(!bInputItem)
-					bInputItem=Context->Vector;
-				Self->IExec->ObtainSemaphore(&Self->Lock);
-				if(Self->IKeymap->MapRawKey(hInputEvent,(APTR)&buffer,4,NULL))
-				{
-					bInputItem->glyph	= buffer;
-					bInputItem->qual	= hInputEvent->ie_Qualifier;
-					bInputItem->type	= TRANSLATE_ANSI;
-				}else{
-					bInputItem->glyph	= hInputEvent->ie_Code;
-					bInputItem->qual	= hInputEvent->ie_Qualifier;
-					bInputItem->type	= TRANSLATE_AMIGA;
-				};
-				if(InputIndex<IME_VECTOR_SIZE)
-				{
-					InputIndex++; bInputItem++;
-				}else{
-					InputIndex=0L; bInputItem=NULL;
-				};
-				Context->State[ICSTATE_FIFO_IW]=InputIndex;
-				Context->State[ICSTATE_FIFO_PW]=(ULONG)bInputItem;
-				Self->IExec->ReleaseSemaphore(&Self->Lock);
-				Self->IExec->Signal(Self->IExec->FindTask(NULL),hDaemon->ioSignal);
-			}
-			prev=hInputEvent;
-		}while((hInputEvent=hInputEvent->ie_NextEvent)!=NULL);
-	return((APTR)rc);
-}
-
 void  ProcInputHandler(struct DaemonApplication *hDaemon)
 {
 	ULONG xc=0L, InputIndex=0L, OutputIndex=0L, OutputMask=0L;
@@ -478,6 +409,7 @@ void  ProcInputHandler(struct DaemonApplication *hDaemon)
 
 	if(hDaemon->CommodityFlags && PERCEPTION_STATE_ACTIVE)
 	{
+		KDEBUG("Perception[Commodity//ProcInputHandler]()\n");
 		if(Context)
 		{
 			InputIndex=Context->State[ICSTATE_FIFO_IR];
@@ -534,7 +466,6 @@ void  ProcInputHandler(struct DaemonApplication *hDaemon)
 			}else{
 				xc=hDaemon->IUtility->CallHookPkt((APTR)&Context->Hook,(APTR)Language,(APTR)Message);
 			};
-			KDEBUG("ProcInputHandler()[Hook::PostEntry]\n");
 			for(OutputIndex=LCSTATE_EMITBUFF;OutputIndex<LCSTATE_EMITBMAX;OutputIndex++)
 			{
 				EmitGlyph=(APTR)hDaemon->IUtility->FindTagItem(OutputIndex,Vector);
@@ -551,6 +482,53 @@ void  ProcInputHandler(struct DaemonApplication *hDaemon)
 	};
 
 	return;
+}
+
+APTR  ExecInputHandler(struct DaemonApplication *hDaemon,APTR ieStream)
+{
+	ULONG InputIndex=0L, buffer=0L;
+	struct InputEvent *rc=ieStream, *prev=ieStream, *hInputEvent=ieStream;
+	struct LIBRARY_CLASS *Self=hDaemon->PerceptionBase;
+	struct InputContext *Context=NULL;
+	struct InputTagItem *bInputItem=NULL;
+
+	if(hDaemon->CommodityFlags && PERCEPTION_STATE_ACTIVE)
+		do{
+			if(hInputEvent->ie_Class==IECLASS_RAWKEY)
+				Context=Self->InputContext;
+			if(hInputEvent->ie_Class==IECLASS_EXTENDEDRAWKEY)
+				Context=Self->InputContext;
+			if(Context)
+			{
+				InputIndex=Context->State[ICSTATE_FIFO_IW];
+				bInputItem=(APTR)Context->State[ICSTATE_FIFO_PW];
+				if(!bInputItem)
+					bInputItem=Context->Vector;
+				Self->IExec->ObtainSemaphore(&Self->Lock);
+				if(Self->IKeymap->MapRawKey(hInputEvent,(APTR)&buffer,4,NULL))
+				{
+					bInputItem->glyph	= buffer;
+					bInputItem->qual	= hInputEvent->ie_Qualifier;
+					bInputItem->type	= TRANSLATE_ANSI;
+				}else{
+					bInputItem->glyph	= hInputEvent->ie_Code;
+					bInputItem->qual	= hInputEvent->ie_Qualifier;
+					bInputItem->type	= TRANSLATE_AMIGA;
+				};
+				if(InputIndex<IME_VECTOR_SIZE)
+				{
+					InputIndex++; bInputItem++;
+				}else{
+					InputIndex=0L; bInputItem=NULL;
+				};
+				Context->State[ICSTATE_FIFO_IW]=InputIndex;
+				Context->State[ICSTATE_FIFO_PW]=(ULONG)bInputItem;
+				Self->IExec->ReleaseSemaphore(&Self->Lock);
+				Self->IExec->Signal(Self->IExec->FindTask(NULL),hDaemon->ioSignal);
+			}
+			prev=hInputEvent;
+		}while((hInputEvent=hInputEvent->ie_NextEvent)!=NULL);
+	return((APTR)rc);
 }
 
 //	Refeed Octets through input.device with ignore marker for the filter ?

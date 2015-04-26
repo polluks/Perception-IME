@@ -32,7 +32,7 @@ autodoc:
 	$(AD) apicalls.c >$(AUTODOC)
 
 install: $(LNAME)
-	C:Copy	$(LNAME)	LIBS:$(LNAME)
+	C:Copy	$(LNAME).debug	LIBS:$(LNAME)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
