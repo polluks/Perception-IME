@@ -121,16 +121,16 @@ APTR LCALL_ObtainLanguageContext(struct LIBIFACE_CLASS *iface,APTR name,APTR hoo
 
 	if(name)
 	{
-		Self->IExec->ObtainSemaphore(&Self->Lock);
 		rc=(APTR)Self->IExec->FindName(&Self->InputContextList,name);
 		if(!rc)
 		{
 			rc=(APTR)Self->IExec->AllocVecTags(IHCONTEXTSIZE,MEMF_SHARED);
 			InitLanguageContext((APTR)rc,(APTR)hook);
 			Self->IExec->InitSemaphore((APTR)rc);
+			Self->IExec->ObtainSemaphore(&Self->Lock);
 			Self->IExec->AddHead(&Self->InputContextList,(APTR)rc);
+			Self->IExec->ReleaseSemaphore(&Self->Lock);
 		};
-		Self->IExec->ReleaseSemaphore(&Self->Lock);
     }
 	return((APTR)rc);
 }
@@ -175,13 +175,11 @@ ULONG LCALL_GetLanguageContextAttr(struct LIBIFACE_CLASS *iface, APTR lc, APTR m
 	ULONG rc=0L, *Method=m;
 	struct InputContext *LanguageContext=lc;
 
-	Self->IExec->ObtainSemaphore(&Self->Lock);
 	switch(Method[0])
 	{
 		default:
 			break;
 	}
-	Self->IExec->ReleaseSemaphore(&Self->Lock);
 
 	return(rc);
 }
@@ -204,13 +202,11 @@ ULONG LCALL_SetLanguageContextAttr(struct LIBIFACE_CLASS *iface, APTR lc, APTR m
 	ULONG rc=0L, *Method=m;
 	struct InputContext *LanguageContext=lc;
 
-	Self->IExec->ObtainSemaphore(&Self->Lock);
 	switch(Method[0])
 	{
 		default:
 			break;
 	}
-	Self->IExec->ReleaseSemaphore(&Self->Lock);
 
 	return(rc);
 }
