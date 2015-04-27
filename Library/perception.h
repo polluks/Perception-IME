@@ -94,7 +94,6 @@ struct LIBRARY_CLASS
 	struct	UtilityIFace		*IUtility;
 	struct	LocaleIFace			*ILocale;
 	struct	KeymapIFace			*IKeymap;
-	struct	CodesetsIFace		*ICodesets;
 	struct	CommoditiesIFace	*ICX;
 	struct	RexxSysIFace		*IRexxSys;
 /**/

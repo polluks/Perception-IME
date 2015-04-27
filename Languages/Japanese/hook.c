@@ -160,7 +160,6 @@ void InitPerceptionHook(struct LIBRARY_CLASS *Self)
 		Language=Self->IPerception->ObtainLanguageContext((APTR)LanguageName,(APTR)&ExecLanguageContextHook);
 	if(Language)
 	{
-        Self->IPerception->SetLanguageContextAttr(Language,(APTR)DefaultSystemLanguage);
 		Self->HPerception=Language;
 	}
 
@@ -214,7 +213,6 @@ ULONG FindSyllableCandidate(ULONG Key,struct UtilityIFace *IUtility)
 
 void  QueueSyllableCandidate(ULONG c,struct TagItem *Vector,APTR LanguageContext,struct LanguageContextHook *lch)
 {
-	struct TagItem *qBuffer;
 	KDEBUG("QueueSyllableCandidate[CodePoint=%lx]\n",c);
 	return;
 };
@@ -249,14 +247,14 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 	struct PerceptionIFace	*IPerception= lch->PerceptionLib;
 	struct TagItem *Vector = NULL, VCommand;
 
-	KDEBUG("Japanese.Language::ExecLanguageHook()[LanguageContext]\n");
+	KDEBUG("Japanese.Language[ExecLanguageHook]()[LanguageContext]\n");
 	if(LanguageContext)
 	{
 		VCommand.ti_Tag = LCSTATE_VECTOR;
 		VCommand.ti_Data= 0L;
         Vector=(APTR)IPerception->GetLanguageContextAttr(LanguageContext,&VCommand);
 	};
-	KDEBUG("Japanese.Language::ExecLanguageHook()[Message]\n");
+	KDEBUG("Japanese.Language[ExecLanguageHook]()[Message]\n");
 	if(Message)
 	{
 	    if((Message[1] & 0xFF000000) == Message[1])
@@ -269,8 +267,18 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 				c = TAG_USER | ((Message[1] >> 24)+0x20);
 		}
 	}
-	KDEBUG("ExecLanguageContextHook[Syllable =%lx]\n",Syllable);
-	KDEBUG("ExecLanguageContextHook[Character=%lx]\n",c);
+	KDEBUG("ExecLanguageContextHook[Syllable =%lx][Character=%lx]\n",Syllable,c);
+
+	return(rc);
+};
+
+/**/
+/*
+
+	ULONG rc=0L, *Message=m, c=0L, Syllable=0L, Kana=0L;
+	struct PerceptionIFace	*IPerception= lch->PerceptionLib;
+	struct TagItem *Vector = NULL, VCommand;
+
 	switch(Message[0])
 	{
 		case LANGUAGE_TRANSLATE_AMIGA:
@@ -314,7 +322,7 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 			KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_ANSI]\n");
 			switch(Syllable)
 			{
-				case	0x00000000:	/* NULL */
+				case	0x00000000:	// NULL
 					switch(c)
 					{
 						case 0x00000061:
@@ -329,7 +337,7 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 							break;
 					}
 					break;
-				case	0x0000006E:	/* 'N' */
+				case	0x0000006E:	// 'N'
 					switch(c)
 					{
 						case 0x00000061:
@@ -369,11 +377,9 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 					QueueSyllableCandidate((Kana >> 16),Vector,LanguageContext,lch);
 				if(Kana && 0x00007FFF)
 					QueueSyllableCandidate((Kana & 0xFFFF),Vector,LanguageContext,lch);
-/*
 				UpdateKanjiCandidacy(Vector,LanguageContext,lch);
 				UpdateVocabCandidacy(Vector,LanguageContext,lch);
 
-*/
 			}
 			break;
 		default:
@@ -382,6 +388,4 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 	}
 
 	return(rc);
-}
-
-/**/
+*/

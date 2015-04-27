@@ -93,9 +93,6 @@ struct library *LCALL_Init(struct LIBRARY_CLASS *Self,
 	if((Base = IExec->OpenLibrary("keymap.library",0L)))
 		Self->IKeymap = (APTR)IExec->GetInterface(Base,"main",1L,NULL);
 
-	if((Base = IExec->OpenLibrary("codesets.library",0L)))
-		Self->ICodesets = (APTR)IExec->GetInterface(Base,"main",1L,NULL);
-
 	if((Base = IExec->OpenLibrary("commodities.library",0L)))
 		Self->ICX = (APTR)IExec->GetInterface(Base,"main",1L,NULL);
 
@@ -156,13 +153,6 @@ APTR LCALL_Expunge(struct LIBIFACE_CLASS *Iface)
 		{
 			Base = Self->ICX->Data.LibBase;
 			IExec->DropInterface((APTR)Self->ICX);
-            IExec->CloseLibrary((APTR)Base);
-		}
-
-		if(Self->ICodesets)
-		{
-			Base = Self->ICodesets->Data.LibBase;
-			IExec->DropInterface((APTR)Self->ICodesets);
             IExec->CloseLibrary((APTR)Base);
 		}
 

@@ -84,9 +84,6 @@ struct library *LCALL_Init(struct LIBRARY_CLASS *SelfBase,
 	if((Base = IExec->OpenLibrary("perception.library",0L)))
 		SelfBase->IPerception = (APTR)IExec->GetInterface(Base,"main",1L,NULL);
 
-	if((Base = IExec->OpenLibrary("codesets.library",0L)))
-		SelfBase->ICodesets = (APTR)IExec->GetInterface(Base,"main",1L,NULL);
-
 	if(SelfBase->IPerception)
 		InitPerceptionHook(SelfBase);
 
@@ -122,13 +119,6 @@ APTR LCALL_Expunge(struct LibraryManagerInterface *Self)
 	{
 		SelfBase->Library.lib_Flags |= LIBF_DELEXP;
 	}else{
-		if(SelfBase->ICodesets)
-		{
-			Base = SelfBase->ICodesets->Data.LibBase;
-			IExec->DropInterface((APTR)SelfBase->ICodesets);
-            IExec->CloseLibrary((APTR)Base);
-		}
-
 		if(SelfBase->IPerception)
 		{
 			ExitPerceptionHook(SelfBase);
