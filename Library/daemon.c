@@ -112,17 +112,17 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 	ULONG	signals = 0L, sigmask = 0L;
 	APTR	message = NULL;
 
+	KDEBUG("Perception-IME Daemon Launched\n");
+
 	dApplication=IExec->AllocVecTags(sizeof(struct DaemonApplication),
 		AVT_Type,MEMF_SHARED,AVT_ClearWithValue,0L,TAG_DONE);
 	if(dApplication)
 	{
-/*
-		KDEBUG("Perception-IME Daemon Launched\n");
-
-		dApplication->IExec			= (struct ExecIFace *)(*(struct ExecBase **)4)->MainInterface;
 		if((Base = (APTR)IExec->OpenLibrary(LIBRARY_NAME, 0L)))
+			dApplication->PerceptionBase = (APTR)Base;
+		dApplication->IExec			= (struct ExecIFace *)(*(struct ExecBase **)4)->MainInterface;
+		if(dApplication->PerceptionBase)
 			dApplication->IPerception = (APTR)IExec->GetInterface(Base,"main",1L,NULL);
-		dApplication->PerceptionBase = (APTR)Base;
 
 		if((Base = (APTR)IExec->OpenLibrary("dos.library", 50L)))
 			dApplication->IDOS		 = (APTR)IExec->GetInterface(Base,"main",1L,NULL);
@@ -145,8 +145,6 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 		if(dApplication->ICX)
 			InitCommodity(dApplication);
 
-		KDEBUG("Perception-IME Commodity \n");
-
 		if(dApplication->IApplication)
 			dApplication->ApplicationID=dApplication->IApplication->RegisterApplication((APTR)DaemonName,
 				REGAPP_UniqueApplication,		TRUE,
@@ -157,8 +155,7 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 				REGAPP_Description,				DaemonDescription,
 				NULL,							NULL);
 
-		KDEBUG("Perception-IME Application.Library \n");
-
+/*
 		InitInputContext(&dApplication->DaemonContext,NULL);
 		dApplication->DaemonContext.Hook.PerceptionLib=(APTR)dApplication->IPerception;
 		dApplication->DaemonContext.Hook.UtilityLib=(APTR)dApplication->IUtility;
@@ -166,29 +163,27 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 		InitInputHandler(dApplication);
 
 		KDEBUG("Perception-IME InputHandler \n");
-
+*/
 		do{
 			sigmask = dApplication->ioSignal | dApplication->cxSignal | dApplication->rxSignal;
-*/
 			signals = IExec->Wait(sigmask);
-/*
-
-			if(signals && dApplication->ioSignal)
-				ProcInputHandler(dApplication);
 
 			if(signals && dApplication->cxSignal)
 				while((message=(APTR)IExec->GetMsg(dApplication->cxPort)))
 					exit=PerceptionCommodityEvent(dApplication,message);
 
-			if(signals && dApplication->cxSignal)
+			if(signals && dApplication->ioSignal)
+				ProcInputHandler(dApplication);
+
+			if(signals && dApplication->rxSignal)
 				while((message=(APTR)IExec->GetMsg(dApplication->rxPort)))
 					exit=PerceptionRexxHostEvent(dApplication,message);
 
 		}while(!exit);
-
+/*
 		ExitInputHandler(dApplication);
 		ExitInputContext(&dApplication->DaemonContext);
-
+*/
 		if(dApplication->ApplicationID)
 			dApplication->IApplication->UnregisterApplication(dApplication->ApplicationID, NULL);
 
@@ -241,7 +236,7 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 			IExec->DropInterface((APTR)dApplication->IPerception);
 		if(dApplication->PerceptionBase)
 			IExec->CloseLibrary((APTR)dApplication->PerceptionBase);
-*/
+
         IExec->FreeVec(dApplication);
 	}
 	return(rc);
