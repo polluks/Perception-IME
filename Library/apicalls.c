@@ -64,9 +64,10 @@ CONST APTR LibInterfaceTable[] =
 */
 APTR LCALL_ScriptExec(struct LIBIFACE_CLASS *iface)
 {
+	APTR rc=NULL;
 	struct LIBRARY_CLASS *Self = (APTR) iface->Data.LibBase;
 
-	return(NULL);
+	return(rc);
 }
 
 /****** perception.library/OptionTagList() **********************************
@@ -84,17 +85,20 @@ APTR LCALL_ScriptExec(struct LIBIFACE_CLASS *iface)
 */
 APTR LCALL_OptionTagList(struct LIBIFACE_CLASS *iface, struct TagItem *options)
 {
+	APTR rc=NULL;
 	struct LIBRARY_CLASS *Self = (APTR) iface->Data.LibBase;
 	struct TagItem *mSTATE=options, *Method=NULL;
 
 	while((Method=Self->IUtility->NextTagItem(&mSTATE)))
+		;;
+/*
 		switch(Method->ti_Tag)
 		{
 			default:
 				break;
 		};
-
-	return(NULL);
+*/
+	return(rc);
 }
 
 /****** perception.library/ObtainLanguageContext() *************************
@@ -121,15 +125,19 @@ APTR LCALL_ObtainLanguageContext(struct LIBIFACE_CLASS *iface,APTR name,APTR hoo
 
 	if(name)
 	{
+		Self->IExec->ObtainSemaphore(&Self->Lock);
 		rc=(APTR)Self->IExec->FindName(&Self->InputContextList,name);
+		Self->IExec->ReleaseSemaphore(&Self->Lock);
 		if(!rc)
 		{
 			rc=(APTR)Self->IExec->AllocVecTags(IHCONTEXTSIZE,MEMF_SHARED);
 			InitLanguageContext((APTR)rc,(APTR)hook);
 			Self->IExec->InitSemaphore((APTR)rc);
 			Self->IExec->ObtainSemaphore(&Self->Lock);
-			Self->IExec->AddHead(&Self->InputContextList,(APTR)rc);
+			Self->IExec->AddTail(&Self->InputContextList,rc);
 			Self->IExec->ReleaseSemaphore(&Self->Lock);
+			if(!Self->CurrentLanguage)
+				Self->CurrentLanguage=rc;
 		};
     }
 	return((APTR)rc);
@@ -150,8 +158,12 @@ APTR LCALL_ObtainLanguageContext(struct LIBIFACE_CLASS *iface,APTR name,APTR hoo
 APTR LCALL_ReleaseLanguageContext(struct LIBIFACE_CLASS *iface, APTR o)
 {
 	struct LIBRARY_CLASS *Self = (APTR) iface->Data.LibBase;
+	struct Node *n=o;
 	APTR rc=NULL;
 
+	Self->IExec->ObtainSemaphore(&Self->Lock);
+	Self->IExec->Remove(n);
+	Self->IExec->ReleaseSemaphore(&Self->Lock);
 	Self->IExec->FreeVec(o);
 
 	return(rc);
@@ -175,12 +187,13 @@ ULONG LCALL_GetLanguageContextAttr(struct LIBIFACE_CLASS *iface, APTR lc, APTR m
 	ULONG rc=0L, *Method=m;
 	struct InputContext *LanguageContext=lc;
 
+/*
 	switch(Method[0])
 	{
 		default:
 			break;
 	}
-
+*/
 	return(rc);
 }
 
@@ -201,13 +214,13 @@ ULONG LCALL_SetLanguageContextAttr(struct LIBIFACE_CLASS *iface, APTR lc, APTR m
 	struct LIBRARY_CLASS *Self = (APTR) iface->Data.LibBase;
 	ULONG rc=0L, *Method=m;
 	struct InputContext *LanguageContext=lc;
-
+/*
 	switch(Method[0])
 	{
 		default:
 			break;
 	}
-
+*/
 	return(rc);
 }
 

@@ -46,20 +46,20 @@ struct	DaemonApplication
 
 void  InitCommodity(struct DaemonApplication *Self);
 void  ExitCommodity(struct DaemonApplication *Self);
-void  PerceptionCommodityEvent(struct DaemonApplication *Self, APTR message);
-void  PerceptionRexxHostEvent(struct DaemonApplication *Self, APTR message);
 void  InitInputHandler(struct DaemonApplication *dapp);
 void  ExitInputHandler(struct DaemonApplication *dapp);
-void  ProcInputHandler(struct DaemonApplication *hDaemon);
+ULONG PerceptionCommodityEvent(struct DaemonApplication *Self, APTR message);
+ULONG PerceptionRexxHostEvent(struct DaemonApplication *Self, APTR message);
 APTR  ExecInputHandler(struct DaemonApplication *hDaemon,APTR ieStream);
+void  ProcInputHandler(struct DaemonApplication *hDaemon);
 void  InputForward(struct TagItem *EGlyph,struct DaemonApplication *hDaemon);
 
 /*
  *	Process Information
 */
 STATIC CONST BYTE	DaemonName[]			= "Perception-IME\0";
-STATIC CONST ULONG	DaemonStackSize			= 98304UL;
-STATIC CONST ULONG	DaemonPriority			= 96UL;
+STATIC CONST ULONG	DaemonStackSize			= 131072L;
+STATIC CONST ULONG	DaemonPriority			= 44L;
 STATIC CONST BYTE	DaemonDescription[]		= "Input Method Editing\0";
 STATIC CONST BYTE	DaemonReleaseString[]	= "Open Source Edition\0";
 
@@ -104,7 +104,7 @@ void ExitPerceptionDaemon(struct LIBRARY_CLASS *Self)
 
 int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 {
-	uint32	rc=0L;
+	uint32	rc=0L, exit=0L;
     struct ExecIFace *IExec = (struct ExecIFace *)(*(struct ExecBase **)4)->MainInterface;
 	struct Library *Base = NULL;
 	struct DaemonApplication *dApplication=NULL;
@@ -116,6 +116,9 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 		AVT_Type,MEMF_SHARED,AVT_ClearWithValue,0L,TAG_DONE);
 	if(dApplication)
 	{
+/*
+		KDEBUG("Perception-IME Daemon Launched\n");
+
 		dApplication->IExec			= (struct ExecIFace *)(*(struct ExecBase **)4)->MainInterface;
 		if((Base = (APTR)IExec->OpenLibrary(LIBRARY_NAME, 0L)))
 			dApplication->IPerception = (APTR)IExec->GetInterface(Base,"main",1L,NULL);
@@ -142,6 +145,8 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 		if(dApplication->ICX)
 			InitCommodity(dApplication);
 
+		KDEBUG("Perception-IME Commodity \n");
+
 		if(dApplication->IApplication)
 			dApplication->ApplicationID=dApplication->IApplication->RegisterApplication((APTR)DaemonName,
 				REGAPP_UniqueApplication,		TRUE,
@@ -152,29 +157,34 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 				REGAPP_Description,				DaemonDescription,
 				NULL,							NULL);
 
+		KDEBUG("Perception-IME Application.Library \n");
+
 		InitInputContext(&dApplication->DaemonContext,NULL);
 		dApplication->DaemonContext.Hook.PerceptionLib=(APTR)dApplication->IPerception;
 		dApplication->DaemonContext.Hook.UtilityLib=(APTR)dApplication->IUtility;
         dApplication->PerceptionBase->InputContext=&dApplication->DaemonContext;
-
 		InitInputHandler(dApplication);
+
+		KDEBUG("Perception-IME InputHandler \n");
 
 		do{
 			sigmask = dApplication->ioSignal | dApplication->cxSignal | dApplication->rxSignal;
+*/
 			signals = IExec->Wait(sigmask);
+/*
 
 			if(signals && dApplication->ioSignal)
 				ProcInputHandler(dApplication);
 
 			if(signals && dApplication->cxSignal)
 				while((message=(APTR)IExec->GetMsg(dApplication->cxPort)))
-					PerceptionCommodityEvent(dApplication,message);
+					exit=PerceptionCommodityEvent(dApplication,message);
 
 			if(signals && dApplication->cxSignal)
 				while((message=(APTR)IExec->GetMsg(dApplication->rxPort)))
-					PerceptionRexxHostEvent(dApplication,message);
+					exit=PerceptionRexxHostEvent(dApplication,message);
 
-		}while(dApplication != NULL);
+		}while(!exit);
 
 		ExitInputHandler(dApplication);
 		ExitInputContext(&dApplication->DaemonContext);
@@ -231,7 +241,7 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 			IExec->DropInterface((APTR)dApplication->IPerception);
 		if(dApplication->PerceptionBase)
 			IExec->CloseLibrary((APTR)dApplication->PerceptionBase);
-
+*/
         IExec->FreeVec(dApplication);
 	}
 	return(rc);
@@ -286,45 +296,47 @@ void ExitCommodity(struct DaemonApplication *Self)
 	Enable	-> Start Input Editing
 	Kill	-> Flush Everything
 */
-void PerceptionCommodityEvent(struct DaemonApplication *Self, APTR message)
+ULONG PerceptionCommodityEvent(struct DaemonApplication *Self, APTR message)
 {
+	ULONG rc=0L;
 	KDEBUG("Perception[Commodity]");
 	if((Self->ICX->CxMsgType(message))==CXM_COMMAND)
 		switch(Self->ICX->CxMsgID(message))
 		{
 			case	CXCMD_DISABLE:
 				Self->CommodityFlags = Self->CommodityFlags & (!PERCEPTION_STATE_ACTIVE);
-				KDEBUG("::Disable(%x)\n",Self->CommodityFlags);	break;
+				KDEBUG("::Disable(%x)\n",Self->CommodityFlags);
 				break;
 			case	CXCMD_ENABLE:
 				Self->CommodityFlags = Self->CommodityFlags | PERCEPTION_STATE_ACTIVE;
-				KDEBUG("::Enable(%x)\n",Self->CommodityFlags);	break;
+				KDEBUG("::Enable(%x)\n",Self->CommodityFlags);
 				break;
 			case	CXCMD_APPEAR:   	/* External Forwarded */
-				KDEBUG("::Appear()\n");	break;
+				KDEBUG("::Appear()\n");
 				break;
 			case	CXCMD_DISAPPEAR:	/* External Forwarded */
-				KDEBUG("::Disappear()\n");	break;
+				KDEBUG("::Disappear()\n");
 				break;
 			case	CXCMD_KILL:			/* External then Internal */
-				KDEBUG("::Kill()\n");		break;
+				KDEBUG("::Kill()\n");
+				rc=TRUE;
 				break;
 			case	CXCMD_UNIQUE:		/* Internal Special */
-				KDEBUG("::Unique()\n");	break;
+				KDEBUG("::Unique()\n");
 				break;
 			default:
-				KDEBUG("Perception[Commodity::Unknown()]\n");	break;
+				KDEBUG("Perception[Commodity::Unknown()]\n");
 				break;
 		}
-	return;
+	return(rc);
 }
 
 /*
 */
-void  PerceptionRexxHostEvent(struct DaemonApplication *Self, APTR message)
+ULONG PerceptionRexxHostEvent(struct DaemonApplication *Self, APTR message)
 {
-
-	return;
+	ULONG rc=0L;
+	return(rc);
 }
 
 /*
@@ -446,7 +458,7 @@ APTR  ExecInputHandler(struct DaemonApplication *hDaemon,APTR ieStream)
 	return((APTR)rc);
 }
 
-void  ProcInputHandler(struct DaemonApplication *hDaemon)
+void ProcInputHandler(struct DaemonApplication *hDaemon)
 {
 	ULONG xc=0L, InputIndex=0L, OutputIndex=0L, OutputMask=0L;
 	struct LIBRARY_CLASS *Self=hDaemon->PerceptionBase;

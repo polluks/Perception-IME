@@ -27,7 +27,6 @@
 #include <devices/inputevent.h>
 
 #include <libraries/keymap.h>
-#include <libraries/codesets.h>
 #include <libraries/perception.h>
 
 #define __USE_SYSBASE
@@ -44,7 +43,6 @@
 #include <proto/keymap.h>
 #include <proto/rexxsyslib.h>
 #include <proto/application.h>
-#include <proto/codesets.h>
 
 #include <interfaces/exec.h>
 #include <interfaces/graphics.h>
@@ -54,10 +52,8 @@
 #include <interfaces/locale.h>
 #include <interfaces/keymap.h>
 #include <interfaces/utility.h>
-#include <interfaces/datatypes.h>
 #include <interfaces/rexxsyslib.h>
 #include <interfaces/application.h>
-#include <interfaces/codesets.h>
 #include <interfaces/perception.h>
 
 /*
