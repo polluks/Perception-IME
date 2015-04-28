@@ -18,9 +18,6 @@ struct	DaemonApplication
 	struct	UtilityIFace		*IUtility;
 	struct	LocaleIFace			*ILocale;
 	struct	RexxSysIFace		*IREXX;
-	struct	ApplicationIFace	*IApplication;
-/**/
-	uint32	ApplicationID;
 /**/
 	struct	MsgPort				*cxPort;
 	ULONG						cxSignal;
@@ -62,9 +59,6 @@ STATIC CONST ULONG	DaemonStackSize			= 131072L;
 STATIC CONST ULONG	DaemonPriority			= 44L;
 STATIC CONST BYTE	DaemonDescription[]		= "Input Method Editing\0";
 STATIC CONST BYTE	DaemonReleaseString[]	= "Open Source Edition\0";
-
-STATIC CONST BYTE	EnvironmentSettings[]	= "Env:Perception/Environment\0";
-STATIC CONST BYTE	EnvironmentStorage[]	= "Env:Perception/\0";
 
 /*
  *	Commodity Flag markers
@@ -139,22 +133,8 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 		if((Base = (APTR)IExec->OpenLibrary("rexxsyslib.library", 0L)))
 			dApplication->IREXX		 = (APTR)IExec->GetInterface(Base,"main",1L,NULL);
 
-		if((Base = (APTR)IExec->OpenLibrary("application.library", 50L)))
-			dApplication->IApplication = (APTR)IExec->GetInterface(Base,"main",2L,NULL);
-
 		if(dApplication->ICX)
 			InitCommodity(dApplication);
-
-		if(dApplication->IApplication)
-			dApplication->ApplicationID=dApplication->IApplication->RegisterApplication((APTR)DaemonName,
-				REGAPP_UniqueApplication,		TRUE,
-				REGAPP_Hidden,					TRUE,
-				REGAPP_CustomPrefsFileName,		EnvironmentSettings,
-				REGAPP_ENVDir,					EnvironmentStorage,
-				REGAPP_AppIconInfo,				NULL,
-				REGAPP_Description,				DaemonDescription,
-				NULL,							NULL);
-
 
 		InitInputContext(&dApplication->DaemonContext,NULL);
 		dApplication->DaemonContext.Hook.PerceptionLib=(APTR)dApplication->IPerception;
@@ -183,9 +163,6 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 
 //		ExitInputHandler(dApplication);
 		ExitInputContext(&dApplication->DaemonContext);
-
-		if(dApplication->ApplicationID)
-			dApplication->IApplication->UnregisterApplication(dApplication->ApplicationID, NULL);
 
 		if(dApplication->cxPort)
 			ExitCommodity(dApplication);
@@ -537,46 +514,6 @@ void ProcInputHandler(struct DaemonApplication *hDaemon)
 	};
 
 	return;
-}
-
-//	Refeed Octets through input.device with ignore marker for the filter ?
-
-void  InputForward(struct TagItem *EGlyph,struct DaemonApplication *hDaemon)
-{
-	return;
-}
-
-ULONG LanguageDefaultHook(struct LanguageContextHook *lch,APTR LanguageContext,APTR m)
-{
-	ULONG rc=0L, *Message=m;
-	struct PerceptionIFace *IPerception=lch->PerceptionLib;
-	struct UtilityIFace *IUtility=lch->UtilityLib;
-	struct TagItem *Vector=NULL, *rBuffer=NULL, VCommand;
-
-	if(LanguageContext)
-	{
-		VCommand.ti_Tag=LCSTATE_VECTOR;
-		VCommand.ti_Data=0L;
-		Vector=(APTR)IPerception->GetLanguageContextAttr(LanguageContext,(APTR)&VCommand);
-		if(Vector)
-			rBuffer=IUtility->FindTagItem(LCSTATE_CHORDBUFF,Vector);
-	};
-
-	switch(Message[0])
-	{
-		case LANGUAGE_TRANSLATE_AMIGA:
-			KDEBUG("Perception-IME//English.Language [%lx:%lx]\n", Message[1], Message[3]);
-			break;
-		case LANGUAGE_TRANSLATE_ANSI:
-			KDEBUG("Perception-IME//English.Language [%lx:%lx]\n", Message[1], Message[3]);
-			break;
-		default:
-			KDEBUG("Perception-IME//English.Language [%lx:%lx] Unknown Method:Data\n",
-				Message[0], Message[1], Message[2], Message[3]);
-			break;
-	}
-
-	return(rc);
 }
 
 /**/
