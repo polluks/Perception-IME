@@ -78,9 +78,6 @@ struct library *LCALL_Init(struct LIBRARY_CLASS *SelfBase,
 	if((Base = IExec->OpenLibrary("utility.library",0L)))
 		SelfBase->IUtility = (APTR)IExec->GetInterface(Base,"main",1L,NULL);
 
-	if((Base = IExec->OpenLibrary("locale.library",0L)))
-		SelfBase->ILocale = (APTR)IExec->GetInterface(Base,"main",1L,NULL);
-
 	if((Base = IExec->OpenLibrary("perception.library",0L)))
 		SelfBase->IPerception = (APTR)IExec->GetInterface(Base,"main",1L,NULL);
 
@@ -124,13 +121,6 @@ APTR LCALL_Expunge(struct LibraryManagerInterface *Self)
 			ExitPerceptionHook(SelfBase);
 			Base = SelfBase->IPerception->Data.LibBase;
 			IExec->DropInterface((APTR)SelfBase->IPerception);
-            IExec->CloseLibrary((APTR)Base);
-		}
-
-		if(SelfBase->ILocale)
-		{
-			Base = SelfBase->ILocale->Data.LibBase;
-			IExec->DropInterface((APTR)SelfBase->ILocale);
             IExec->CloseLibrary((APTR)Base);
 		}
 

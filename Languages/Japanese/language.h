@@ -69,9 +69,7 @@ struct LIBRARY_CLASS
 
 	struct ExecIFace *IExec;
 	struct UtilityIFace *IUtility;
-	struct LocaleIFace *ILocale;
 	struct PerceptionIFace *IPerception;
-	struct CodesetsIFace *ICodesets;
 
 	APTR HPerception;
 };
