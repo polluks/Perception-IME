@@ -155,15 +155,15 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 				REGAPP_Description,				DaemonDescription,
 				NULL,							NULL);
 
-/*
+
 		InitInputContext(&dApplication->DaemonContext,NULL);
 		dApplication->DaemonContext.Hook.PerceptionLib=(APTR)dApplication->IPerception;
 		dApplication->DaemonContext.Hook.UtilityLib=(APTR)dApplication->IUtility;
         dApplication->PerceptionBase->InputContext=&dApplication->DaemonContext;
-		InitInputHandler(dApplication);
+//		InitInputHandler(dApplication);
 
 		KDEBUG("Perception-IME InputHandler \n");
-*/
+
 		do{
 			sigmask = dApplication->ioSignal | dApplication->cxSignal | dApplication->rxSignal;
 			signals = IExec->Wait(sigmask);
@@ -180,10 +180,10 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 					exit=PerceptionRexxHostEvent(dApplication,message);
 
 		}while(!exit);
-/*
-		ExitInputHandler(dApplication);
+
+//		ExitInputHandler(dApplication);
 		ExitInputContext(&dApplication->DaemonContext);
-*/
+
 		if(dApplication->ApplicationID)
 			dApplication->IApplication->UnregisterApplication(dApplication->ApplicationID, NULL);
 
