@@ -61,8 +61,6 @@ void  InitLanguageContext(struct InputContext *lc,APTR LHook)
 	ULONG x=0L;
 	APTR  h=LHook;
 	struct TagItem *Vector=(APTR)lc->Vector;
-	if(!h)
-		h=(APTR)&LanguageDefaultHook;
 	InitInputContext(lc,h);
 	lc->Hook.Hook.h_Data=lc;
 

@@ -24,9 +24,6 @@ struct	DaemonApplication
 	APTR						CommodityKey;
 	UWORD						CommodityFlags;
 /**/
-	APTR						hLocale;
-	APTR						hDataBase;
-/**/
 	struct	MsgPort				*ioPort;
 	ULONG						ioSignal;
 	struct	Interrupt			*imFilter;
@@ -140,7 +137,7 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 		dApplication->DaemonContext.Hook.PerceptionLib=(APTR)dApplication->IPerception;
 		dApplication->DaemonContext.Hook.UtilityLib=(APTR)dApplication->IUtility;
         dApplication->PerceptionBase->InputContext=&dApplication->DaemonContext;
-//		InitInputHandler(dApplication);
+		InitInputHandler(dApplication);
 
 		KDEBUG("Perception-IME InputHandler \n");
 
@@ -161,18 +158,11 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 
 		}while(!exit);
 
-//		ExitInputHandler(dApplication);
+		ExitInputHandler(dApplication);
 		ExitInputContext(&dApplication->DaemonContext);
 
 		if(dApplication->cxPort)
 			ExitCommodity(dApplication);
-
-		if(dApplication->IApplication)
-		{
-			Base = dApplication->IApplication->Data.LibBase;
-			IExec->DropInterface((APTR)dApplication->IApplication);
-			IExec->CloseLibrary((APTR)Base);
-		}
 
 		if(dApplication->IREXX)
 		{
