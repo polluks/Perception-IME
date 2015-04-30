@@ -55,6 +55,49 @@ void  ExitInputContext(struct InputContext *ic)
 	return;
 }
 
+APTR  GetInputContext(APTR name,struct PerceptionIFace *IPerception)
+{
+	APTR rc=NULL;
+	struct LIBRARY_CLASS *PerceptionBase=NULL;
+
+	if(IPerception)
+		PerceptionBase = (APTR)IPerception->Data.LibBase;
+	if(PerceptionBase)
+	{
+		if(name)
+		{
+			PerceptionBase->IExec->ObtainSemaphore(&PerceptionBase->Lock);
+			rc=PerceptionBase->IExec->FindName(&PerceptionBase->InputContextList,name);
+			PerceptionBase->IExec->ReleaseSemaphore(&PerceptionBase->Lock);
+		}else{
+			PerceptionBase->IExec->ObtainSemaphore(&PerceptionBase->Lock);
+			rc=PerceptionBase->InputContext;
+			PerceptionBase->IExec->ReleaseSemaphore(&PerceptionBase->Lock);
+		};
+	}
+
+	return(rc);
+}
+
+void  SetInputContext(APTR ctxt,struct PerceptionIFace *IPerception)
+{
+	struct LIBRARY_CLASS *PerceptionBase=NULL;
+
+	if(IPerception)
+		PerceptionBase = (APTR)IPerception->Data.LibBase;
+	if(PerceptionBase)
+	{
+		if(ctxt)
+		{
+			PerceptionBase->IExec->ObtainSemaphore(&PerceptionBase->Lock);
+			PerceptionBase->InputContext=ctxt;
+			PerceptionBase->IExec->ReleaseSemaphore(&PerceptionBase->Lock);
+		}
+	}
+
+	return;
+}
+
 /**/
 void  InitLanguageContext(struct InputContext *lc,APTR LHook)
 {

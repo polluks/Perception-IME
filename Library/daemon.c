@@ -38,7 +38,7 @@ struct	DaemonApplication
 /**/
 };
 
-void  InitCommodity(struct DaemonApplication *Self);
+void  InitCommodity(struct DaemonApplication *Self,LONG active);
 void  ExitCommodity(struct DaemonApplication *Self);
 void  InitInputHandler(struct DaemonApplication *dapp);
 void  ExitInputHandler(struct DaemonApplication *dapp);
@@ -46,14 +46,13 @@ ULONG PerceptionCommodityEvent(struct DaemonApplication *Self, APTR message);
 ULONG PerceptionRexxHostEvent(struct DaemonApplication *Self, APTR message);
 APTR  ExecInputHandler(struct DaemonApplication *hDaemon,APTR ieStream);
 void  ProcInputHandler(struct DaemonApplication *hDaemon);
-void  InputForward(struct TagItem *EGlyph,struct DaemonApplication *hDaemon);
 
 /*
  *	Process Information
 */
 STATIC CONST BYTE	DaemonName[]			= "Perception-IME\0";
 STATIC CONST ULONG	DaemonStackSize			= 131072L;
-STATIC CONST ULONG	DaemonPriority			= 44L;
+STATIC CONST ULONG	DaemonPriority			= 11L;
 STATIC CONST BYTE	DaemonDescription[]		= "Input Method Editing\0";
 STATIC CONST BYTE	DaemonReleaseString[]	= "Open Source Edition\0";
 
@@ -103,8 +102,6 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 	ULONG	signals = 0L, sigmask = 0L;
 	APTR	message = NULL;
 
-	KDEBUG("Perception-IME Daemon Launched\n");
-
 	dApplication=IExec->AllocVecTags(sizeof(struct DaemonApplication),
 		AVT_Type,MEMF_SHARED,AVT_ClearWithValue,0L,TAG_DONE);
 	if(dApplication)
@@ -131,15 +128,13 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 			dApplication->IREXX		 = (APTR)IExec->GetInterface(Base,"main",1L,NULL);
 
 		if(dApplication->ICX)
-			InitCommodity(dApplication);
+			InitCommodity(dApplication,TRUE);
 
 		InitInputContext(&dApplication->DaemonContext,NULL);
 		dApplication->DaemonContext.Hook.PerceptionLib=(APTR)dApplication->IPerception;
 		dApplication->DaemonContext.Hook.UtilityLib=(APTR)dApplication->IUtility;
         dApplication->PerceptionBase->InputContext=&dApplication->DaemonContext;
 		InitInputHandler(dApplication);
-
-		KDEBUG("Perception-IME InputHandler \n");
 
 		do{
 			sigmask = dApplication->ioSignal | dApplication->cxSignal | dApplication->rxSignal;
@@ -209,7 +204,7 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 	return(rc);
 };
 
-void InitCommodity(struct DaemonApplication *Self)
+void InitCommodity(struct DaemonApplication *Self,LONG active)
 {
 	LONG	error=0L;
 	struct NewBroker NewCommodityDaemon;
@@ -234,10 +229,9 @@ void InitCommodity(struct DaemonApplication *Self)
 		NewCommodityDaemon.nb_Port = Self->cxPort;
 	Self->CommodityKey=Self->ICX->CxBroker(&NewCommodityDaemon,&error);
 	if(Self->CommodityKey)
-    {
-		Self->ICX->ActivateCxObj(Self->CommodityKey, TRUE);
+		Self->ICX->ActivateCxObj(Self->CommodityKey, active);
+	if(active)
 		Self->CommodityFlags = Self->CommodityFlags | PERCEPTION_STATE_ACTIVE;
-	}
 	return;
 }
 
@@ -287,7 +281,7 @@ ULONG PerceptionCommodityEvent(struct DaemonApplication *Self, APTR message)
 				KDEBUG("::Unique()\n");
 				break;
 			default:
-				KDEBUG("Perception[Commodity::Unknown()]\n");
+				KDEBUG("::Unknown()\n");
 				break;
 		}
 	return(rc);
@@ -375,18 +369,28 @@ void  ExitInputHandler(struct DaemonApplication *Self)
 
 APTR  ExecInputHandler(struct DaemonApplication *hDaemon,APTR ieStream)
 {
-	ULONG InputIndex=0L, buffer=0L;
-	struct InputEvent *rc=ieStream, *prev=ieStream, *hInputEvent=ieStream;
+	APTR rc=NULL;
+	struct InputEvent *nInputEvent=ieStream, *cInputEvent=NULL;
+	struct InputContext *CurrentContext=NULL;
+	if(hDaemon->CommodityFlags && PERCEPTION_STATE_ACTIVE)
+		while(cInputEvent=nInputEvent)
+		{
+			nInputEvent=cInputEvent->ie_NextEvent;
+			if(cInputEvent->ie_Class==IECLASS_RAWKEY)
+				CurrentContext=GetInputContext(hDaemon->PerceptionBase,NULL);
+			if(cInputEvent->ie_Class==IECLASS_EXTENDEDRAWKEY)
+				CurrentContext=GetInputContext(hDaemon->PerceptionBase,NULL);
+			if(CurrentContext)
+			{
+				;;
+			}
+		}
+	return((APTR)rc);
+};
+/*
 	struct LIBRARY_CLASS *Self=hDaemon->PerceptionBase;
-	struct InputContext *Context=NULL;
 	struct InputTagItem *bInputItem=NULL;
 
-	if(hDaemon->CommodityFlags && PERCEPTION_STATE_ACTIVE)
-		do{
-			if(hInputEvent->ie_Class==IECLASS_RAWKEY)
-				Context=Self->InputContext;
-			if(hInputEvent->ie_Class==IECLASS_EXTENDEDRAWKEY)
-				Context=Self->InputContext;
 			if(Context)
 			{
 				InputIndex=Context->State[ICSTATE_FIFO_IW];
@@ -415,13 +419,12 @@ APTR  ExecInputHandler(struct DaemonApplication *hDaemon,APTR ieStream)
 				Context->State[ICSTATE_FIFO_PW]=(ULONG)bInputItem;
 				Self->IExec->Signal(Self->IExec->FindTask(NULL),hDaemon->ioSignal);
 			}
-			prev=hInputEvent;
-		}while((hInputEvent=hInputEvent->ie_NextEvent)!=NULL);
-	return((APTR)rc);
-}
-
+*/
 void ProcInputHandler(struct DaemonApplication *hDaemon)
 {
+	return;
+}
+/*
 	ULONG xc=0L, InputIndex=0L, OutputIndex=0L, OutputMask=0L;
 	struct LIBRARY_CLASS *Self=hDaemon->PerceptionBase;
 	struct InputContext *Context=Self->InputContext, *Language=NULL;
@@ -486,7 +489,6 @@ void ProcInputHandler(struct DaemonApplication *hDaemon)
 			}else{
 				xc=hDaemon->IUtility->CallHookPkt((APTR)&Context->Hook,(APTR)Language,(APTR)Message);
 			};
-/*
 			for(OutputIndex=LCSTATE_EMITBUFF;OutputIndex<LCSTATE_EMITBMAX;OutputIndex++)
 			{
 				EmitGlyph=(APTR)hDaemon->IUtility->FindTagItem(OutputIndex,Vector);
@@ -499,11 +501,8 @@ void ProcInputHandler(struct DaemonApplication *hDaemon)
 				}
 				EmitGlyph->ti_Data=0L;
 			};
-*/
 		};
 	};
-
-	return;
-}
+*/
 
 /**/
