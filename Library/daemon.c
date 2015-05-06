@@ -375,6 +375,8 @@ APTR  ExecInputHandler(struct DaemonApplication *hDaemon,APTR ieStream)
 	ULONG  InputIndex=0L;
 	struct InputTagItem *InputItem=NULL;
 	if(hDaemon->CommodityFlags && PERCEPTION_STATE_ACTIVE)
+	{
+		KDEBUG("Perception-IME Input Handler() Active\n");
 		while((cInputEvent=nInputEvent)!=NULL)
 		{
 			nInputEvent=cInputEvent->ie_NextEvent;
@@ -384,14 +386,12 @@ APTR  ExecInputHandler(struct DaemonApplication *hDaemon,APTR ieStream)
 				CurrentContext=GetInputContext(hDaemon->PerceptionBase,NULL);
 			if(CurrentContext)
 			{
-				rc=NULL;
-				/*
-ReadInputVectorItem(CurrentContext,ICSTATE_FIFO_IW,&InputIndex,ICSTATE_FIFO_PW,&InputItem);
-NextInputVectorItem(CurrentContext,ICSTATE_FIFO_IW,&InputIndex,ICSTATE_FIFO_PW,&InputItem);
-WriteInputVectorItem(CurrentContext,ICSTATE_FIFO_IW,&InputIndex,ICSTATE_FIFO_PW,&InputItem);
-				*/
+				//ReadInputVectorItem(CurrentContext,ICSTATE_FIFO_IW,&InputIndex,ICSTATE_FIFO_PW,&InputItem);
+				//UpdateInputVectorItem(CurrentContext,ICSTATE_FIFO_IW,&InputIndex,ICSTATE_FIFO_PW,&InputItem);
+				//WriteInputVectorItem(CurrentContext,ICSTATE_FIFO_IW,&InputIndex,ICSTATE_FIFO_PW,&InputItem);
 			}
 		}
+	}
 	return((APTR)rc);
 };
 /*
