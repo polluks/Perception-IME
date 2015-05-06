@@ -134,7 +134,7 @@ APTR LCALL_ObtainLanguageContext(struct LIBIFACE_CLASS *iface,APTR name,APTR hoo
 			InitLanguageContext((APTR)rc,(APTR)hook);
 			Self->IExec->InitSemaphore((APTR)rc);
 			Self->IExec->ObtainSemaphore(&Self->Lock);
-			Self->IExec->AddTail(&Self->InputContextList,rc);
+			Self->IExec->AddTail(&Self->InputContextList,(APTR)rc);
 			Self->IExec->ReleaseSemaphore(&Self->Lock);
 			if(!Self->CurrentLanguage)
 				Self->CurrentLanguage=rc;
