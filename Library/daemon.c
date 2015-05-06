@@ -372,6 +372,7 @@ APTR  ExecInputHandler(struct DaemonApplication *hDaemon,APTR ieStream)
 	APTR rc=NULL;
 	struct InputEvent *nInputEvent=ieStream, *cInputEvent=NULL;
 	struct InputContext *CurrentContext=NULL;
+	struct InputTagItem *InputItem=NULL;
 	if(hDaemon->CommodityFlags && PERCEPTION_STATE_ACTIVE)
 		while(cInputEvent=nInputEvent)
 		{
@@ -383,7 +384,9 @@ APTR  ExecInputHandler(struct DaemonApplication *hDaemon,APTR ieStream)
 			if(CurrentContext)
 			{
 				;;
-			}
+			}else{
+				rc=ieStream;
+			};
 		}
 	return((APTR)rc);
 };
