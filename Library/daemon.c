@@ -375,7 +375,7 @@ APTR  ExecInputHandler(struct DaemonApplication *hDaemon,APTR ieStream)
 	ULONG  InputIndex=0L;
 	struct InputTagItem *InputItem=NULL;
 	if(hDaemon->CommodityFlags && PERCEPTION_STATE_ACTIVE)
-		while(cInputEvent=nInputEvent)
+		while((cInputEvent=nInputEvent)!=NULL)
 		{
 			nInputEvent=cInputEvent->ie_NextEvent;
 			if(cInputEvent->ie_Class==IECLASS_RAWKEY)
