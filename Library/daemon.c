@@ -369,9 +369,10 @@ void  ExitInputHandler(struct DaemonApplication *Self)
 
 APTR  ExecInputHandler(struct DaemonApplication *hDaemon,APTR ieStream)
 {
-	APTR rc=NULL;
+	APTR rc=ieStream;
 	struct InputEvent *nInputEvent=ieStream, *cInputEvent=NULL;
 	struct InputContext *CurrentContext=NULL;
+	ULONG  InputIndex=0L;
 	struct InputTagItem *InputItem=NULL;
 	if(hDaemon->CommodityFlags && PERCEPTION_STATE_ACTIVE)
 		while(cInputEvent=nInputEvent)
@@ -383,10 +384,13 @@ APTR  ExecInputHandler(struct DaemonApplication *hDaemon,APTR ieStream)
 				CurrentContext=GetInputContext(hDaemon->PerceptionBase,NULL);
 			if(CurrentContext)
 			{
-				;;
-			}else{
-				rc=ieStream;
-			};
+				rc=NULL;
+				/*
+ReadInputVectorItem(CurrentContext,ICSTATE_FIFO_IW,&InputIndex,ICSTATE_FIFO_PW,&InputItem);
+NextInputVectorItem(CurrentContext,ICSTATE_FIFO_IW,&InputIndex,ICSTATE_FIFO_PW,&InputItem);
+WriteInputVectorItem(CurrentContext,ICSTATE_FIFO_IW,&InputIndex,ICSTATE_FIFO_PW,&InputItem);
+				*/
+			}
 		}
 	return((APTR)rc);
 };
