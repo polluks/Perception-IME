@@ -198,10 +198,6 @@ extern void  ExitPerceptionDaemon(struct LIBRARY_CLASS *Self);
 extern int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc);
 extern ULONG LanguageDefaultHook(struct LanguageContextHook *lch,APTR LanguageContext,APTR m);
 /*objects.c*/
-extern APTR  NewInputContext(struct LIBRARY_CLASS *Self,APTR InputContextHook);
-extern void  EndInputContext(struct LIBRARY_CLASS *Self,struct InputContext *Key);
-extern void  InitInputContext(struct InputContext *ic,APTR ich);
-extern void  ExitInputContext(struct InputContext *ic);
 extern APTR  GetInputContext(APTR name,struct PerceptionIFace *IPerception);
 extern void  SetInputContext(APTR ctxt,struct PerceptionIFace *IPerception);
 extern void  InitLanguageContext(struct InputContext *lc,APTR LHook);

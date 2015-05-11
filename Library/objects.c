@@ -6,55 +6,6 @@
 #include "perception.h"
 
 /**/
-APTR  NewInputContext(struct LIBRARY_CLASS *Self,APTR InputContextHook)
-{
-	struct InputContext *rc=NULL;
-
-	if(Self)
-		rc=(APTR)Self->IExec->AllocVecTags(IHCONTEXTSIZE,MEMF_SHARED);
-	if(rc)
-		InitInputContext(rc,InputContextHook);
-
-	return((APTR)rc);
-}
-
-void  EndInputContext(struct LIBRARY_CLASS *Self,struct InputContext *Key)
-{
-	if(Self)
-		if(Key)
-        	Self->IExec->FreeVec(Key);
-	return;
-}
-
-void  InitInputContext(struct InputContext *ic,APTR ich)
-{
-	ULONG x;
-	ic->Hook.Hook.h_Entry=ich;
-	for(x=0L;x<IME_STATE_SIZE;x++)
-    {
-		ic->State[x]	=0L;
-	}
-	for(x=0L;x<IME_MESSAGE_SIZE;x++)
-    {
-		ic->Message[x].ti_Tag	=	LANGUAGE_IME_NOP;
-		ic->Message[x].ti_Data	=	LANGUAGE_IME_NOP_NULL;
-	}
-	for(x=0L;x<IME_VECTOR_SIZE;x++)
-    {
-		ic->Vector[x].type	=0x8000L;
-		ic->Vector[x].qual	=0L;
-		ic->Vector[x].glyph	=0L;
-	}
-
-    return;
-}
-
-void  ExitInputContext(struct InputContext *ic)
-{
-	ic->Hook.Hook.h_Entry=NULL;
-	return;
-}
-
 APTR  GetInputContext(APTR name,struct PerceptionIFace *IPerception)
 {
 	APTR rc=NULL;
@@ -79,6 +30,7 @@ APTR  GetInputContext(APTR name,struct PerceptionIFace *IPerception)
 	return(rc);
 }
 
+/**/
 void  SetInputContext(APTR ctxt,struct PerceptionIFace *IPerception)
 {
 	struct LIBRARY_CLASS *PerceptionBase=NULL;
@@ -102,12 +54,26 @@ void  SetInputContext(APTR ctxt,struct PerceptionIFace *IPerception)
 void  InitLanguageContext(struct InputContext *lc,APTR LHook)
 {
 	ULONG x=0L;
-	APTR  h=LHook;
 	struct TagItem *Vector=(APTR)lc->Vector;
-	InitInputContext(lc,h);
+
+	lc->Hook.Hook.h_Entry=LHook;
 	lc->Hook.Hook.h_Data=lc;
 
-	/*DEBUG: LanguageContext specific setup */
+	for(x=0L;x<IME_STATE_SIZE;x++)
+    {
+		lc->State[x]	=0L;
+	}
+	for(x=0L;x<IME_MESSAGE_SIZE;x++)
+    {
+		lc->Message[x].ti_Tag	=	LANGUAGE_IME_NOP;
+		lc->Message[x].ti_Data	=	LANGUAGE_IME_NOP_NULL;
+	}
+	for(x=0L;x<IME_VECTOR_SIZE;x++)
+    {
+		lc->Vector[x].type	=0x8000L;
+		lc->Vector[x].qual	=0L;
+		lc->Vector[x].glyph	=0L;
+	}
 
 	for(x=0L;x<IME_VECTOR_SIZE;x++)
     {
@@ -121,7 +87,7 @@ void  InitLanguageContext(struct InputContext *lc,APTR LHook)
 /**/
 void  ExitLanguageContext(struct InputContext *lc)
 {
-	ExitInputContext(lc);
+	lc->Hook.Hook.h_Entry=NULL;
 	return;
 }
 
@@ -178,6 +144,7 @@ void  TranslateCP32UTF8(ULONG *codepoint)
 
 	return;
 }
+
 /*
 void  TranslateUTF8CP32(struct TagItem *item)
 {
