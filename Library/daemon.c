@@ -18,11 +18,14 @@ struct	DaemonApplication
 	struct	UtilityIFace		*IUtility;
 	struct	LocaleIFace			*ILocale;
 	struct	RexxSysIFace		*IREXX;
+	struct	ApplicationIFace	*IApplication;
 /**/
 	struct	MsgPort				*cxPort;
 	ULONG						cxSignal;
 	APTR						CommodityKey;
 	UWORD						CommodityFlags;
+/**/
+	ULONG						HApplication;
 /**/
 	struct	MsgPort				*ioPort;
 	ULONG						ioSignal;
@@ -34,6 +37,7 @@ struct	DaemonApplication
 	struct	MsgPort				*rxPort;
 	ULONG						rxSignal;
 /**/
+	struct InputContext			LanguageContext;
 };
 
 void  InitCommodity(struct DaemonApplication *Self,LONG active);
@@ -74,6 +78,7 @@ void InitPerceptionDaemon(struct LIBRARY_CLASS *Self)
 				NP_WindowPtr,	NULL,			NP_CopyVars,	NULL,
 				NP_Cli,			NULL,			NP_Path,		NULL,
 				TAG_END,		NULL);
+	Self->CurrentLanguage=NULL;
 	return;
 };
 
@@ -113,6 +118,9 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 		if((Base = (APTR)IExec->OpenLibrary("utility.library", 50L)))
 			dApplication->IUtility	 = (APTR)IExec->GetInterface(Base,"main",1L,NULL);
 
+		if((Base = (APTR)IExec->OpenLibrary("application.library", 50L)))
+			dApplication->IApplication = (APTR)IExec->GetInterface(Base,"main",2L,NULL);
+
 		if((Base = (APTR)IExec->OpenLibrary("locale.library", 50L)))
 			dApplication->ILocale	 = (APTR)IExec->GetInterface(Base,"main",1L,NULL);
 
@@ -121,6 +129,17 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 
 		if(dApplication->ICX)
 			InitCommodity(dApplication,TRUE);
+
+		if(dApplication->IApplication)
+			dApplication->HApplication=dApplication->IApplication->RegisterApplication((APTR)DaemonName,
+				REGAPP_UniqueApplication,	TRUE,
+				REGAPP_Hidden,				FALSE,
+//				REGAPP_CustomPrefsFileName,	&,
+//				REGAPP_ENVDir,				&,
+				REGAPP_SavePrefs,			TRUE,
+				REGAPP_AppIconInfo,			NULL,
+				REGAPP_Description,			DaemonDescription,
+				TAG_END,					NULL);
 
 		InitInputHandler(dApplication);
 
@@ -140,6 +159,9 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 
 		ExitInputHandler(dApplication);
 
+		if(dApplication->HApplication)
+			dApplication->IApplication->UnregisterApplication(dApplication->HApplication,0L);
+
 		if(dApplication->cxPort)
 			ExitCommodity(dApplication);
 
@@ -154,6 +176,13 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 		{
 			Base = dApplication->ILocale->Data.LibBase;
 			IExec->DropInterface((APTR)dApplication->ILocale);
+			IExec->CloseLibrary((APTR)Base);
+		}
+
+		if(dApplication->IApplication)
+		{
+			Base = dApplication->IApplication->Data.LibBase;
+			IExec->DropInterface((APTR)dApplication->IApplication);
 			IExec->CloseLibrary((APTR)Base);
 		}
 
@@ -241,33 +270,33 @@ void ExitCommodity(struct DaemonApplication *Self)
 ULONG PerceptionCommodityEvent(struct DaemonApplication *Self, APTR message)
 {
 	ULONG rc=0L;
-	KDEBUG("Perception[Commodity]");
 	if((Self->ICX->CxMsgType(message))==CXM_COMMAND)
 		switch(Self->ICX->CxMsgID(message))
 		{
 			case	CXCMD_DISABLE:
 				Self->CommodityFlags = Self->CommodityFlags & (!PERCEPTION_STATE_ACTIVE);
-				KDEBUG("::Disable(%x)\n",Self->CommodityFlags);
 				break;
 			case	CXCMD_ENABLE:
 				Self->CommodityFlags = Self->CommodityFlags | PERCEPTION_STATE_ACTIVE;
-				KDEBUG("::Enable(%x)\n",Self->CommodityFlags);
+				//
+				//	Select the Active LanguageContext
+				//
 				break;
 			case	CXCMD_APPEAR:   	/* External Forwarded */
-				KDEBUG("::Appear()\n");
+				KDEBUG("Perception[Commodity]::Appear()\n");
 				break;
 			case	CXCMD_DISAPPEAR:	/* External Forwarded */
-				KDEBUG("::Disappear()\n");
+				KDEBUG("Perception[Commodity]::Disappear()\n");
 				break;
 			case	CXCMD_KILL:			/* External then Internal */
-				KDEBUG("::Kill()\n");
+				KDEBUG("Perception[Commodity]::Kill()\n");
 				rc=TRUE;
 				break;
 			case	CXCMD_UNIQUE:		/* Internal Special */
-				KDEBUG("::Unique()\n");
+				KDEBUG("Perception[Commodity]::Unique()\n");
 				break;
 			default:
-				KDEBUG("::Unknown()\n");
+				KDEBUG("Perception[Commodity]::Unknown()\n");
 				break;
 		}
 	return(rc);
@@ -357,19 +386,18 @@ APTR  ExecInputHandler(APTR stream,APTR data)
     if(dApplication->CommodityFlags && PERCEPTION_STATE_ACTIVE)
 		do{
 			nInputEvent=cInputEvent->ie_NextEvent;
-			KDEBUG("Perception-IME InputEvent[%lx]\n",cInputEvent);
 			switch(cInputEvent->ie_Class)
 			{
 				case IECLASS_RAWKEY:
 				case IECLASS_EXTENDEDRAWKEY:
 					Self->IExec->ObtainSemaphore(&Self->Lock);
-					Context=Self->CurrentLanguage;
+					Context=GetInputContext(NULL,dApplication->IPerception);
 					Self->IExec->ReleaseSemaphore(&Self->Lock);
 					break;
 				default:
 					break;
 			}
-			KDEBUG("Perception-IME Context[%lx]\n",Context);
+			KDEBUG("Perception-IME[Daemon]::Context[%lx]",Context);
 			cInputEvent=nInputEvent;
 		}while(cInputEvent);
 

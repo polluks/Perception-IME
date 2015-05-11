@@ -98,7 +98,6 @@ struct LIBRARY_CLASS
 /**/
 	struct	List	InputContextList;
 /**/
-	APTR			InputContext;           		/*	Active LanguageContext for InputHandler */
     APTR			CurrentLanguage;				/*  Active LanguageContext for PluginCalls  */
 /**/
 };
@@ -200,6 +199,7 @@ extern ULONG LanguageDefaultHook(struct LanguageContextHook *lch,APTR LanguageCo
 /*objects.c*/
 extern APTR  GetInputContext(APTR name,struct PerceptionIFace *IPerception);
 extern void  SetInputContext(APTR ctxt,struct PerceptionIFace *IPerception);
+extern void  NextInputContext(struct PerceptionIFace *IPerception);
 extern void  InitLanguageContext(struct InputContext *lc,APTR LHook);
 extern void  ExitLanguageContext(struct InputContext *lc);
 extern void  TranslateCP32UTF8(ULONG *codepoint);

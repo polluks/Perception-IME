@@ -22,7 +22,7 @@ APTR  GetInputContext(APTR name,struct PerceptionIFace *IPerception)
 			PerceptionBase->IExec->ReleaseSemaphore(&PerceptionBase->Lock);
 		}else{
 			PerceptionBase->IExec->ObtainSemaphore(&PerceptionBase->Lock);
-			rc=PerceptionBase->InputContext;
+			rc=PerceptionBase->CurrentLanguage;
 			PerceptionBase->IExec->ReleaseSemaphore(&PerceptionBase->Lock);
 		};
 	}
@@ -42,9 +42,36 @@ void  SetInputContext(APTR ctxt,struct PerceptionIFace *IPerception)
 		if(ctxt)
 		{
 			PerceptionBase->IExec->ObtainSemaphore(&PerceptionBase->Lock);
-			PerceptionBase->InputContext=ctxt;
+			PerceptionBase->CurrentLanguage=ctxt;
 			PerceptionBase->IExec->ReleaseSemaphore(&PerceptionBase->Lock);
 		}
+	}
+
+	return;
+}
+
+/**/
+void  NextInputContext(struct PerceptionIFace *IPerception)
+{
+	struct LIBRARY_CLASS *PerceptionBase=NULL;
+	struct Node *n=NULL;
+
+	if(IPerception)
+		PerceptionBase = (APTR)IPerception->Data.LibBase;
+	if(PerceptionBase)
+	{
+		if(PerceptionBase->CurrentLanguage)
+		{
+            PerceptionBase->IExec->ObtainSemaphore(&PerceptionBase->Lock);
+			n=PerceptionBase->CurrentLanguage;
+			if(n->ln_Succ)
+				PerceptionBase->CurrentLanguage=n->ln_Succ;
+            PerceptionBase->IExec->ReleaseSemaphore(&PerceptionBase->Lock);
+		}else{
+            PerceptionBase->IExec->ObtainSemaphore(&PerceptionBase->Lock);
+			PerceptionBase->CurrentLanguage=PerceptionBase->InputContextList.lh_Head;
+			PerceptionBase->IExec->ReleaseSemaphore(&PerceptionBase->Lock);
+		};
 	}
 
 	return;
