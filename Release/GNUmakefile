@@ -10,8 +10,6 @@ RM		=	C:Delete ALL FORCE QUIET
 
 TARGET	= Perception-IME.${PACKAGE}
 
-OBJECTS = Documents Devs Libs Locale Utilities
-
 # Preperations for a release
 archive:
 	@ ${MKDIR} dummy
@@ -20,7 +18,6 @@ archive:
 
 clean:
 	@ ${MKDIR}	Dummy
-	@ ${RM}		Libs Devs Locale Utilities Dummy
-	@ ${MKDIR}	Libs Devs Locale Utilities
+	@ ${RM}		Libs Devs Locale Dummy
+	@ ${MKDIR}	Libs Devs Locale
 	@ ${MKDIR}	Devs/Keymaps Locale/Charsets Locale/Languages
-	@ ${MKDIR}	Utilities/Commodities Utilities/Commodities/Dockies
