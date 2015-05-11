@@ -33,6 +33,7 @@ autodoc:
 
 install: $(LNAME)
 	C:Copy	$(LNAME).debug	LIBS:$(LNAME)
+	C:Delete LIBS:$(LNAME).debug
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
