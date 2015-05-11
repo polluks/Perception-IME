@@ -7,7 +7,7 @@
 
 STATIC CONST BYTE LanguageName[] = LIBRARY_NAME;
 
-/* This is where the incoming ANSI characters get stored */
+/* This is where the incoming ANSI characters get stored
 #define	LCSTATE_Syllable		(LCSTATE_EXPANDED)
 #define	LCSTATE_IDEOGRAPH_IDX	(LCSTATE_EXPANDED+1)
 #define	LCSTATE_IDEOGRAPH_BUFF	(LCSTATE_EXPANDED+2)
@@ -20,13 +20,14 @@ STATIC CONST BYTE LanguageName[] = LIBRARY_NAME;
 
 #define CODEPOINT_HIRAGANA_KEY		0x3040
 #define CODEPOINT_KATAKANA_KEY		0x30A0
-#define	CODEPOINT_KANATOGGLE_MASK	0x00E0	/* Reversible Hiragana<->Katakana Transform Key */
+#define	CODEPOINT_KANATOGGLE_MASK	0x00E0	// Reversible Hiragana<->Katakana Transform Key
+
 
 ULONG GetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility);
 void  SetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility,ULONG data);
 ULONG FindSyllableCandidate(ULONG Key,struct UtilityIFace *IUtility);
 void  QueueSyllableCandidate(ULONG c,struct TagItem *Vector,APTR LanguageContext,struct LanguageContextHook *lch);
-/*
+
 UpdateKanjiCandidacy(Vector,LanguageContext,lch);
 UpdateVocabCandidacy(Vector,LanguageContext,lch);
 */
@@ -145,8 +146,8 @@ STATIC CONST struct TagItem SyllableMiniCandidates[] =
 	{TAG_END,	TAG_END}
 };
 
-/*	Set the Primary System Input Language	*/
-STATIC CONST struct TagItem DefaultSystemLanguage =	{ DEFAULT_SYSTEM_LANGUAGE, TRUE };
+/*  Set the Primary System Input Language
+*/
 STATIC CONST unsigned char LanguageKanjiCatalog[] = "Ideographs";
 STATIC CONST unsigned char LanguageVocabCatalog[] = "Vocabulary";
 
@@ -154,12 +155,12 @@ STATIC CONST unsigned char LanguageVocabCatalog[] = "Vocabulary";
 */
 void InitPerceptionHook(struct LIBRARY_CLASS *Self)
 {
-    APTR Language=NULL;
+    APTR Context=NULL;
 
 	if(Self->IPerception)
-		Language=Self->IPerception->ObtainLanguageContext((APTR)LanguageName,(APTR)&ExecLanguageContextHook);
-	if(Language)
-		Self->HPerception=Language;
+		Context=Self->IPerception->ObtainLanguageContext((APTR)LanguageName,(APTR)&ExecLanguageContextHook);
+	if(Context)
+		Self->HPerception=Context;
 
 	return;
 }
@@ -170,62 +171,6 @@ void ExitPerceptionHook(struct LIBRARY_CLASS *Self)
 		Self->IPerception->ReleaseLanguageContext(Self->HPerception);
 	return;
 }
-
-ULONG GetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility)
-{
-	ULONG rc=0L;
-	struct TagItem *Item = NULL;
-
-	if(Vector)
-		Item=IUtility->FindTagItem(Key,Vector);
-    if(Item)
-		rc=Item->ti_Data;
-
-	return(rc);
-};
-
-void  SetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility,ULONG data)
-{
-	struct TagItem *Item = NULL;
-
-	if(Vector)
-		Item=IUtility->FindTagItem(Key,Vector);
-    if(Item)
-		Item->ti_Data=data;
-
-	return;
-};
-
-ULONG FindSyllableCandidate(ULONG Key,struct UtilityIFace *IUtility)
-{
-	ULONG rc = 0L;
-	struct TagItem *Candidate = NULL;
-
-	if(Key)
-		Candidate=IUtility->FindTagItem((Key & 0x7FFFFFFF),SyllableCandidates);
-	if(Candidate)
-		rc=Candidate->ti_Data;
-
-	return(rc);
-};
-
-void  QueueSyllableCandidate(ULONG c,struct TagItem *Vector,APTR LanguageContext,struct LanguageContextHook *lch)
-{
-	KDEBUG("QueueSyllableCandidate[CodePoint=%lx]\n",c);
-	return;
-};
-
-ULONG FindKanjiCandidates(void)
-{
-	ULONG rc=0L;
-	return(rc);
-};
-
-ULONG FindVocabCandidates(void)
-{
-	ULONG rc=0L;
-	return(rc);
-};
 
 /*
 	This is where ALL of the Language Specific "Magic" happens...
@@ -241,6 +186,10 @@ ULONG FindVocabCandidates(void)
 */
 ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageContext,APTR m)
 {
+	ULONG rc=0L;
+	return(rc);
+}
+/*
 	ULONG rc=0L, *Message=m, c=0L, Syllable=0L, Kana=0L;
 	struct PerceptionIFace	*IPerception= lch->PerceptionLib;
 	struct TagItem *Vector = NULL, VCommand;
@@ -385,5 +334,60 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 			break;
 	}
 
+ULONG GetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility)
+{
+	ULONG rc=0L;
+	struct TagItem *Item = NULL;
+
+	if(Vector)
+		Item=IUtility->FindTagItem(Key,Vector);
+    if(Item)
+		rc=Item->ti_Data;
+
 	return(rc);
+};
+
+void  SetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility,ULONG data)
+{
+	struct TagItem *Item = NULL;
+
+	if(Vector)
+		Item=IUtility->FindTagItem(Key,Vector);
+    if(Item)
+		Item->ti_Data=data;
+
+	return;
+};
+
+ULONG FindSyllableCandidate(ULONG Key,struct UtilityIFace *IUtility)
+{
+	ULONG rc = 0L;
+	struct TagItem *Candidate = NULL;
+
+	if(Key)
+		Candidate=IUtility->FindTagItem((Key & 0x7FFFFFFF),SyllableCandidates);
+	if(Candidate)
+		rc=Candidate->ti_Data;
+
+	return(rc);
+};
+
+void  QueueSyllableCandidate(ULONG c,struct TagItem *Vector,APTR LanguageContext,struct LanguageContextHook *lch)
+{
+	KDEBUG("QueueSyllableCandidate[CodePoint=%lx]\n",c);
+	return;
+};
+
+ULONG FindKanjiCandidates(void)
+{
+	ULONG rc=0L;
+	return(rc);
+};
+
+ULONG FindVocabCandidates(void)
+{
+	ULONG rc=0L;
+	return(rc);
+};
+
 */

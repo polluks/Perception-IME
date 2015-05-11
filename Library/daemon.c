@@ -294,10 +294,6 @@ void  InitInputHandler(struct DaemonApplication *Self)
 	if(Self->ioPort)
 		Self->imFilter			= (APTR)Self->IExec->AllocSysObjectTags( ASOT_INTERRUPT,
 			ASOINTR_Size,		sizeof(struct Interrupt),
-/*
-			ASOINTR_Code,		(ULONG)&ExecInputHandler,
-			ASOINTR_Data,		Self,
-*/
 			NULL,				NULL);
 	if(Self->ioPort)
 		Self->ioSignal=1L << Self->ioPort->mp_SigBit;
@@ -361,16 +357,19 @@ APTR  ExecInputHandler(APTR stream,APTR data)
     if(dApplication->CommodityFlags && PERCEPTION_STATE_ACTIVE)
 		do{
 			nInputEvent=cInputEvent->ie_NextEvent;
+			KDEBUG("Perception-IME InputEvent[%lx]\n",cInputEvent);
 			switch(cInputEvent->ie_Class)
 			{
 				case IECLASS_RAWKEY:
 				case IECLASS_EXTENDEDRAWKEY:
 					Self->IExec->ObtainSemaphore(&Self->Lock);
-					Context=Self->InputContext;
+					Context=Self->CurrentLanguage;
 					Self->IExec->ReleaseSemaphore(&Self->Lock);
+					break;
 				default:
 					break;
 			}
+			KDEBUG("Perception-IME Context[%lx]\n",Context);
 			cInputEvent=nInputEvent;
 		}while(cInputEvent);
 
