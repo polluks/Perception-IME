@@ -21,7 +21,6 @@ all:
 	@ ${MAKE} -C Devkit 	-f GNUmakefile
 	@ ${MAKE} -C Library	-f GNUmakefile
 	@ ${MAKE} -C Charsets	-f GNUmakefile -j 2
-	@ ${MAKE} -C Catalogs	-f GNUmakefile -j 2
 	@ ${MAKE} -C Languages	-f GNUmakefile -j 2
 	@ ${MAKE} -C Docky		-f GNUmakefile
 
@@ -30,6 +29,9 @@ autodocs: all
 
 prepack:
 	@ ${MAKE} -C Release	-f GNUmakefile clean
+
+data:
+	@ ${MAKE} -C Catalogs	-f GNUmakefile -j 4
 
 clean:
 	@ ${MAKE} -C Docky		-f GNUmakefile clean
