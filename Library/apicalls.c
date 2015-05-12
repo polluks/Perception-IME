@@ -122,7 +122,7 @@ APTR LCALL_ObtainLanguageContext(struct LIBIFACE_CLASS *iface,APTR name,APTR hoo
 		Self->IExec->ReleaseSemaphore(&Self->Lock);
 		if(rc==NULL)
 		{
-			rc=(APTR)Self->IExec->AllocVecTags(IHCONTEXTSIZE,MEMF_SHARED);
+			rc=(APTR)Self->IExec->AllocVecTags(IHCONTEXTSIZE,AVT_Type,MEMF_SHARED,TAG_DONE,0L);
 			if(rc)
 			{
 				Self->IExec->InitSemaphore((APTR)rc);

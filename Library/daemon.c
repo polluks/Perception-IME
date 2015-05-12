@@ -25,7 +25,8 @@ struct	DaemonApplication
 	APTR						CommodityKey;
 	UWORD						CommodityFlags;
 /**/
-	ULONG						HApplication;
+	ULONG						hApplication;
+	struct	ApplicationIconInfo *hApplicationInfo;
 /**/
 	struct	MsgPort				*ioPort;
 	ULONG						ioSignal;
@@ -33,6 +34,7 @@ struct	DaemonApplication
 	struct  IOStdReq			*imRequest;
 	LONG						imSigBit;
 	ULONG						imSignal;
+/**/
 /**/
 	struct	MsgPort				*rxPort;
 	ULONG						rxSignal;
@@ -45,6 +47,8 @@ void  ExitCommodity(struct DaemonApplication *Self);
 void  InitInputHandler(struct DaemonApplication *dapp);
 void  ExitInputHandler(struct DaemonApplication *dapp);
 ULONG PerceptionCommodityEvent(struct DaemonApplication *Self, APTR message);
+void  InitApplication(struct DaemonApplication *Self);
+void  ExitApplication(struct DaemonApplication *Self);
 ULONG PerceptionRexxHostEvent(struct DaemonApplication *Self, APTR message);
 void  PerceptionPluginHandler(struct DaemonApplication *hDaemon);
 APTR  ExecInputHandler(APTR stream,APTR data);
@@ -54,8 +58,10 @@ APTR  ExecInputHandler(APTR stream,APTR data);
 STATIC CONST BYTE	DaemonName[]			= "Perception-IME\0";
 STATIC CONST ULONG	DaemonStackSize			= 131072L;
 STATIC CONST ULONG	DaemonPriority			= 21L;
-STATIC CONST BYTE	DaemonDescription[]		= "Input Method Editing\0";
+STATIC CONST BYTE	DaemonDescription[]		= "Input Method Editing\0\0";
 STATIC CONST BYTE	DaemonReleaseString[]	= "Open Source Edition\0";
+STATIC CONST BYTE	DaemonConfiguration[]	= "Perception-IME\0";
+STATIC CONST BYTE	DaemonEnvironment[]		= "Perception\0\0";
 
 /*	Commodity Flag markers
 */
@@ -131,16 +137,10 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 			InitCommodity(dApplication,TRUE);
 
 		if(dApplication->IApplication)
-			dApplication->HApplication=dApplication->IApplication->RegisterApplication((APTR)DaemonName,
-				REGAPP_UniqueApplication,	TRUE,
-				REGAPP_Hidden,				FALSE,
-//				REGAPP_CustomPrefsFileName,	&,
-//				REGAPP_ENVDir,				&,
-				REGAPP_SavePrefs,			TRUE,
-				REGAPP_AppIconInfo,			NULL,
-				REGAPP_Description,			DaemonDescription,
-				TAG_END,					NULL);
+			InitApplication(dApplication);
 
+        InitLanguageContext(&dApplication->LanguageContext,NULL);
+		SetInputContext(&dApplication->LanguageContext,dApplication->IPerception);
 		InitInputHandler(dApplication);
 
 		do{
@@ -158,9 +158,10 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 		}while(!exit);
 
 		ExitInputHandler(dApplication);
+		ExitLanguageContext(&dApplication->LanguageContext);
 
-		if(dApplication->HApplication)
-			dApplication->IApplication->UnregisterApplication(dApplication->HApplication,0L);
+		if(dApplication->hApplication)
+			ExitApplication(dApplication);
 
 		if(dApplication->cxPort)
 			ExitCommodity(dApplication);
@@ -278,14 +279,11 @@ ULONG PerceptionCommodityEvent(struct DaemonApplication *Self, APTR message)
 				break;
 			case	CXCMD_ENABLE:
 				Self->CommodityFlags = Self->CommodityFlags | PERCEPTION_STATE_ACTIVE;
-				//
-				//	Select the Active LanguageContext
-				//
 				break;
-			case	CXCMD_APPEAR:   	/* External Forwarded */
+			case	CXCMD_APPEAR:   	/* External Forwarded? */
 				KDEBUG("Perception[Commodity]::Appear()\n");
 				break;
-			case	CXCMD_DISAPPEAR:	/* External Forwarded */
+			case	CXCMD_DISAPPEAR:	/* External Forwarded? */
 				KDEBUG("Perception[Commodity]::Disappear()\n");
 				break;
 			case	CXCMD_KILL:			/* External then Internal */
@@ -301,6 +299,39 @@ ULONG PerceptionCommodityEvent(struct DaemonApplication *Self, APTR message)
 		}
 	return(rc);
 }
+
+/**/
+void  InitApplication(struct DaemonApplication *Self)
+{
+	struct ApplicationIconInfo *info=NULL;
+    info=Self->IExec->AllocVecTags(sizeof(struct ApplicationIconInfo),
+		AVT_Type,			MEMF_SHARED,
+		AVT_ClearWithValue,	0L,
+		TAG_DONE,			0L);
+	if(info)
+	{
+		info->iconType=APPICONT_Docky;
+		Self->hApplicationInfo=info;
+	}
+
+	Self->hApplication=Self->IApplication->RegisterApplication((APTR)DaemonName,
+		REGAPP_UniqueApplication,	TRUE,
+		REGAPP_LoadPrefs,			TRUE,
+		REGAPP_SavePrefs,			TRUE,
+		REGAPP_CustomPrefsFileName,	DaemonConfiguration,
+		REGAPP_ENVDir,				DaemonEnvironment,
+		REGAPP_Hidden,				FALSE,
+		REGAPP_AppIconInfo,			info,
+		REGAPP_Description,			DaemonDescription,
+		TAG_END,					NULL);
+}
+
+/**/
+void  ExitApplication(struct DaemonApplication *Self)
+{
+	Self->IApplication->UnregisterApplication(Self->hApplication,0L);
+}
+
 
 /**/
 ULONG PerceptionRexxHostEvent(struct DaemonApplication *Self, APTR message)
@@ -347,7 +378,7 @@ void  InitInputHandler(struct DaemonApplication *Self)
 
 	if(ioError)
 	{
-		KDEBUG("Perception-IME::InitInputHandler() [%lx] FATAL: Internal Error", ioError);
+		KDEBUG("Perception-IME::InitInputHandler() [%lx] FATAL: Internal Error\n", ioError);
 	}else{
 		Self->IExec->DoIO((APTR)Self->imRequest);
 	};
@@ -393,11 +424,11 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 					Self->IExec->ObtainSemaphore(&Self->Lock);
 					Context=GetInputContext(NULL,dApplication->IPerception);
 					Self->IExec->ReleaseSemaphore(&Self->Lock);
+					KDEBUG("Perception-IME[Daemon]::Context[%lx]\n",Context);
 					break;
 				default:
 					break;
 			}
-			KDEBUG("Perception-IME[Daemon]::Context[%lx]",Context);
 			cInputEvent=nInputEvent;
 		}while(cInputEvent);
 
