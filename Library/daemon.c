@@ -404,7 +404,7 @@ void  ExitInputHandler(struct DaemonApplication *Self)
 */
 APTR  ExecInputHandler(APTR stream,APTR data)
 {
-	APTR rc=stream;
+	APTR rc=stream; ULONG bInputIndex=0L;
     struct InputEvent *cInputEvent=stream, *nInputEvent=NULL;
 	struct DaemonApplication *dApplication=data;
 	struct LIBRARY_CLASS *Self=dApplication->PerceptionBase;
@@ -427,8 +427,10 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 			}
 			if(Context)
 			{
-				Self->IExec->ObtainSemaphore((APTR)Context);
-				bInputItem=ReadOutputItem(Context);
+				bInputIndex=Context->State[ICSTATE_FIFO_IW];
+				bInputItem=Context->State[ICSTATE_FIFO_PW];
+				if(bInputItem)
+					bInputItem=Context->Vector;
 				if(bInputItem)
 				{
 					if(Self->IKeymap->MapRawKey(cInputEvent,(APTR)&bInputItem->glyph,4L,NULL))
@@ -439,9 +441,14 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 					};
                     bInputItem->qual=cInputEvent->ie_Qualifier;
 				}
-				UpdateOutputItem(Context);
-				Self->IExec->Signal(Self->DaemonProcess,dApplication->ioSignal);
-				Self->IExec->ReleaseSemaphore((APTR)Context);
+				if(bInputIndex<IME_VECTOR_SIZE)
+				{
+					bInputIndex++;bInputItem++;
+				}else{
+					bInputIndex=0L;bInputItem=Context->Vector;
+				};
+				Context->State[ICSTATE_FIFO_IW]=bInputIndex;
+				Context->State[ICSTATE_FIFO_PW]=bInputItem;
 			}
 			cInputEvent=nInputEvent;
 		}while(cInputEvent);
