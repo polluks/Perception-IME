@@ -138,7 +138,8 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 		if(dApplication->IApplication)
 			InitApplication(dApplication);
 
-        DefaultLanguageContext(&dApplication->LanguageContext);
+		dApplication->IExec->InitSemaphore((APTR)&dApplication->LanguageContext);
+		InitLanguageContext(&dApplication->LanguageContext,NULL);
 		message=GetInputContext(NULL,dApplication->IPerception);
 		if(!message)
 			SetInputContext(&dApplication->LanguageContext,dApplication->IPerception);
@@ -433,25 +434,10 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 			}
 			if(Context)
 			{
-				Self->IExec->ObtainSemaphore(Context);
+				Self->IExec->ObtainSemaphore((APTR)Context);
 				bInputItem=ReadInputItem(Context);
-/*
-                if(Self->IKeymap->MapRawKey(cInputEvent,(APTR)&bInputItem->glyph,4L,NULL))
-				{
-					bInputItem->type	= TRANSLATE_ANSI;
-				}else{
-					bInputItem->type	= TRANSLATE_AMIGA;
-				};
-				bInputItem->qual=cInputEvent->ie_Qualifier;
-*/
-				NextInputItem(Context);
-
-//
-//	KDEBUG("Perception-IME[Daemon]//bInputItem[%lx:%lx:%lx]",
-//		bInputItem->glyph,bInputItem->qual,bInputItem->type);
-//
-				Self->IExec->ReleaseSemaphore(Context);
-				Self->IExec->Signal(Self->DaemonProcess,dApplication->ioSignal);
+				UpdateInputItem(Context);
+				Self->IExec->ReleaseSemaphore((APTR)Context);
 			}
 			cInputEvent=nInputEvent;
 		}while(cInputEvent);
