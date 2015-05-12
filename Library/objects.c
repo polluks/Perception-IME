@@ -81,14 +81,80 @@ void  NextInputContext(struct PerceptionIFace *IPerception)
 APTR  ReadInputItem(struct InputContext *ctxt)
 {
 	APTR rc=NULL;
+	ULONG Idx=0L;
+
+	if(ctxt)
+	{
+    	Idx	= ctxt->State[ICSTATE_FIFO_IW];
+	    rc	= ctxt->State[ICSTATE_FIFO_PW];
+	}
+    if(rc==NULL)
+		rc=ctxt->Vector;
+
 	return(rc);
 }
 
 /**/
-APTR  NextInputItem(struct InputContext *ctxt)
+APTR  UpdateInputItem(struct InputContext *ctxt)
+{
+	struct InputTagItem *rc=NULL;
+	ULONG Idx=0L;
+
+	if(ctxt)
+	{
+		Idx	= ctxt->State[ICSTATE_FIFO_IW];
+		rc	= ctxt->State[ICSTATE_FIFO_PW];
+	}
+	if(Idx<IME_VECTOR_SIZE)
+	{
+		Idx++; rc++;
+	}else{
+		Idx=0L;rc=NULL;
+	};
+	ctxt->State[ICSTATE_FIFO_IW]=Idx;
+	ctxt->State[ICSTATE_FIFO_PW]=rc;
+
+	return((APTR)rc);
+}
+
+/**/
+APTR  ReadOutputItem(struct InputContext *ctxt)
 {
 	APTR rc=NULL;
+	ULONG Idx=0L;
+
+	if(ctxt)
+	{
+    	Idx	= ctxt->State[ICSTATE_FIFO_IR];
+	    rc	= ctxt->State[ICSTATE_FIFO_PR];
+	}
+    if(rc==NULL)
+		rc=ctxt->Vector;
+
 	return(rc);
+}
+
+/**/
+APTR  UpdateOutputItem(struct InputContext *ctxt)
+{
+	struct InputTagItem *rc=NULL;
+	ULONG Idx=0L;
+
+	if(ctxt)
+	{
+		Idx	= ctxt->State[ICSTATE_FIFO_IR];
+		rc	= ctxt->State[ICSTATE_FIFO_PR];
+	}
+	if(Idx<IME_VECTOR_SIZE)
+	{
+		Idx++; rc++;
+	}else{
+		Idx=0L;rc=NULL;
+	};
+	ctxt->State[ICSTATE_FIFO_IR]=Idx;
+	ctxt->State[ICSTATE_FIFO_PR]=rc;
+
+	return((APTR)rc);
 }
 
 /**/

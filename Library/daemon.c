@@ -49,8 +49,8 @@ ULONG PerceptionCommodityEvent(struct DaemonApplication *Self, APTR message);
 void  InitApplication(struct DaemonApplication *Self);
 void  ExitApplication(struct DaemonApplication *Self);
 ULONG PerceptionRexxHostEvent(struct DaemonApplication *Self, APTR message);
-void  PerceptionPluginHandler(struct DaemonApplication *hDaemon);
 APTR  ExecInputHandler(APTR stream,APTR data);
+void  ExecPerceptionPlugin(struct DaemonApplication *dapp);
 
 /*	Process Information
 */
@@ -153,7 +153,7 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 				while((message=(APTR)IExec->GetMsg(dApplication->cxPort)))
 					exit=PerceptionCommodityEvent(dApplication,message);
 			if(signals && dApplication->ioSignal)
-				PerceptionPluginHandler(dApplication);
+				ExecPerceptionPlugin(dApplication);
 			if(signals && dApplication->rxSignal)
 				while((message=(APTR)IExec->GetMsg(dApplication->rxPort)))
 					exit=PerceptionRexxHostEvent(dApplication,message);
@@ -283,20 +283,15 @@ ULONG PerceptionCommodityEvent(struct DaemonApplication *Self, APTR message)
 				Self->CommodityFlags = Self->CommodityFlags | PERCEPTION_STATE_ACTIVE;
 				break;
 			case	CXCMD_APPEAR:   	/* External Forwarded? */
-				KDEBUG("Perception[Commodity]::Appear()\n");
 				break;
 			case	CXCMD_DISAPPEAR:	/* External Forwarded? */
-				KDEBUG("Perception[Commodity]::Disappear()\n");
 				break;
 			case	CXCMD_KILL:			/* External then Internal */
-				KDEBUG("Perception[Commodity]::Kill()\n");
 				rc=TRUE;
 				break;
 			case	CXCMD_UNIQUE:		/* Internal Special */
-				KDEBUG("Perception[Commodity]::Unique()\n");
 				break;
 			default:
-				KDEBUG("Perception[Commodity]::Unknown()\n");
 				break;
 		}
 	return(rc);
@@ -352,7 +347,6 @@ void  InitInputHandler(struct DaemonApplication *Self)
 			ASOPORT_Pri,		0L,
 			ASOPORT_Name,		DaemonName,
 			NULL,				NULL);
-
 	if(Self->ioPort)
 		Self->imFilter			= (APTR)Self->IExec->AllocSysObjectTags( ASOT_INTERRUPT,
 			ASOINTR_Size,		sizeof(struct Interrupt),
@@ -425,7 +419,7 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 				case IECLASS_RAWKEY:
 				case IECLASS_EXTENDEDRAWKEY:
 					Self->IExec->ObtainSemaphore(&Self->Lock);
-					Context=GetInputContext(NULL,dApplication->IPerception);
+					Context=&dApplication->LanguageContext;
 					Self->IExec->ReleaseSemaphore(&Self->Lock);
 					KDEBUG("Perception-IME[Daemon]::Context[%lx]\n",Context);
 					break;
@@ -436,7 +430,18 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 			{
 				Self->IExec->ObtainSemaphore((APTR)Context);
 				bInputItem=ReadInputItem(Context);
+				if(bInputItem)
+				{
+					if(Self->IKeymap->MapRawKey(cInputEvent,(APTR)&bInputItem->glyph,4L,NULL))
+                    {
+						bInputItem->type=TRANSLATE_ANSI;
+					}else{
+						bInputItem->type=TRANSLATE_AMIGA;
+					};
+                    bInputItem->qual=cInputEvent->ie_Qualifier;
+				}
 				UpdateInputItem(Context);
+				Self->IExec->Signal(Self->DaemonProcess,dApplication->ioSignal);
 				Self->IExec->ReleaseSemaphore((APTR)Context);
 			}
 			cInputEvent=nInputEvent;
@@ -447,8 +452,22 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 
 /*  LanguageContextHook Processing of InputTagItems and Isolation
 */
-void  PerceptionPluginHandler(struct DaemonApplication *hDaemon)
+void  ExecPerceptionPlugin(struct DaemonApplication *dapp)
 {
+	struct LIBRARY_CLASS *Self=dapp->PerceptionBase;
+	struct InputContext *Context=&dapp->LanguageContext;
+	struct InputTagItem *bInputItem=NULL, *cInputItem=NULL;
+
+    if(dapp->CommodityFlags && PERCEPTION_STATE_ACTIVE)
+	{
+		if(Context)
+		{
+			Self->IExec->ObtainSemaphore(&Self->Lock);
+			Context=GetInputContext(NULL,dapp->IPerception);
+			Self->IExec->ReleaseSemaphore(&Self->Lock);
+		}
+	}
+
 	return;
 }
 
