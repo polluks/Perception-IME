@@ -82,9 +82,9 @@ APTR  ReadOutputItem(struct InputContext *ctxt)
 {
 	APTR rc=NULL;
 	if(ctxt)
-	    rc	= ctxt->State[ICSTATE_FIFO_PW];
+	    rc=ctxt->State[ICSTATE_FIFO_PW];
     if(rc==NULL)
-		rc=&ctxt->Vector;
+		rc=ctxt->Vector;
 	return(rc);
 }
 
@@ -96,14 +96,14 @@ APTR  UpdateOutputItem(struct InputContext *ctxt)
 
 	if(ctxt)
 	{
-		Idx	= ctxt->State[ICSTATE_FIFO_IW];
-		rc	= ctxt->State[ICSTATE_FIFO_PW];
+		Idx=ctxt->State[ICSTATE_FIFO_IW];
+		rc=ctxt->State[ICSTATE_FIFO_PW];
 	}
 	if(Idx<IME_VECTOR_SIZE)
 	{
-		Idx++; rc++;
+		Idx++;rc++;
 	}else{
-		Idx=0L;rc=&ctxt->Vector;
+		Idx=0L;rc=ctxt->Vector;
 	};
 	ctxt->State[ICSTATE_FIFO_IW]=Idx;
 	ctxt->State[ICSTATE_FIFO_PW]=rc;
@@ -116,9 +116,9 @@ APTR  ReadInputItem(struct InputContext *ctxt)
 {
 	APTR rc=NULL;
 	if(ctxt)
-	    rc	= ctxt->State[ICSTATE_FIFO_PR];
+	    rc=ctxt->State[ICSTATE_FIFO_PR];
     if(rc==NULL)
-		rc=ctxt->&Vector;
+		rc=ctxt->Vector;
 
 	return(rc);
 }
@@ -131,14 +131,14 @@ APTR  UpdateInputItem(struct InputContext *ctxt)
 
 	if(ctxt)
 	{
-		Idx	= ctxt->State[ICSTATE_FIFO_IR];
-		rc	= ctxt->State[ICSTATE_FIFO_PR];
+		Idx=ctxt->State[ICSTATE_FIFO_IR];
+		rc=ctxt->State[ICSTATE_FIFO_PR];
 	}
 	if(Idx<IME_VECTOR_SIZE)
 	{
-		Idx++; rc++;
+		Idx++;rc++;
 	}else{
-		Idx=0L;rc=&ctxt->Vector;
+		Idx=0L;rc=ctxt->Vector;
 	};
 	ctxt->State[ICSTATE_FIFO_IR]=Idx;
 	ctxt->State[ICSTATE_FIFO_PR]=rc;
