@@ -78,6 +78,20 @@ void  NextInputContext(struct PerceptionIFace *IPerception)
 }
 
 /**/
+APTR  ReadInputItem(struct InputContext *ctxt)
+{
+	APTR rc=NULL;
+	return(rc);
+}
+
+/**/
+APTR  NextInputItem(struct InputContext *ctxt)
+{
+	APTR rc=NULL;
+	return(rc);
+}
+
+/**/
 void  InitLanguageContext(struct InputContext *lc,APTR LHook)
 {
 	ULONG x=0L;
@@ -115,6 +129,12 @@ void  InitLanguageContext(struct InputContext *lc,APTR LHook)
 void  ExitLanguageContext(struct InputContext *lc)
 {
 	lc->Hook.Hook.h_Entry=NULL;
+	return;
+}
+
+/**/
+void  DefaultLanguageContext(struct InputContext *lc)
+{
 	return;
 }
 

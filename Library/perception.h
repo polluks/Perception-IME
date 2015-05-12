@@ -200,8 +200,11 @@ extern ULONG LanguageDefaultHook(struct LanguageContextHook *lch,APTR LanguageCo
 extern APTR  GetInputContext(APTR name,struct PerceptionIFace *IPerception);
 extern void  SetInputContext(APTR ctxt,struct PerceptionIFace *IPerception);
 extern void  NextInputContext(struct PerceptionIFace *IPerception);
+extern APTR  ReadInputItem(struct InputContext *ctxt);
+extern APTR  NextInputItem(struct InputContext *ctxt);
 extern void  InitLanguageContext(struct InputContext *lc,APTR LHook);
 extern void  ExitLanguageContext(struct InputContext *lc);
+extern void  DefaultLanguageContext(struct InputContext *lc);
 extern void  TranslateCP32UTF8(ULONG *codepoint);
 /*extern void  TranslateUTF8CP32(struct TagItem *item);*/
 /**/
