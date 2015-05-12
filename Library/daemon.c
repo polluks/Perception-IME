@@ -433,8 +433,9 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 			}
 			if(Context)
 			{
-				dApplication->IExec->ObtainSemaphore(Context);
+				Self->IExec->ObtainSemaphore(Context);
 				bInputItem=ReadInputItem(Context);
+/*
                 if(Self->IKeymap->MapRawKey(cInputEvent,(APTR)&bInputItem->glyph,4L,NULL))
 				{
 					bInputItem->type	= TRANSLATE_ANSI;
@@ -442,11 +443,12 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 					bInputItem->type	= TRANSLATE_AMIGA;
 				};
 				bInputItem->qual=cInputEvent->ie_Qualifier;
+*/
 				NextInputItem(Context);
 
 //
-	KDEBUG("Perception-IME[Daemon]//bInputItem[%lx:%lx:%lx]",
-		bInputItem->glyph,bInputItem->qual,bInputItem->type);
+//	KDEBUG("Perception-IME[Daemon]//bInputItem[%lx:%lx:%lx]",
+//		bInputItem->glyph,bInputItem->qual,bInputItem->type);
 //
 				Self->IExec->ReleaseSemaphore(Context);
 				Self->IExec->Signal(Self->DaemonProcess,dApplication->ioSignal);
