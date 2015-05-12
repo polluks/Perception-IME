@@ -78,24 +78,18 @@ void  NextInputContext(struct PerceptionIFace *IPerception)
 }
 
 /**/
-APTR  ReadInputItem(struct InputContext *ctxt)
+APTR  ReadOutputItem(struct InputContext *ctxt)
 {
 	APTR rc=NULL;
-	ULONG Idx=0L;
-
 	if(ctxt)
-	{
-    	Idx	= ctxt->State[ICSTATE_FIFO_IW];
 	    rc	= ctxt->State[ICSTATE_FIFO_PW];
-	}
     if(rc==NULL)
-		rc=ctxt->Vector;
-
+		rc=&ctxt->Vector;
 	return(rc);
 }
 
 /**/
-APTR  UpdateInputItem(struct InputContext *ctxt)
+APTR  UpdateOutputItem(struct InputContext *ctxt)
 {
 	struct InputTagItem *rc=NULL;
 	ULONG Idx=0L;
@@ -109,7 +103,7 @@ APTR  UpdateInputItem(struct InputContext *ctxt)
 	{
 		Idx++; rc++;
 	}else{
-		Idx=0L;rc=NULL;
+		Idx=0L;rc=&ctxt->Vector;
 	};
 	ctxt->State[ICSTATE_FIFO_IW]=Idx;
 	ctxt->State[ICSTATE_FIFO_PW]=rc;
@@ -118,24 +112,19 @@ APTR  UpdateInputItem(struct InputContext *ctxt)
 }
 
 /**/
-APTR  ReadOutputItem(struct InputContext *ctxt)
+APTR  ReadInputItem(struct InputContext *ctxt)
 {
 	APTR rc=NULL;
-	ULONG Idx=0L;
-
 	if(ctxt)
-	{
-    	Idx	= ctxt->State[ICSTATE_FIFO_IR];
 	    rc	= ctxt->State[ICSTATE_FIFO_PR];
-	}
     if(rc==NULL)
-		rc=ctxt->Vector;
+		rc=ctxt->&Vector;
 
 	return(rc);
 }
 
 /**/
-APTR  UpdateOutputItem(struct InputContext *ctxt)
+APTR  UpdateInputItem(struct InputContext *ctxt)
 {
 	struct InputTagItem *rc=NULL;
 	ULONG Idx=0L;
@@ -149,7 +138,7 @@ APTR  UpdateOutputItem(struct InputContext *ctxt)
 	{
 		Idx++; rc++;
 	}else{
-		Idx=0L;rc=NULL;
+		Idx=0L;rc=&ctxt->Vector;
 	};
 	ctxt->State[ICSTATE_FIFO_IR]=Idx;
 	ctxt->State[ICSTATE_FIFO_PR]=rc;

@@ -421,7 +421,6 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 					Self->IExec->ObtainSemaphore(&Self->Lock);
 					Context=&dApplication->LanguageContext;
 					Self->IExec->ReleaseSemaphore(&Self->Lock);
-					KDEBUG("Perception-IME[Daemon]::Context[%lx]\n",Context);
 					break;
 				default:
 					break;
@@ -429,7 +428,7 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 			if(Context)
 			{
 				Self->IExec->ObtainSemaphore((APTR)Context);
-				bInputItem=ReadInputItem(Context);
+				bInputItem=ReadOutputItem(Context);
 				if(bInputItem)
 				{
 					if(Self->IKeymap->MapRawKey(cInputEvent,(APTR)&bInputItem->glyph,4L,NULL))
@@ -440,7 +439,7 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 					};
                     bInputItem->qual=cInputEvent->ie_Qualifier;
 				}
-				UpdateInputItem(Context);
+				UpdateOutputItem(Context);
 				Self->IExec->Signal(Self->DaemonProcess,dApplication->ioSignal);
 				Self->IExec->ReleaseSemaphore((APTR)Context);
 			}
