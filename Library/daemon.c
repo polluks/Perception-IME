@@ -35,7 +35,6 @@ struct	DaemonApplication
 	LONG						imSigBit;
 	ULONG						imSignal;
 /**/
-/**/
 	struct	MsgPort				*rxPort;
 	ULONG						rxSignal;
 /**/
@@ -139,8 +138,10 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 		if(dApplication->IApplication)
 			InitApplication(dApplication);
 
-        InitLanguageContext(&dApplication->LanguageContext,NULL);
-		SetInputContext(&dApplication->LanguageContext,dApplication->IPerception);
+        DefaultLanguageContext(&dApplication->LanguageContext);
+		message=GetInputContext(dApplication->IPerception);
+		if(!message)
+			SetInputContext(&dApplication->LanguageContext,dApplication->IPerception);
 		InitInputHandler(dApplication);
 
 		do{
