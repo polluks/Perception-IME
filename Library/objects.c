@@ -51,53 +51,11 @@ void  SetInputContext(APTR ctxt,struct PerceptionIFace *IPerception)
 }
 
 /**/
-void  NextInputContext(struct PerceptionIFace *IPerception)
-{
-	struct LIBRARY_CLASS *PerceptionBase=NULL;
-	struct Node *n=NULL;
-
-	if(IPerception)
-		PerceptionBase = (APTR)IPerception->Data.LibBase;
-	if(PerceptionBase)
-	{
-		if(PerceptionBase->CurrentLanguage)
-		{
-            PerceptionBase->IExec->ObtainSemaphore(&PerceptionBase->Lock);
-			n=PerceptionBase->CurrentLanguage;
-			if(n->ln_Succ)
-				PerceptionBase->CurrentLanguage=n->ln_Succ;
-            PerceptionBase->IExec->ReleaseSemaphore(&PerceptionBase->Lock);
-		}else{
-            PerceptionBase->IExec->ObtainSemaphore(&PerceptionBase->Lock);
-			PerceptionBase->CurrentLanguage=PerceptionBase->InputContextList.lh_Head;
-			PerceptionBase->IExec->ReleaseSemaphore(&PerceptionBase->Lock);
-		};
-	}
-
-	return;
-}
-
-/**/
 void  InitLanguageContext(struct InputContext *lc,APTR LHook)
-{
-	DefaultLanguageContext(lc);
-	lc->Hook.Hook.h_Entry=LHook;
-    return;
-}
-
-/**/
-void  ExitLanguageContext(struct InputContext *lc)
-{
-	lc->Hook.Hook.h_Entry=NULL;
-	return;
-}
-
-/**/
-void  DefaultLanguageContext(struct InputContext *lc)
 {
 	ULONG x=0L;
 
-	lc->Hook.Hook.h_Entry=NULL;
+	lc->Hook.Hook.h_Entry=LHook;
 	lc->Hook.Hook.h_Data=lc;
 
 	for(x=0L;x<IME_STATE_SIZE;x++)
@@ -116,6 +74,13 @@ void  DefaultLanguageContext(struct InputContext *lc)
 		lc->Vector[x].glyph	=0;
 	}
 
+	return;
+}
+
+/**/
+void  ExitLanguageContext(struct InputContext *lc)
+{
+	lc->Hook.Hook.h_Entry=NULL;
 	return;
 }
 

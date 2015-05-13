@@ -130,9 +130,7 @@ APTR LCALL_ObtainLanguageContext(struct LIBIFACE_CLASS *iface,APTR name,APTR hoo
 				rc->Lock.ss_Link.ln_Name=name;
 				Self->IExec->ObtainSemaphore(&Self->Lock);
 				Self->IExec->AddTail(&Self->InputContextList,(APTR)rc);
-				Self->CurrentLanguage=rc;
 				Self->IExec->ReleaseSemaphore(&Self->Lock);
-				KDEBUG("Perception.Library//ObtainLanguageContext[%lx/%s]\n",rc,name);
 			}
 		}
 	}

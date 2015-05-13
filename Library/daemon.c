@@ -41,7 +41,8 @@ struct	DaemonApplication
 	LONG						imSigBit;
 	ULONG						imSignal;
 /**/
-	struct InputContext			LanguageContext;
+	ULONG                       InputState[IME_STATE_SIZE];
+	struct InputTagItem			InputVector[IME_VECTOR_SIZE];
 };
 
 void  InitCommodity(struct DaemonApplication *Self,LONG active);
@@ -57,7 +58,8 @@ ULONG PerceptionRexxHostEvent(struct DaemonApplication *Self, APTR message);
 void  InitInputHandler(struct DaemonApplication *dapp);
 void  ExitInputHandler(struct DaemonApplication *dapp);
 APTR  ExecInputHandler(APTR stream,APTR data);
-void  ExecPerceptionPlugin(struct DaemonApplication *dapp);
+void  PerceptionInputContext(struct DaemonApplication *dapp);
+void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp);
 
 /*	Process Information
 */
@@ -152,11 +154,6 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 		if(dApplication->IREXX)
 			InitRexxHost(dApplication);
 
-		dApplication->IExec->InitSemaphore((APTR)&dApplication->LanguageContext);
-		InitLanguageContext(&dApplication->LanguageContext,NULL);
-		message=GetInputContext(NULL,dApplication->IPerception);
-		if(!message)
-			SetInputContext(&dApplication->LanguageContext,dApplication->IPerception);
 		InitInputHandler(dApplication);
 
 		do{
@@ -167,14 +164,14 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 				while((message=(APTR)IExec->GetMsg(dApplication->cxPort)))
 					exit=PerceptionCommodityEvent(dApplication,message);
 			if(signals && dApplication->ioSignal)
-				ExecPerceptionPlugin(dApplication);
+				ExecPerceptionInputPlugin(dApplication);
 			if(signals && dApplication->rxSignal)
 				while((message=(APTR)IExec->GetMsg(dApplication->rxPort)))
 					exit=PerceptionRexxHostEvent(dApplication,message);
 		}while(!exit);
 
 		ExitInputHandler(dApplication);
-		ExitLanguageContext(&dApplication->LanguageContext);
+
 		ExitRexxHost(dApplication);
 		ExitLocalization(dApplication);
 		ExitApplication(dApplication);
@@ -394,6 +391,9 @@ void  ExitRexxHost(struct DaemonApplication *Self)
 ULONG PerceptionRexxHostEvent(struct DaemonApplication *Self, APTR message)
 {
 	ULONG rc=0L;
+
+	KDEBUG("Perception-IME[Daemon]::PerceptionRexxHost();\n");
+
 	return(rc);
 }
 
@@ -465,35 +465,55 @@ void  ExitInputHandler(struct DaemonApplication *Self)
 */
 APTR  ExecInputHandler(APTR stream,APTR data)
 {
-	APTR rc=stream; ULONG bInputItem=0L, bMapKey=0L; WORD l=4;
+	APTR rc=stream; ULONG bInputItem=0L, bMapKey=0L, bMapType=TRANSLATE_AMIGA; WORD l=4;
     struct InputEvent *cInputEvent=stream, *nInputEvent=NULL;
 	struct DaemonApplication *dApplication=data;
 	struct LIBRARY_CLASS *Self=dApplication->PerceptionBase;
-	struct InputContext *Context=NULL;
 	struct InputTagItem *pInputItem=NULL;
 
     if(dApplication->CommodityFlags && PERCEPTION_STATE_ACTIVE)
-		do{
+		while(cInputEvent!=NULL)
+		{
 			nInputEvent=cInputEvent->ie_NextEvent;
 			switch(cInputEvent->ie_Class)
 			{
 				case IECLASS_RAWKEY:
 				case IECLASS_EXTENDEDRAWKEY:
+
 					Self->IExec->ObtainSemaphore(&Self->Lock);
-					Context=&dApplication->LanguageContext;
+					bInputItem=dApplication->InputState[ICSTATE_FIFO_IVW];
+					pInputItem=dApplication->InputState[ICSTATE_FIFO_PVW];
+					if(pInputItem==NULL)
+						pInputItem=dApplication->InputVector;
+					if(Self->IKeymap->MapRawKey((APTR)cInputEvent,(APTR)&bMapKey,l,NULL))
+						bMapType=TRANSLATE_ANSI;
+					pInputItem->qual=cInputEvent->ie_Qualifier;
+					pInputItem->type=bMapType;
+					pInputItem->glyph=bMapKey;
+					KDEBUG("Perception-IME[input.device]ExecInputHandler(InputItem    [%lx][%lx])\r\n",bInputItem,pInputItem);
+					KDEBUG("Perception-IME[input.device]ExecInputHandler(Map Type Key [%lx][%lx])\r\n",bMapType,bMapKey);
+					if(bInputItem<IME_VECTOR_SIZE)
+					{
+						bInputItem++;
+					}else{
+						bInputItem=1L;
+					};
+					dApplication->InputState[ICSTATE_FIFO_IVW]=bInputItem;
+					dApplication->InputState[ICSTATE_FIFO_PVW]=pInputItem;
+					Self->IExec->Signal(Self->DaemonProcess,dApplication->ioSignal);
 					Self->IExec->ReleaseSemaphore(&Self->Lock);
 					break;
 				default:
 					break;
 			}
-			if(Context)
+			cInputEvent=nInputEvent;
+		};
+
+	return(rc);
+}
+/*			if(Context)
 			{
 				Self->IExec->ObtainSemaphore((APTR)&dApplication->LanguageContext);
-				bInputItem=Context->State[ICSTATE_FIFO_IVW];
-				pInputItem=Context->Vector;
-				KDEBUG("Perception-IME[input.device] [%lx; %lx; %lx]",
-					Context,&Context->Vector,&dApplication->LanguageContext.Vector);
-/*
 				if(Self->IKeymap->MapRawKey((APTR)cInputEvent,(APTR)&bMapKey,l,NULL))
 				{
 					Context->Vector[bInputItem].type=TRANSLATE_ANSI;
@@ -502,38 +522,50 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 				};
 				Context->Vector[bInputItem].qual=cInputEvent->ie_Qualifier;
 				Context->Vector[bInputItem].glyph=bMapKey;
-*/
-				if(bInputItem<IME_VECTOR_SIZE)
-				{
-					bInputItem++;
-				}else{
-					bInputItem=0L;
-				};
-				Context->State[ICSTATE_FIFO_IVW]=bInputItem;
 				Context=NULL;
 				Self->IExec->ReleaseSemaphore((APTR)&dApplication->LanguageContext);
-//				Self->IExec->Signal(Self->DaemonProcess,dApplication->ioSignal);
+				Self->
 			}
-			cInputEvent=nInputEvent;
-		}while(cInputEvent);
+*/
 
-	return(rc);
+/*	LanguageContext style
+*/
+void  PerceptionInputContext(struct DaemonApplication *dapp)
+{
 }
 
 /*  LanguageContextHook Processing of InputTagItems and Isolation
 */
-void  ExecPerceptionPlugin(struct DaemonApplication *dapp)
+void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 {
 	struct LIBRARY_CLASS *Self=dapp->PerceptionBase;
-	struct InputContext *Context=&dapp->LanguageContext;
 	ULONG bInputItem=0L;
 	struct InputTagItem *pInputItem=NULL;
 
     if(dapp->CommodityFlags && PERCEPTION_STATE_ACTIVE)
 	{
+		KDEBUG("Perception-IME[Daemon]::ExecPerceptionInputPlugin();\n");
 		Self->IExec->ObtainSemaphore(&Self->Lock);
-		Context=GetInputContext(NULL,dapp->IPerception);
+		bInputItem=dapp->InputState[ICSTATE_FIFO_IVR];
+		pInputItem=dapp->InputState[ICSTATE_FIFO_PVR];
+		if(pInputItem==NULL)
+			pInputItem=dapp->InputVector;
+		//
+		//
+		if(bInputItem<IME_VECTOR_SIZE)
+		{
+			bInputItem++;
+		}else{
+			bInputItem=0L;
+		};
+		dapp->InputState[ICSTATE_FIFO_IVR]=bInputItem;
+		dapp->InputState[ICSTATE_FIFO_PVR]=pInputItem;
 		Self->IExec->ReleaseSemaphore(&Self->Lock);
+	}
+
+	return;
+}
+/*
 		if(Context)
 		{
 			Self->IExec->ObtainSemaphore((APTR)Context);
@@ -547,9 +579,5 @@ void  ExecPerceptionPlugin(struct DaemonApplication *dapp)
 			Context->State[ICSTATE_FIFO_IVR]=bInputItem;
 			Self->IExec->ReleaseSemaphore((APTR)Context);
 		}
-	}
-
-	return;
-}
-
+*/
 /**/
