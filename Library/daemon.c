@@ -28,6 +28,9 @@ struct	DaemonApplication
 	ULONG						hApplication;
 	struct	ApplicationIconInfo *hApplicationInfo;
 /**/
+	APTR						hLocale;
+	APTR						hLocaleDB;
+/**/
 	struct	MsgPort				*ioPort;
 	ULONG						ioSignal;
 	struct	Interrupt			*imFilter;
@@ -43,12 +46,16 @@ struct	DaemonApplication
 
 void  InitCommodity(struct DaemonApplication *Self,LONG active);
 void  ExitCommodity(struct DaemonApplication *Self);
-void  InitInputHandler(struct DaemonApplication *dapp);
-void  ExitInputHandler(struct DaemonApplication *dapp);
 ULONG PerceptionCommodityEvent(struct DaemonApplication *Self, APTR message);
 void  InitApplication(struct DaemonApplication *Self);
 void  ExitApplication(struct DaemonApplication *Self);
+void  InitLocalization(struct DaemonApplication *Self);
+void  ExitLocalization(struct DaemonApplication *Self);
+void  InitRexxHost(struct DaemonApplication *Self);
+void  ExitRexxHost(struct DaemonApplication *Self);
 ULONG PerceptionRexxHostEvent(struct DaemonApplication *Self, APTR message);
+void  InitInputHandler(struct DaemonApplication *dapp);
+void  ExitInputHandler(struct DaemonApplication *dapp);
 APTR  ExecInputHandler(APTR stream,APTR data);
 void  ExecPerceptionPlugin(struct DaemonApplication *dapp);
 
@@ -61,6 +68,7 @@ STATIC CONST BYTE	DaemonDescription[]		= "Input Method Editing\0\0";
 STATIC CONST BYTE	DaemonReleaseString[]	= "Open Source Edition\0";
 STATIC CONST BYTE	DaemonConfiguration[]	= "Perception-IME\0";
 STATIC CONST BYTE	DaemonEnvironment[]		= "Perception\0\0";
+STATIC CONST BYTE   DaemonLocale[]			= "english";
 
 /*	Commodity Flag markers
 */
@@ -138,6 +146,12 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 		if(dApplication->IApplication)
 			InitApplication(dApplication);
 
+		if(dApplication->ILocale)
+			InitLocalization(dApplication);
+
+		if(dApplication->IREXX)
+			InitRexxHost(dApplication);
+
 		dApplication->IExec->InitSemaphore((APTR)&dApplication->LanguageContext);
 		InitLanguageContext(&dApplication->LanguageContext,NULL);
 		message=GetInputContext(NULL,dApplication->IPerception);
@@ -161,12 +175,10 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 
 		ExitInputHandler(dApplication);
 		ExitLanguageContext(&dApplication->LanguageContext);
-
-		if(dApplication->hApplication)
-			ExitApplication(dApplication);
-
-		if(dApplication->cxPort)
-			ExitCommodity(dApplication);
+		ExitRexxHost(dApplication);
+		ExitLocalization(dApplication);
+		ExitApplication(dApplication);
+		ExitCommodity(dApplication);
 
 		if(dApplication->IREXX)
 		{
@@ -220,6 +232,7 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 	return(rc);
 };
 
+/**/
 void InitCommodity(struct DaemonApplication *Self,LONG active)
 {
 	LONG	error=0L;
@@ -329,6 +342,40 @@ void  ExitApplication(struct DaemonApplication *Self)
 	Self->IApplication->UnregisterApplication(Self->hApplication,0L);
 }
 
+/**/
+void  InitLocalization(struct DaemonApplication *Self)
+{
+	Self->hLocale	= Self->ILocale->OpenLocale(NULL);
+	if(Self->hLocale)
+		Self->hLocaleDB	= Self->ILocale->OpenCatalog(Self->hLocale, "Perception",
+			OC_BuiltInLanguage, (LONG)DaemonLocale,
+			OC_BuiltInCodeSet,	106L,
+			OC_PreferExternal,	TRUE,
+			TAG_END,			NULL);
+	return;
+}
+
+/**/
+void  ExitLocalization(struct DaemonApplication *Self)
+{
+	if(Self->hLocaleDB)
+		Self->ILocale->CloseCatalog(Self->hLocaleDB);
+	if(Self->hLocale)
+		Self->ILocale->CloseLocale(Self->hLocale);
+	return;
+}
+
+/**/
+void  InitRexxHost(struct DaemonApplication *Self)
+{
+	return;
+}
+
+/**/
+void  ExitRexxHost(struct DaemonApplication *Self)
+{
+	return;
+}
 
 /**/
 ULONG PerceptionRexxHostEvent(struct DaemonApplication *Self, APTR message)
@@ -409,6 +456,7 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 	struct DaemonApplication *dApplication=data;
 	struct LIBRARY_CLASS *Self=dApplication->PerceptionBase;
 	struct InputContext *Context=NULL;
+	struct InputTagItem *pInputItem=NULL;
 
     if(dApplication->CommodityFlags && PERCEPTION_STATE_ACTIVE)
 		do{
@@ -426,10 +474,11 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 			}
 			if(Context)
 			{
-//				Self->IExec->ObtainSemaphore((APTR)Context);
+				Self->IExec->ObtainSemaphore((APTR)&dApplication->LanguageContext);
 				bInputItem=Context->State[ICSTATE_FIFO_IVW];
-				KDEBUG("Perception-IME[input.device] [%lx %lx]",
-					Context,bInputItem);
+				pInputItem=Context->Vector;
+				KDEBUG("Perception-IME[input.device] [%lx; %lx; %lx]",
+					Context,&Context->Vector,&dApplication->LanguageContext.Vector);
 /*
 				if(Self->IKeymap->MapRawKey((APTR)cInputEvent,(APTR)&bMapKey,l,NULL))
 				{
@@ -448,7 +497,7 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 				};
 				Context->State[ICSTATE_FIFO_IVW]=bInputItem;
 				Context=NULL;
-//				Self->IExec->ReleaseSemaphore((APTR)Context);
+				Self->IExec->ReleaseSemaphore((APTR)&dApplication->LanguageContext);
 //				Self->IExec->Signal(Self->DaemonProcess,dApplication->ioSignal);
 			}
 			cInputEvent=nInputEvent;
@@ -464,6 +513,7 @@ void  ExecPerceptionPlugin(struct DaemonApplication *dapp)
 	struct LIBRARY_CLASS *Self=dapp->PerceptionBase;
 	struct InputContext *Context=&dapp->LanguageContext;
 	ULONG bInputItem=0L;
+	struct InputTagItem *pInputItem=NULL;
 
     if(dapp->CommodityFlags && PERCEPTION_STATE_ACTIVE)
 	{

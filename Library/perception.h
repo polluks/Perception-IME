@@ -27,6 +27,7 @@
 #include <devices/inputevent.h>
 
 #include <libraries/keymap.h>
+#include <libraries/locale.h>
 #include <libraries/perception.h>
 
 #define __USE_SYSBASE
