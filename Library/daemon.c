@@ -535,6 +535,7 @@ void  PerceptionInputContext(struct DaemonApplication *dapp)
 void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 {
 	struct LIBRARY_CLASS *Self=dapp->PerceptionBase;
+	struct InputContext *cLanguageContext=NULL, *nLanguageContext=NULL;
 	struct InputTagItem *pInputItem=NULL;
 	ULONG	bInputItem=0L,
 			Message[IME_MESSAGE_SIZE];
@@ -580,10 +581,24 @@ void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 		dapp->InputState[ICSTATE_FIFO_IVR]=bInputItem;
 		dapp->InputState[ICSTATE_FIFO_PVR]=(ULONG)pInputItem;
 		Self->IExec->ReleaseSemaphore(&Self->Lock);
-KDEBUG("Perception-IME[Daemon]ExecPerceptionInputPlugin(Glyph[%lx:%c])\r\n",Message[1],Message[1]);
-//
-//		I have a Message...Now to Call a plugin...
-//
+		cLanguageContext=GetInputContext(NULL,Self->IPerception);
+		Self->IExec->ObtainSemaphore(&Self->Lock);
+		cLanguageContext=Self->InputContextList.lh_Head;
+		while(cLanguageContext)
+		{
+			nLanguageContext=cLanguageContext->Lock.ss_Link.ln_Succ;
+			if(!cLanguageContext->Hook.Hook.h_Data)
+				cLanguageContext->Hook.Hook.h_Data=cLanguageContext;
+			if(!cLanguageContext->Hook.PerceptionLib)
+				cLanguageContext->Hook.PerceptionLib=Self->IPerception;
+			if(!cLanguageContext->Hook.UtilityLib)
+				cLanguageContext->Hook.UtilityLib=Self->IUtility;
+			Self->IExec->ReleaseSemaphore(&Self->Lock);
+			Self->IUtility->CallHookPkt((APTR)&cLanguageContext->Hook,(APTR)cLanguageContext,(APTR)Message);
+			Self->IExec->ObtainSemaphore(&Self->Lock);
+			cLanguageContext=nLanguageContext;
+		};
+		Self->IExec->ReleaseSemaphore(&Self->Lock);
 	}
 
 	return;

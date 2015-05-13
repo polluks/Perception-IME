@@ -64,8 +64,7 @@ void  InitLanguageContext(struct InputContext *lc,APTR LHook)
 	}
 	for(x=0L;x<IME_MESSAGE_SIZE;x++)
     {
-		lc->Message[x].ti_Tag	=	LANGUAGE_IME_NOP;
-		lc->Message[x].ti_Data	=	LANGUAGE_IME_NOP_NULL;
+		lc->Message[x]	=0L;
 	}
 	for(x=0L;x<IME_VECTOR_SIZE;x++)
     {

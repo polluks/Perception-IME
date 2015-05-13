@@ -184,9 +184,13 @@ void ExitPerceptionHook(struct LIBRARY_CLASS *Self)
 	DEBUG: RE-FACTORING IN PROGRESS... THIS FUNCTION IS ACTIVELY BROKEN...
 
 */
-ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageContext,APTR m)
+ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageContext,ULONG *Message)
 {
 	ULONG rc=0L;
+
+//	if(LanguageContext)
+//		Vector=(APTR)IPerception->GetLanguageContextAttr(LanguageContext,LCSTATE_VECTOR);
+
 	return(rc);
 }
 /*
@@ -194,7 +198,6 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 	struct PerceptionIFace	*IPerception= lch->PerceptionLib;
 	struct TagItem *Vector = NULL, VCommand;
 
-	KDEBUG("Japanese.Language[ExecLanguageHook]()[LanguageContext]\n");
 	if(LanguageContext)
 	{
 		VCommand.ti_Tag = LCSTATE_VECTOR;
@@ -218,9 +221,6 @@ ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageConte
 
 	return(rc);
 };
-
-/**/
-/*
 
 	ULONG rc=0L, *Message=m, c=0L, Syllable=0L, Kana=0L;
 	struct PerceptionIFace	*IPerception= lch->PerceptionLib;
