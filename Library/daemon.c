@@ -426,8 +426,11 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 			}
 			if(Context)
 			{
-				Self->IExec->ObtainSemaphore((APTR)Context);
+//				Self->IExec->ObtainSemaphore((APTR)Context);
 				bInputItem=Context->State[ICSTATE_FIFO_IVW];
+				KDEBUG("Perception-IME[input.device] [%lx %lx]",
+					Context,bInputItem);
+/*
 				if(Self->IKeymap->MapRawKey((APTR)cInputEvent,(APTR)&bMapKey,l,NULL))
 				{
 					Context->Vector[bInputItem].type=TRANSLATE_ANSI;
@@ -436,10 +439,7 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 				};
 				Context->Vector[bInputItem].qual=cInputEvent->ie_Qualifier;
 				Context->Vector[bInputItem].glyph=bMapKey;
-				KDEBUG("Perception-IME:ExecInputHandler():[Glyph=%lx:Qual=%lx:Type=%lx]\n",
-						Context->Vector[bInputItem].glyph,
-						Context->Vector[bInputItem].qual,
-						Context->Vector[bInputItem].type);
+*/
 				if(bInputItem<IME_VECTOR_SIZE)
 				{
 					bInputItem++;
@@ -448,8 +448,8 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 				};
 				Context->State[ICSTATE_FIFO_IVW]=bInputItem;
 				Context=NULL;
-				Self->IExec->ReleaseSemaphore((APTR)Context);
-				Self->IExec->Signal(Self->DaemonProcess,dApplication->ioSignal);
+//				Self->IExec->ReleaseSemaphore((APTR)Context);
+//				Self->IExec->Signal(Self->DaemonProcess,dApplication->ioSignal);
 			}
 			cInputEvent=nInputEvent;
 		}while(cInputEvent);

@@ -151,11 +151,13 @@ struct InputContext
 
 	Numbers here are arbitrary.
 */
-#define	ICSTATE_FIFO_IVW			(0)		/*  Index 	// InputHandler InputEvent->InputTagItem	*/
-#define	ICSTATE_FIFO_IVR			(1)		/*  Index 	// Translation of InputTagItem				*/
+#define	ICSTATE_FIFO_IVW		(0)		//  Index 	// InputHandler InputEvent->InputTagItem
+#define	ICSTATE_FIFO_IVR		(1)		//  Index 	// Translation of InputTagItem
+#define	ICSTATE_FIFO_PVW		(2)		//  Index 	// InputHandler InputEvent->InputTagItem
+#define	ICSTATE_FIFO_PVR		(3)		//  Index 	// Translation of InputTagItem
 
 /**/
-#define ICSTATE_MAX_ATTRIBUTE_COUNT	IME_STATE_SIZE	/*	ICSTATE Enumeration Ends at this value */
+#define ICSTATE_MAX_COUNT		IME_STATE_SIZE		// ICSTATE Enumeration Ends at this value
 
 /*main.c*/
 STATIC CONST struct Resident RomTag;

@@ -80,27 +80,8 @@ void  NextInputContext(struct PerceptionIFace *IPerception)
 /**/
 void  InitLanguageContext(struct InputContext *lc,APTR LHook)
 {
-	ULONG x=0L;
-
+	DefaultLanguageContext(lc);
 	lc->Hook.Hook.h_Entry=LHook;
-	lc->Hook.Hook.h_Data=lc;
-
-	for(x=0L;x<IME_STATE_SIZE;x++)
-    {
-		lc->State[x]	=0L;
-	}
-	for(x=0L;x<IME_MESSAGE_SIZE;x++)
-    {
-		lc->Message[x].ti_Tag	=	LANGUAGE_IME_NOP;
-		lc->Message[x].ti_Data	=	LANGUAGE_IME_NOP_NULL;
-	}
-	for(x=0L;x<IME_VECTOR_SIZE;x++)
-    {
-		lc->Vector[x].type	=0x8000L;
-		lc->Vector[x].qual	=0L;
-		lc->Vector[x].glyph	=0L;
-	}
-
     return;
 }
 
