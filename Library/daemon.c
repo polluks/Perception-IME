@@ -465,7 +465,7 @@ void  ExitInputHandler(struct DaemonApplication *Self)
 */
 APTR  ExecInputHandler(APTR stream,APTR data)
 {
-	APTR rc=stream; ULONG bInputItem=0L, bMapKey=0L, bMapType=TRANSLATE_AMIGA; WORD l=4;
+	APTR rc=stream; ULONG bInputItem=0L, bMapKey=0L; WORD l=4;
     struct InputEvent *cInputEvent=stream, *nInputEvent=NULL;
 	struct DaemonApplication *dApplication=data;
 	struct LIBRARY_CLASS *Self=dApplication->PerceptionBase;
@@ -484,13 +484,14 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 					pInputItem=(APTR)dApplication->InputState[ICSTATE_FIFO_PVW];
 					if(pInputItem==NULL)
 						pInputItem=dApplication->InputVector;
-					if(Self->IKeymap->MapRawKey((APTR)cInputEvent,(APTR)&bMapKey,l,NULL))
-						bMapType=TRANSLATE_ANSI;
 					pInputItem->qual=cInputEvent->ie_Qualifier;
-					pInputItem->type=bMapType;
+					if(Self->IKeymap->MapRawKey((APTR)cInputEvent,(APTR)&bMapKey,l,NULL))
+					{
+						pInputItem->type=TRANSLATE_ANSI;
+					}else{
+						pInputItem->type=TRANSLATE_AMIGA;
+					};
 					pInputItem->glyph=bMapKey;
-					KDEBUG("Perception-IME[input.device]ExecInputHandler( t[%lx] q[%lx] k[%lx] Item[%lx])\r\n",
-						pInputItem->type,pInputItem->qual,pInputItem->glyph, pInputItem);
 					if(bInputItem<IME_VECTOR_SIZE)
 					{
 						bInputItem++;pInputItem++;
@@ -534,11 +535,9 @@ void  PerceptionInputContext(struct DaemonApplication *dapp)
 void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 {
 	struct LIBRARY_CLASS *Self=dapp->PerceptionBase;
-	struct InputContext *cLanguageContext=NULL, *nLanguageContext=NULL;
-	ULONG bInputItem=0L;
 	struct InputTagItem *pInputItem=NULL;
-
-	ULONG t=0L,q=0L,k=0L;
+	ULONG	bInputItem=0L,
+			Message[IME_MESSAGE_SIZE];
 
     if(dapp->CommodityFlags && PERCEPTION_STATE_ACTIVE)
 	{
@@ -547,10 +546,31 @@ void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 		pInputItem=(APTR)dapp->InputState[ICSTATE_FIFO_PVR];
 		if(pInputItem==NULL)
 			pInputItem=dapp->InputVector;
-		//
-		KDEBUG("Perception-IME[Daemon]ExecPerceptionInputPlugin( t[%lx] q[%lx] k[%lx] Item[%lx])\r\n",
-			pInputItem->type,pInputItem->qual,pInputItem->glyph, pInputItem);
-		//
+        switch(pInputItem->type)
+		{
+            case TRANSLATE_ANSI:
+				Message[0]=LANGUAGE_TRANSLATE_ANSI;
+				Message[1]=pInputItem->glyph;
+				Message[2]=pInputItem->qual;
+				Message[3]=0L;
+				Message[4]=0L;
+				Message[5]=0L;
+				Message[6]=0L;
+				Message[7]=0L;
+				break;
+            case TRANSLATE_AMIGA:
+				Message[0]=LANGUAGE_TRANSLATE_AMIGA;
+				Message[1]=pInputItem->glyph;
+				Message[2]=pInputItem->qual;
+				Message[3]=0L;
+				Message[4]=0L;
+				Message[5]=0L;
+				Message[6]=0L;
+				Message[7]=0L;
+				break;
+			default:
+				break;
+		}
 		if(bInputItem<IME_VECTOR_SIZE)
 		{
 			bInputItem++;pInputItem++;
@@ -560,6 +580,10 @@ void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 		dapp->InputState[ICSTATE_FIFO_IVR]=bInputItem;
 		dapp->InputState[ICSTATE_FIFO_PVR]=(ULONG)pInputItem;
 		Self->IExec->ReleaseSemaphore(&Self->Lock);
+KDEBUG("Perception-IME[Daemon]ExecPerceptionInputPlugin(Glyph[%lx:%c])\r\n",Message[1],Message[1]);
+//
+//		I have a Message...Now to Call a plugin...
+//
 	}
 
 	return;
