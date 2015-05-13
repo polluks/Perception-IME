@@ -65,7 +65,7 @@ void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp);
 */
 STATIC CONST BYTE	DaemonName[]			= "Perception-IME\0";
 STATIC CONST ULONG	DaemonStackSize			= 131072L;
-STATIC CONST ULONG	DaemonPriority			= 96L;
+STATIC CONST ULONG	DaemonPriority			= 121L;
 STATIC CONST BYTE	DaemonDescription[]		= "Input Method Editing\0\0";
 STATIC CONST BYTE	DaemonReleaseString[]	= "Open Source Edition\0";
 STATIC CONST BYTE	DaemonConfiguration[]	= "Perception-IME\0";
@@ -489,8 +489,8 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 					pInputItem->qual=cInputEvent->ie_Qualifier;
 					pInputItem->type=bMapType;
 					pInputItem->glyph=bMapKey;
-					KDEBUG("Perception-IME[input.device]ExecInputHandler( b[%lx] p[%lx] Type[%lx] Key[%lx] )\r\n",
-						bInputItem,pInputItem,bMapType,bMapKey);
+					KDEBUG("Perception-IME[input.device]ExecInputHandler( t[%lx] q[%lx] k[%lx] Item[%lx])\r\n",
+						pInputItem->type,pInputItem->qual,pInputItem->glyph, pInputItem);
 					if(bInputItem<IME_VECTOR_SIZE)
 					{
 						bInputItem++;pInputItem++;
@@ -548,8 +548,8 @@ void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 		if(pInputItem==NULL)
 			pInputItem=dapp->InputVector;
 		//
-		KDEBUG("Perception-IME[input.device]ExecPerceptionInputPlugin( t[%lx] q[%lx] k[%lx] Key[%lx] )\r\n",
-			pInputItem->type,pInputItem->qual,pInputItem->glyph);
+		KDEBUG("Perception-IME[Daemon]ExecPerceptionInputPlugin( t[%lx] q[%lx] k[%lx] Item[%lx])\r\n",
+			pInputItem->type,pInputItem->qual,pInputItem->glyph, pInputItem);
 		//
 		if(bInputItem<IME_VECTOR_SIZE)
 		{
