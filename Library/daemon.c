@@ -31,15 +31,15 @@ struct	DaemonApplication
 	APTR						hLocale;
 	APTR						hLocaleDB;
 /**/
+	struct	MsgPort				*rxPort;
+	ULONG						rxSignal;
+/**/
 	struct	MsgPort				*ioPort;
 	ULONG						ioSignal;
 	struct	Interrupt			*imFilter;
 	struct  IOStdReq			*imRequest;
 	LONG						imSigBit;
 	ULONG						imSignal;
-/**/
-	struct	MsgPort				*rxPort;
-	ULONG						rxSignal;
 /**/
 	struct InputContext			LanguageContext;
 };
@@ -251,7 +251,9 @@ void InitCommodity(struct DaemonApplication *Self,LONG active)
 		Self->cxPort =	(APTR)Self->IExec->AllocSysObjectTags( ASOT_PORT,
 			ASOPORT_Size,		sizeof(struct MsgPort),
 			ASOPORT_Pri,		0L,
-			NULL,				NULL);
+			ASOPORT_Name,		DaemonName,
+			ASOPORT_Public,		FALSE,
+			TAG_END,			NULL);
 	if(Self->cxPort)
 		Self->cxSignal=1L << Self->cxPort->mp_SigBit;
 	if(Self->cxSignal)
@@ -368,12 +370,23 @@ void  ExitLocalization(struct DaemonApplication *Self)
 /**/
 void  InitRexxHost(struct DaemonApplication *Self)
 {
+	if(Self->IExec)
+		Self->rxPort =	(APTR)Self->IExec->AllocSysObjectTags( ASOT_PORT,
+			ASOPORT_Size,		sizeof(struct MsgPort),
+			ASOPORT_Pri,		0L,
+			ASOPORT_Name,		DaemonName,
+			ASOPORT_Public,		TRUE,
+			TAG_END,			NULL);
+	if(Self->rxPort)
+		Self->rxSignal=1L << Self->rxPort->mp_SigBit;
 	return;
 }
 
 /**/
 void  ExitRexxHost(struct DaemonApplication *Self)
 {
+	if(Self->rxPort)
+    	Self->IExec->FreeSysObject( ASOT_PORT, Self->rxPort );
 	return;
 }
 
@@ -393,7 +406,8 @@ void  InitInputHandler(struct DaemonApplication *Self)
 			ASOPORT_Size,		sizeof(struct MsgPort),
 			ASOPORT_Pri,		0L,
 			ASOPORT_Name,		DaemonName,
-			NULL,				NULL);
+			ASOPORT_Public,		FALSE,
+			TAG_END,			NULL);
 	if(Self->ioPort)
 		Self->imFilter			= (APTR)Self->IExec->AllocSysObjectTags( ASOT_INTERRUPT,
 			ASOINTR_Size,		sizeof(struct Interrupt),
