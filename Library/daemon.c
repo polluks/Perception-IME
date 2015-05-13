@@ -481,7 +481,7 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 				case IECLASS_EXTENDEDRAWKEY:
 					Self->IExec->ObtainSemaphore(&Self->Lock);
 					bInputItem=dApplication->InputState[ICSTATE_FIFO_IVW];
-					pInputItem=dApplication->InputState[ICSTATE_FIFO_PVW];
+					pInputItem=(APTR)dApplication->InputState[ICSTATE_FIFO_PVW];
 					if(pInputItem==NULL)
 						pInputItem=dApplication->InputVector;
 					if(Self->IKeymap->MapRawKey((APTR)cInputEvent,(APTR)&bMapKey,l,NULL))
@@ -498,7 +498,7 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 						bInputItem=0L;pInputItem=NULL;
 					};
 					dApplication->InputState[ICSTATE_FIFO_IVW]=bInputItem;
-					dApplication->InputState[ICSTATE_FIFO_PVW]=pInputItem;
+					dApplication->InputState[ICSTATE_FIFO_PVW]=(ULONG)pInputItem;
 					Self->IExec->Signal(Self->DaemonProcess,dApplication->ioSignal);
 					Self->IExec->ReleaseSemaphore(&Self->Lock);
 					break;
@@ -523,9 +523,9 @@ void  PerceptionInputContext(struct DaemonApplication *dapp)
 	}
 	for(x=0L;x<IME_VECTOR_SIZE;x++)
     {
-		dapp->Vector[x].type=0;
-		dapp->Vector[x].qual=0;
-		dapp->Vector[x].glyph=0;
+		dapp->InputVector[x].type=0;
+		dapp->InputVector[x].qual=0;
+		dapp->InputVector[x].glyph=0;
 	}
 }
 
@@ -534,7 +534,7 @@ void  PerceptionInputContext(struct DaemonApplication *dapp)
 void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 {
 	struct LIBRARY_CLASS *Self=dapp->PerceptionBase;
-	struct InputContext *cLanguageContext=NULL, nLanguageContext=NULL;
+	struct InputContext *cLanguageContext=NULL, *nLanguageContext=NULL;
 	ULONG bInputItem=0L;
 	struct InputTagItem *pInputItem=NULL;
 
@@ -544,7 +544,7 @@ void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 	{
 		Self->IExec->ObtainSemaphore(&Self->Lock);
 		bInputItem=dapp->InputState[ICSTATE_FIFO_IVR];
-		pInputItem=dapp->InputState[ICSTATE_FIFO_PVR];
+		pInputItem=(APTR)dapp->InputState[ICSTATE_FIFO_PVR];
 		if(pInputItem==NULL)
 			pInputItem=dapp->InputVector;
 		//
@@ -558,7 +558,7 @@ void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 			bInputItem=0L;pInputItem=NULL;
 		};
 		dapp->InputState[ICSTATE_FIFO_IVR]=bInputItem;
-		dapp->InputState[ICSTATE_FIFO_PVR]=pInputItem;
+		dapp->InputState[ICSTATE_FIFO_PVR]=(ULONG)pInputItem;
 		Self->IExec->ReleaseSemaphore(&Self->Lock);
 	}
 
