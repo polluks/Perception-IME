@@ -151,12 +151,8 @@ struct InputContext
 
 	Numbers here are arbitrary.
 */
-#define	ICSTATE_FIFO_IW				(0)		/*  Index 	// InputHandler InputEvent->InputTagItem	*/
-#define	ICSTATE_FIFO_IR				(1)		/*  Index 	// Translation of InputTagItem				*/
-#define	ICSTATE_FIFO_PW				(2)		/*  Pointer // InputHandler InputEvent->InputTagItem	*/
-#define	ICSTATE_FIFO_PR				(3)		/*  Pointer // Translation of InputTagItem				*/
-#define ICSTATE_CURRENT_LOCALE		(16)	/*	Pointer // This is the Current System Locale		*/
-#define ICSTATE_RESERVED			(64)	/*	Pointer // This is a Reserved Entry					*/
+#define	ICSTATE_FIFO_IVW			(0)		/*  Index 	// InputHandler InputEvent->InputTagItem	*/
+#define	ICSTATE_FIFO_IVR			(1)		/*  Index 	// Translation of InputTagItem				*/
 
 /**/
 #define ICSTATE_MAX_ATTRIBUTE_COUNT	IME_STATE_SIZE	/*	ICSTATE Enumeration Ends at this value */

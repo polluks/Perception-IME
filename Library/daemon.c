@@ -404,12 +404,11 @@ void  ExitInputHandler(struct DaemonApplication *Self)
 */
 APTR  ExecInputHandler(APTR stream,APTR data)
 {
-	APTR rc=stream; ULONG bInputIndex=0L, bMapKey=0L; WORD l=4;
+	APTR rc=stream; ULONG bInputItem=0L, bMapKey=0L; WORD l=4;
     struct InputEvent *cInputEvent=stream, *nInputEvent=NULL;
 	struct DaemonApplication *dApplication=data;
 	struct LIBRARY_CLASS *Self=dApplication->PerceptionBase;
 	struct InputContext *Context=NULL;
-	struct InputTagItem *bInputItem=NULL;
 
     if(dApplication->CommodityFlags && PERCEPTION_STATE_ACTIVE)
 		do{
@@ -428,31 +427,29 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 			if(Context)
 			{
 				Self->IExec->ObtainSemaphore((APTR)Context);
-				bInputIndex=Context->State[ICSTATE_FIFO_IW];
-				bInputItem=(APTR)Context->State[ICSTATE_FIFO_PW];
-				if(bInputItem)
-					bInputItem=Context->Vector;
+				bInputItem=Context->State[ICSTATE_FIFO_IVW];
 				if(Self->IKeymap->MapRawKey((APTR)cInputEvent,(APTR)&bMapKey,l,NULL))
 				{
-					bInputItem->type=TRANSLATE_ANSI;
+					Context->Vector[bInputItem].type=TRANSLATE_ANSI;
 				}else{
-					bInputItem->type=TRANSLATE_AMIGA;
+					Context->Vector[bInputItem].type=TRANSLATE_AMIGA;
 				};
-				bInputItem->glyph=bMapKey;
-				bInputItem->qual=cInputEvent->ie_Qualifier;
-				KDEBUG("Perception-IME:ExecInputHandler():bInputItem[Glyph=%lx:Qual=%lx:Type=%lx]\n",
-						bInputItem->glyph, bInputItem->qual, bInputItem->type);
-				if(bInputIndex<IME_VECTOR_SIZE)
+				Context->Vector[bInputItem].qual=cInputEvent->ie_Qualifier;
+				Context->Vector[bInputItem].glyph=bMapKey;
+				KDEBUG("Perception-IME:ExecInputHandler():[Glyph=%lx:Qual=%lx:Type=%lx]\n",
+						Context->Vector[bInputItem].glyph,
+						Context->Vector[bInputItem].qual,
+						Context->Vector[bInputItem].type);
+				if(bInputItem<IME_VECTOR_SIZE)
 				{
-					bInputIndex++;bInputItem++;
+					bInputItem++;
 				}else{
-					bInputIndex=0L;bInputItem=Context->Vector;
+					bInputItem=0L;
 				};
-				Context->State[ICSTATE_FIFO_IW]=bInputIndex;
-				Context->State[ICSTATE_FIFO_PW]=(ULONG)bInputItem;
+				Context->State[ICSTATE_FIFO_IVW]=bInputItem;
 				Context=NULL;
-				Self->IExec->Signal(Self->DaemonProcess,dApplication->ioSignal);
 				Self->IExec->ReleaseSemaphore((APTR)Context);
+				Self->IExec->Signal(Self->DaemonProcess,dApplication->ioSignal);
 			}
 			cInputEvent=nInputEvent;
 		}while(cInputEvent);
@@ -466,8 +463,7 @@ void  ExecPerceptionPlugin(struct DaemonApplication *dapp)
 {
 	struct LIBRARY_CLASS *Self=dapp->PerceptionBase;
 	struct InputContext *Context=&dapp->LanguageContext;
-	ULONG bInputIndex=0L;
-	struct InputTagItem *bInputItem=NULL, *cInputItem=NULL;
+	ULONG bInputItem=0L;
 
     if(dapp->CommodityFlags && PERCEPTION_STATE_ACTIVE)
 	{
@@ -477,18 +473,14 @@ void  ExecPerceptionPlugin(struct DaemonApplication *dapp)
 		if(Context)
 		{
 			Self->IExec->ObtainSemaphore((APTR)Context);
-			bInputIndex=Context->State[ICSTATE_FIFO_IW];
-			bInputItem=(APTR)Context->State[ICSTATE_FIFO_PW];
-			if(bInputItem)
-				bInputItem=Context->Vector;
-			if(bInputIndex<IME_VECTOR_SIZE)
+			bInputItem=Context->State[ICSTATE_FIFO_IVR];
+			if(bInputItem<IME_VECTOR_SIZE)
 			{
-				bInputIndex++;bInputItem++;
+				bInputItem++;
 			}else{
-				bInputIndex=0L;bInputItem=Context->Vector;
+				bInputItem=0L;
 			};
-			Context->State[ICSTATE_FIFO_IW]=bInputIndex;
-			Context->State[ICSTATE_FIFO_PW]=(ULONG)bInputItem;
+			Context->State[ICSTATE_FIFO_IVR]=bInputItem;
 			Self->IExec->ReleaseSemaphore((APTR)Context);
 		}
 	}

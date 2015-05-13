@@ -81,7 +81,6 @@ void  NextInputContext(struct PerceptionIFace *IPerception)
 void  InitLanguageContext(struct InputContext *lc,APTR LHook)
 {
 	ULONG x=0L;
-	struct TagItem *Vector=(APTR)lc->Vector;
 
 	lc->Hook.Hook.h_Entry=LHook;
 	lc->Hook.Hook.h_Data=lc;
@@ -102,12 +101,6 @@ void  InitLanguageContext(struct InputContext *lc,APTR LHook)
 		lc->Vector[x].glyph	=0L;
 	}
 
-	for(x=0L;x<IME_VECTOR_SIZE;x++)
-    {
-		Vector[x].ti_Tag	= TAG_USER+x;
-		Vector[x].ti_Data	= (ULONG)0L;
-	}
-
     return;
 }
 
@@ -121,6 +114,27 @@ void  ExitLanguageContext(struct InputContext *lc)
 /**/
 void  DefaultLanguageContext(struct InputContext *lc)
 {
+	ULONG x=0L;
+
+	lc->Hook.Hook.h_Entry=NULL;
+	lc->Hook.Hook.h_Data=lc;
+
+	for(x=0L;x<IME_STATE_SIZE;x++)
+    {
+		lc->State[x]	=0L;
+	}
+	for(x=0L;x<IME_MESSAGE_SIZE;x++)
+    {
+		lc->Message[x].ti_Tag	=	LANGUAGE_IME_NOP;
+		lc->Message[x].ti_Data	=	LANGUAGE_IME_NOP_NULL;
+	}
+	for(x=0L;x<IME_VECTOR_SIZE;x++)
+    {
+		lc->Vector[x].type	=0;
+		lc->Vector[x].qual	=0;
+		lc->Vector[x].glyph	=0;
+	}
+
 	return;
 }
 
