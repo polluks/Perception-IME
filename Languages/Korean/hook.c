@@ -48,8 +48,11 @@ void ExitPerceptionHook(struct LIBRARY_CLASS *Self)
 	return;
 }
 
-ULONG ExecPerceptionHook(struct LanguageContextHook *lch,APTR LanguageContext,APTR m)
+ULONG ExecPerceptionHook(struct LanguageContextHook *lch,APTR LanguageContext,ULONG *Message)
 {
+	return(rc);
+}
+/*
 	ULONG rc=0L, *Message=m, VCommand=0L, chord=0L, emIndex=LCSTATE_EMITBUFF;
 	struct PerceptionIFace	*IPerception= lch->PerceptionLib;
 	struct UtilityIFace 	*IUtility	= lch->UtilityLib;
@@ -99,5 +102,4 @@ ULONG ExecPerceptionHook(struct LanguageContextHook *lch,APTR LanguageContext,AP
 			break;
 	}
 
-	return(rc);
-}
+*/

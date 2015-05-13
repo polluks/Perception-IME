@@ -581,7 +581,7 @@ void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 		dapp->InputState[ICSTATE_FIFO_IVR]=bInputItem;
 		dapp->InputState[ICSTATE_FIFO_PVR]=(ULONG)pInputItem;
 		Self->IExec->ReleaseSemaphore(&Self->Lock);
-		cLanguageContext=GetInputContext(NULL,Self->IPerception);
+		cLanguageContext=GetInputContext(NULL,dapp->IPerception);
 		Self->IExec->ObtainSemaphore(&Self->Lock);
 		cLanguageContext=Self->InputContextList.lh_Head;
 		while(cLanguageContext)
@@ -590,9 +590,9 @@ void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 			if(!cLanguageContext->Hook.Hook.h_Data)
 				cLanguageContext->Hook.Hook.h_Data=cLanguageContext;
 			if(!cLanguageContext->Hook.PerceptionLib)
-				cLanguageContext->Hook.PerceptionLib=Self->IPerception;
+				cLanguageContext->Hook.PerceptionLib=dapp->IPerception;
 			if(!cLanguageContext->Hook.UtilityLib)
-				cLanguageContext->Hook.UtilityLib=Self->IUtility;
+				cLanguageContext->Hook.UtilityLib=dapp->IUtility;
 			Self->IExec->ReleaseSemaphore(&Self->Lock);
 			Self->IUtility->CallHookPkt((APTR)&cLanguageContext->Hook,(APTR)cLanguageContext,(APTR)Message);
 			Self->IExec->ObtainSemaphore(&Self->Lock);
