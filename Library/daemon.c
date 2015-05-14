@@ -10,7 +10,7 @@
 struct	DaemonApplication
 {
 	struct	LIBRARY_CLASS		*PerceptionBase;
-/**/
+//
 	struct	ExecIFace			*IExec;
 	struct  PerceptionIFace		*IPerception;
 	struct	DOSIFace			*IDOS;
@@ -19,28 +19,28 @@ struct	DaemonApplication
 	struct	LocaleIFace			*ILocale;
 	struct	RexxSysIFace		*IREXX;
 	struct	ApplicationIFace	*IApplication;
-/**/
+//
 	struct	MsgPort				*cxPort;
 	ULONG						cxSignal;
 	APTR						CommodityKey;
 	UWORD						CommodityFlags;
-/**/
+//
 	ULONG						hApplication;
 	struct	ApplicationIconInfo *hApplicationInfo;
-/**/
+//
 	APTR						hLocale;
 	APTR						hLocaleDB;
-/**/
+//
 	struct	MsgPort				*rxPort;
 	ULONG						rxSignal;
-/**/
+//
 	struct	MsgPort				*ioPort;
 	ULONG						ioSignal;
 	struct	Interrupt			*imFilter;
 	struct  IOStdReq			*imRequest;
 	LONG						imSigBit;
 	ULONG						imSignal;
-/**/
+//
 	ULONG                       InputState[IME_STATE_SIZE];
 	struct InputTagItem			InputVector[IME_VECTOR_SIZE];
 };
@@ -568,6 +568,15 @@ void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 				Message[5]=0L;
 				Message[6]=0L;
 				Message[7]=0L;
+				//
+				switch(pInputItem->glyph)
+				{
+					case :
+						break;
+					default:
+						break;
+				}
+				//
 				break;
 			default:
 				break;
@@ -581,6 +590,9 @@ void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 		dapp->InputState[ICSTATE_FIFO_IVR]=bInputItem;
 		dapp->InputState[ICSTATE_FIFO_PVR]=(ULONG)pInputItem;
 		Self->IExec->ReleaseSemaphore(&Self->Lock);
+
+
+		KDEBUG("Perception-IME[]:ExecPerceptionInputPlugin()\n");
 //
 //  I need to use the CurrentLanguage LanguageContext,
 //		Validate the Contents and force things if they are blank...
