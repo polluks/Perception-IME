@@ -158,7 +158,7 @@ void InitPerceptionHook(struct LIBRARY_CLASS *Self)
     APTR Context=NULL;
 
 	if(Self->IPerception)
-		Context=Self->IPerception->ObtainLanguageContext((APTR)LanguageName,(APTR)&ExecLanguageContextHook);
+		Context=Self->IPerception->ObtainLanguageContext((APTR)LanguageName,(APTR)&ExecPerceptionHook);
 	if(Context)
 		Self->HPerception=Context;
 
