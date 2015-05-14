@@ -591,6 +591,8 @@ void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 		while(cLanguage)
 		{
 			nLanguage=(APTR)cLanguage->Hook.h_MinNode.mln_Succ;
+			cLanguage->IPerception=dapp->IPerception;
+			cLanguage->IUtility=dapp->IUtility;
 			Self->IUtility->CallHookPkt((APTR)cLanguage,(APTR)cLanguage,(APTR)Message);
 			cLanguage=nLanguage;
 		}
