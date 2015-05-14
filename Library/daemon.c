@@ -543,10 +543,9 @@ void  PerceptionInputContext(struct DaemonApplication *dapp)
 void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 {
 	struct LIBRARY_CLASS *Self=dapp->PerceptionBase;
-	struct LanguageContext *cLanguageContext=NULL, *nLanguageContext=NULL;
+	struct LanguageContext *cLanguage=NULL, *nLanguage=NULL;
 	struct InputTagItem *pInputItem=NULL;
-	ULONG	bInputItem=0L,
-			Message[IME_MESSAGE_SIZE];
+	ULONG	bInputItem=0L, Message[IME_MESSAGE_SIZE];
 
     if(dapp->CommodityFlags && PERCEPTION_STATE_ACTIVE)
 	{
@@ -576,35 +575,6 @@ void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 				Message[5]=0L;
 				Message[6]=0L;
 				Message[7]=0L;
-				//
-				switch(pInputItem->glyph)
-				{
-//
-//					case 0x00000000:	//  Henkaku~Zankaku or Method-Cycle
-//						break;
-//					case 0x78000000:	//  Romaji~Hiragana=Kanji Mode-Cycle
-//						break;
-//					case 0x79000000:	//	Henkan
-//						break;
-//					case 0x7A000000:	//	MuHenkan
-//						break;
-//
-//					case 0x08000000:	//	Official:Backspace
-//						break;
-//					case 0x40000000:	//	Official:Space
-//						break;
-//					case 0x43000000:	//	Official:Enter
-//						break;
-//					case 0x44000000:	//	Official:Return
-//						break;
-//					case 0x7F000000:    //	Official:Delete
-//						break;
-//
-					default:
-						KDEBUG("Perception-IME[Daemon]://Unmapped Key [%lx]\n", pInputItem->glyph);
-						break;
-				}
-				//
 				break;
 			default:
 				break;
@@ -617,15 +587,14 @@ void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 		};
 		dapp->InputState[ICSTATE_FIFO_IVR]=bInputItem;
 		dapp->InputState[ICSTATE_FIFO_PVR]=(ULONG)pInputItem;
+		cLanguage=(APTR)Self->LanguageContextList.lh_Head;
+		while(cLanguage)
+		{
+			nLanguage=(APTR)cLanguage->Hook.h_MinNode.mln_Succ;
+			Self->IUtility->CallHookPkt((APTR)cLanguage,(APTR)cLanguage,(APTR)Message);
+			cLanguage=nLanguage;
+		}
 		Self->IExec->ReleaseSemaphore(&Self->Lock);
-
-
-		KDEBUG("Perception-IME[]:ExecPerceptionInputPlugin()\n");
-//
-//  I need to use the CurrentLanguage LanguageContext,
-//		Validate the Contents and force things if they are blank...
-//		and IUtility->CallHookPkt() the Hook as PPC code.
-//
 	}
 
 	return;

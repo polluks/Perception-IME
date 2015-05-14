@@ -184,7 +184,7 @@ void ExitPerceptionHook(struct LIBRARY_CLASS *Self)
 	DEBUG: RE-FACTORING IN PROGRESS... THIS FUNCTION IS ACTIVELY BROKEN...
 
 */
-ULONG ExecLanguageContextHook(struct LanguageContextHook *lch,APTR LanguageContext,ULONG *Message)
+ULONG ExecLanguageContextHook(struct Hook *h,struct LanguageContext LanguageContext,ULONG *Message)
 {
 	ULONG rc=0L;
 
