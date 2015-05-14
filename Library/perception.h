@@ -103,9 +103,9 @@ struct LIBRARY_CLASS
 /**/
 };
 
-#define     IME_STATE_SIZE		64L		/* Size is Arbitrary and subject to change				*/
-#define		IME_MESSAGE_SIZE	16L		/* Size is Arbitrary and subject to change				*/
-#define     IME_VECTOR_SIZE     512L	/* Size is NOT-Arbitrary and still subject to change!	*/
+#define     IME_STATE_SIZE		24L		/* Size is Arbitrary and subject to change				*/
+#define		IME_MESSAGE_SIZE	8L		/* Size is Arbitrary and subject to change				*/
+#define     IME_VECTOR_SIZE     64L		/* Size is NOT-Arbitrary and still subject to change!	*/
 
 /*
 	The Global Context (Each Language provides its own LanguageContext
@@ -122,7 +122,7 @@ struct InputContext
 	struct	SignalSemaphore		Lock;
 	struct	LanguageContextHook	Hook;
 	ULONG						State[IME_STATE_SIZE];
-	struct	TagItem				Message[IME_MESSAGE_SIZE];
+	ULONG						Message[IME_MESSAGE_SIZE];
 	struct	InputTagItem		Vector[IME_VECTOR_SIZE];
 };
 /*
@@ -156,7 +156,6 @@ struct InputContext
 #define	ICSTATE_FIFO_IVR		(1)		//  Index 	// Translation of InputTagItem
 #define	ICSTATE_FIFO_PVW		(2)		//  Index 	// InputHandler InputEvent->InputTagItem
 #define	ICSTATE_FIFO_PVR		(3)		//  Index 	// Translation of InputTagItem
-
 /**/
 #define ICSTATE_MAX_COUNT		IME_STATE_SIZE		// ICSTATE Enumeration Ends at this value
 

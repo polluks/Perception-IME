@@ -133,7 +133,7 @@ APTR LCALL_ObtainLanguageContext(struct LIBIFACE_CLASS *iface,APTR name,APTR hoo
 				Self->IExec->ReleaseSemaphore(&Self->Lock);
 			}
 		}
-	}
+	};
 
 	return((APTR)rc);
 }
