@@ -12,12 +12,12 @@ extern "C" {
 #define	PERCEPTION_API_VERSION		1
 #define	PERCEPTION_API_REVISION		0
 
-typedef struct InputTagItem
+struct InputTagItem
 {
 	UWORD	type;
 	UWORD	qual;
 	ULONG	glyph;
-}InputTagItem;
+};
 /*
 			Name                    16 Bits formatted in 1:3:4:4:3:1 notation
 */
@@ -25,38 +25,23 @@ typedef struct InputTagItem
 #define		TRANSLATE_AMIGA			0x0001	/* Default Keymap Native without Translation	*/
 #define		TRANSLATE_ANSI			0x0011	/* Default Keymap Native with ANSI Translation	*/
 
-/*
-	The "LanguageContext" structure and making use of it...
+/*	LanguageContext Definition
 
-	"LanguageContext" structures are an indirect mechanism used within the Perception-IME framework,
-		each "LanguageContext" is allocated as a core-block but requires Language Special Expansion.
-
-	"LanguageContext"s are the core means where Perception-IME can provide user-choice of Language
-		and the modal options provided by that language in a standardized manner.
-
-	The following Hook definition is the only public part of the context, the rest of the structure
-        is subject to change including order/sizing and other requirements on a per-language basis.
-
-	There is no limitations on the variability outside the core definitions presented here,
-
-	All LanguageContext Hook's are given the following Data with "Object" and "Method" information
-		provided as "TagItem" lists (which gives the Utility.Library requirement presented here.
-
-    Perception-IME only provides the bare minimum subset of functionality with the Language module
-		registering any "extended" materials through specific tagitem handling.
-
-	There IS an internally defined structure for this data however access is provided through these
-		published TagItem chains so there is no reason for a module developer to deal with it.
-	Any reference within the TagItems will be a direct access into the above structure so normal
-		shared-memory access restrictions apply (such as triggering a semaphore lock before writing)
-
+	This structure is for record-keeping within each Language plugin.
 */
-struct LanguageContextHook		/*	Expanded Hook Structure Used for ALL Expanded Language Drivers */
+#define     IME_STATE_SIZE		32L		/* Size is Arbitrary and subject to change				*/
+#define		IME_MESSAGE_SIZE	8L		/* Size is Arbitrary and subject to change				*/
+#define     IME_VECTOR_SIZE     32L		/* Size is NOT-Arbitrary and still subject to change!	*/
+
+struct LanguageContext
 {
-	struct Hook Hook;			/*	Normal Hook for Utility.Library/CallHookPkt()	*/
-	APTR		PerceptionLib;	/*	Perception.Library Base/Interface				*/
-	APTR		UtilityLib;		/*	Utility.Library Base/Interface					*/
+	struct Hook				Hook;
+	struct PerceptionIFace	*IPerception;
+	struct UtilityIFace		*IUtility;
+	ULONG					State[IME_STATE_SIZE];
+	struct InputTagItem		Vector[IME_VECTOR_SIZE];
 };
+#define	LHCONTEXTSIZE    sizeof(struct LanguageContext)
 /*
 	System-Wide Attributes (LanguageContext *Expanded* settings)
 */

@@ -112,24 +112,27 @@ APTR LCALL_OptionTagList(struct LIBIFACE_CLASS *iface, struct TagItem *options)
 */
 APTR LCALL_ObtainLanguageContext(struct LIBIFACE_CLASS *iface,APTR name,APTR hook)
 {
-	struct InputContext *rc=NULL;
+	struct LanguageContext *rc=NULL;
 	struct LIBRARY_CLASS *Self = (APTR) iface->Data.LibBase;
 
 	if(name)
 	{
 		Self->IExec->ObtainSemaphore(&Self->Lock);
-		rc=(APTR)Self->IExec->FindName(&Self->InputContextList,name);
+		rc=(APTR)Self->IExec->FindName(&Self->LanguageContextList,name);
 		Self->IExec->ReleaseSemaphore(&Self->Lock);
 		if(rc==NULL)
 		{
-			rc=(APTR)Self->IExec->AllocVecTags(IHCONTEXTSIZE,AVT_Type,MEMF_SHARED,TAG_DONE,0L);
+			rc=(APTR)Self->IExec->AllocSysObjectTags( ASOT_HOOK,
+				ASOHOOK_Size,		LHCONTEXTSIZE,
+				ASOHOOK_Entry,		(ULONG)hook,
+				ASOHOOK_Data,		0L,
+				TAG_END,			0L);
 			if(rc)
 			{
-				Self->IExec->InitSemaphore((APTR)rc);
-				InitLanguageContext((APTR)rc,(APTR)hook);
-				rc->Lock.ss_Link.ln_Name=name;
+				rc->Hook.h_Data=rc;
+				InitLanguageContext((APTR)rc);
 				Self->IExec->ObtainSemaphore(&Self->Lock);
-				Self->IExec->AddTail(&Self->InputContextList,(APTR)rc);
+				Self->IExec->AddTail(&Self->LanguageContextList,(APTR)rc);
 				Self->IExec->ReleaseSemaphore(&Self->Lock);
 			}
 		}

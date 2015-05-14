@@ -97,52 +97,13 @@ struct LIBRARY_CLASS
 	APTR	DaemonProcess;
 	APTR	DaemonDHandle;
 /**/
-	struct	List	InputContextList;
+	struct	List	LanguageContextList;
 /**/
     APTR			CurrentLanguage;				/*  Active LanguageContext for PluginCalls  */
 /**/
 };
 
-#define     IME_STATE_SIZE		24L		/* Size is Arbitrary and subject to change				*/
-#define		IME_MESSAGE_SIZE	8L		/* Size is Arbitrary and subject to change				*/
-#define     IME_VECTOR_SIZE     64L		/* Size is NOT-Arbitrary and still subject to change!	*/
-
-/*
-	The Global Context (Each Language provides its own LanguageContext
-
-	This structure is the basic definition for both Input and Language Context structures,
-
-		LanguageContext Attributes are embedded as TagItem Chains within this structure.
-		This overload of TagItems within a fixed structure allows the Language modules
-		to override and use Internal DataBase expansion upon the Language specific contexts
-		along with overloading the attributes for other purposes
-*/
-struct InputContext
-{
-	struct	SignalSemaphore		Lock;
-	struct	LanguageContextHook	Hook;
-	ULONG						State[IME_STATE_SIZE];
-	ULONG						Message[IME_MESSAGE_SIZE];
-	struct	InputTagItem		Vector[IME_VECTOR_SIZE];
-};
-/*
-	"InputTagItem"s are deliberately the same size as "TagItem" structures for interchange purposes
-	When the "Hook" within the InputContext is called from the Perception-IME process
-
-	"State[]" has both System-Wide attributes defined following the size definition
-		along with Language plugin specific Attributes stored within each Instance.
-
-	Expect the InputContext to be subject to change based on which Language is currently active.
-		User preferences decide which Languages are Active along with selection.
-
-	LanguageContext usage ***overrides*** ALL InputContext Defined Attributes and behaviours
-		so you need to look twice and DO NOT CHANGE OR RELY on InputContext Data,
-		Instead rely exclusively on your own LanguageContext Allocation where possible.
-*/
-#define	IHCONTEXTSIZE    sizeof(struct InputContext)
-#define	LHCONTEXTSIZE    sizeof(struct InputContext)
-
-/*	InputContext State Information
+/*	LanguageContext State Information
 
 	>> Global, Shared, Private << is the declared Attributes order
 
@@ -193,13 +154,11 @@ extern ULONG LCALL_SetLanguageContextAttr(struct LIBIFACE_CLASS *Self, APTR lc, 
 extern void  InitPerceptionDaemon(struct LIBRARY_CLASS *Self);
 extern void  ExitPerceptionDaemon(struct LIBRARY_CLASS *Self);
 extern int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc);
-extern ULONG LanguageDefaultHook(struct LanguageContextHook *lch,APTR LanguageContext,APTR m);
 /*objects.c*/
 extern APTR  GetInputContext(APTR name,struct PerceptionIFace *IPerception);
 extern void  SetInputContext(APTR ctxt,struct PerceptionIFace *IPerception);
-extern void  InitLanguageContext(struct InputContext *lc,APTR LHook);
-extern void  ExitLanguageContext(struct InputContext *lc);
-extern void  DefaultLanguageContext(struct InputContext *lc);
+extern void  InitLanguageContext(struct LanguageContext *lc);
+extern void  ExitLanguageContext(struct LanguageContext *lc);
 extern void  TranslateCP32UTF8(ULONG *codepoint);
 /*extern void  TranslateUTF8CP32(struct TagItem *item);*/
 /**/

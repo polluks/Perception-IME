@@ -18,7 +18,7 @@ APTR  GetInputContext(APTR name,struct PerceptionIFace *IPerception)
 		if(name)
 		{
 			PerceptionBase->IExec->ObtainSemaphore(&PerceptionBase->Lock);
-			rc=PerceptionBase->IExec->FindName(&PerceptionBase->InputContextList,name);
+			rc=PerceptionBase->IExec->FindName(&PerceptionBase->LanguageContextList,name);
 			PerceptionBase->IExec->ReleaseSemaphore(&PerceptionBase->Lock);
 		}else{
 			PerceptionBase->IExec->ObtainSemaphore(&PerceptionBase->Lock);
@@ -51,20 +51,13 @@ void  SetInputContext(APTR ctxt,struct PerceptionIFace *IPerception)
 }
 
 /**/
-void  InitLanguageContext(struct InputContext *lc,APTR LHook)
+void  InitLanguageContext(struct LanguageContext *lc)
 {
 	ULONG x=0L;
-
-	lc->Hook.Hook.h_Entry=LHook;
-	lc->Hook.Hook.h_Data=lc;
 
 	for(x=0L;x<IME_STATE_SIZE;x++)
     {
 		lc->State[x]	=0L;
-	}
-	for(x=0L;x<IME_MESSAGE_SIZE;x++)
-    {
-		lc->Message[x]	=0L;
 	}
 	for(x=0L;x<IME_VECTOR_SIZE;x++)
     {
@@ -77,9 +70,9 @@ void  InitLanguageContext(struct InputContext *lc,APTR LHook)
 }
 
 /**/
-void  ExitLanguageContext(struct InputContext *lc)
+void  ExitLanguageContext(struct LanguageContext *lc)
 {
-	lc->Hook.Hook.h_Entry=NULL;
+	lc->Hook.h_Entry=NULL;
 	return;
 }
 

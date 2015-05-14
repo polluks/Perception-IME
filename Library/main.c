@@ -101,7 +101,7 @@ struct library *LCALL_Init(struct LIBRARY_CLASS *Self,
 
 	IExec->InitSemaphore(&Self->Lock);
 	IExec->ObtainSemaphore(&Self->Lock);
-	IExec->NewList(&Self->InputContextList);
+	IExec->NewList(&Self->LanguageContextList);
 	IExec->ReleaseSemaphore(&Self->Lock);
 
 	return(rc);

@@ -154,6 +154,14 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 		if(dApplication->IREXX)
 			InitRexxHost(dApplication);
 
+		for(sigmask=0L;sigmask<IME_STATE_SIZE;sigmask++)
+			dApplication->InputState[sigmask]=0L;
+		for(sigmask=0L;sigmask<IME_VECTOR_SIZE;sigmask++)
+		{
+			dApplication->InputVector[sigmask].type=0;
+			dApplication->InputVector[sigmask].qual=0;
+			dApplication->InputVector[sigmask].glyph=0;
+		}
 		InitInputHandler(dApplication);
 
 		do{
@@ -535,7 +543,7 @@ void  PerceptionInputContext(struct DaemonApplication *dapp)
 void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 {
 	struct LIBRARY_CLASS *Self=dapp->PerceptionBase;
-	struct InputContext *cLanguageContext=NULL, *nLanguageContext=NULL;
+	struct LanguageContext *cLanguageContext=NULL, *nLanguageContext=NULL;
 	struct InputTagItem *pInputItem=NULL;
 	ULONG	bInputItem=0L,
 			Message[IME_MESSAGE_SIZE];
@@ -571,9 +579,29 @@ void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 				//
 				switch(pInputItem->glyph)
 				{
-					case :
-						break;
+//
+//					case 0x00000000:	//  Henkaku~Zankaku or Method-Cycle
+//						break;
+//					case 0x78000000:	//  Romaji~Hiragana=Kanji Mode-Cycle
+//						break;
+//					case 0x79000000:	//	Henkan
+//						break;
+//					case 0x7A000000:	//	MuHenkan
+//						break;
+//
+//					case 0x08000000:	//	Official:Backspace
+//						break;
+//					case 0x40000000:	//	Official:Space
+//						break;
+//					case 0x43000000:	//	Official:Enter
+//						break;
+//					case 0x44000000:	//	Official:Return
+//						break;
+//					case 0x7F000000:    //	Official:Delete
+//						break;
+//
 					default:
+						KDEBUG("Perception-IME[Daemon]://Unmapped Key [%lx]\n", pInputItem->glyph);
 						break;
 				}
 				//
