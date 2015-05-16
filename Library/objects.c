@@ -18,7 +18,7 @@ APTR  GetInputContext(APTR name,struct PerceptionIFace *IPerception)
 		if(name)
 		{
 			PerceptionBase->IExec->ObtainSemaphore(&PerceptionBase->Lock);
-			rc=PerceptionBase->IExec->FindName(&PerceptionBase->LanguageContextList,name);
+//			rc=PerceptionBase->IExec->FindName(&PerceptionBase->LanguageContextList,name);
 			PerceptionBase->IExec->ReleaseSemaphore(&PerceptionBase->Lock);
 		}else{
 			PerceptionBase->IExec->ObtainSemaphore(&PerceptionBase->Lock);
