@@ -7,7 +7,6 @@
 
 STATIC CONST BYTE LanguageName[] = LIBRARY_NAME;
 
-/* This is where the incoming ANSI characters get stored
 #define	LCSTATE_Syllable		(LCSTATE_EXPANDED)
 #define	LCSTATE_IDEOGRAPH_IDX	(LCSTATE_EXPANDED+1)
 #define	LCSTATE_IDEOGRAPH_BUFF	(LCSTATE_EXPANDED+2)
@@ -22,10 +21,12 @@ STATIC CONST BYTE LanguageName[] = LIBRARY_NAME;
 #define CODEPOINT_KATAKANA_KEY		0x30A0
 #define	CODEPOINT_KANATOGGLE_MASK	0x00E0	// Reversible Hiragana<->Katakana Transform Key
 
-
 ULONG GetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility);
 void  SetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility,ULONG data);
 ULONG FindSyllableCandidate(ULONG Key,struct UtilityIFace *IUtility);
+
+/*
+
 void  QueueSyllableCandidate(ULONG c,struct TagItem *Vector,APTR LanguageContext,struct LanguageContextHook *lch);
 
 UpdateKanjiCandidacy(Vector,LanguageContext,lch);
@@ -158,7 +159,7 @@ void InitPerceptionHook(struct LIBRARY_CLASS *Self)
     APTR Context=NULL;
 
 	if(Self->IPerception)
-		Context=Self->IPerception->ObtainLanguageContext((APTR)LanguageName,(APTR)&ExecPerceptionHook);
+		Context=Self->IPerception->ObtainLanguageContext((APTR)LanguageName,(APTR)&ExecLanguageHook);
 	if(Context)
 		Self->HPerception=Context;
 
@@ -184,39 +185,131 @@ void ExitPerceptionHook(struct LIBRARY_CLASS *Self)
 	DEBUG: RE-FACTORING IN PROGRESS... THIS FUNCTION IS ACTIVELY BROKEN...
 
 */
-ULONG ExecPerceptionHook(struct Hook *h,struct LanguageContext *LanguageContext,ULONG *Message)
+ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,ULONG *Message)
 {
-	ULONG rc=0L;
+	ULONG rc=0L, xc=0L, Syllable=0L, Kana=0L;
 	struct TagItem *Vector=NULL;
 
 	if(LanguageContext)
 		Vector=(APTR)LanguageContext->IPerception->GetLanguageContextAttr(LanguageContext,LCSTATE_VECTOR);
+	if(Message)
+	{
+		switch(Message[0])
+		{
+            case LANGUAGE_TRANSLATE_AMIGA:
+				KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_AMIGA]\n");
+				break;
+            case LANGUAGE_TRANSLATE_ANSI:
+				KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_ANSI]\n");
+				Syllable = GetLCSTATEbyValue(Vector,LCSTATE_Syllable,LanguageContext->IUtility);
+			    if((Message[1] & 0xFF000000) == Message[1])
+    			{
+					if(((Message[1] >> 24)-0x00000061)<0x0000001B)
+						xc = TAG_USER | (Message[1] >> 24);
+					if(((Message[1] >> 24)-0x00000041)<0x0000001B)
+						xc = TAG_USER | ((Message[1] >> 24)+0x20);
+				}
+				switch(Syllable)
+				{
+					case 0x00000000: // No Syllable
+						switch(xc)
+						{
+							case 0x00000061: // A
+							case 0x00000069: // I
+							case 0x00000075: // U
+							case 0x00000065: // E
+							case 0x0000006F: // O
+								Kana = FindSyllableCandidate(Syllable,LanguageContext->IUtility);
+                                break;
+							default:
+								Syllable = (Syllable << 8)+(0x7F & xc);
+								break;
+						}
+						break;
+					case 0x0000006E: // 'N' Singular Usage exception
+						switch(xc)
+						{
+							case 0x00000061: // A
+							case 0x00000069: // I
+							case 0x00000075: // U
+							case 0x00000065: // E
+							case 0x0000006F: // O
+								Syllable = (Syllable << 8)+(0x7F & xc);
+								Kana = FindSyllableCandidate(Syllable,LanguageContext->IUtility);
+								break;
+							case 0x00000079: // Y
+								Syllable = (Syllable << 8)+(0x7F & xc);
+								break;
+							default:
+								Kana = 0x00003093;
+								Syllable = (0x7F && xc);
+								break;
+						}
+						break;
+					default:
+						if(Syllable==xc)
+						{
+							Kana = 0x00003063;
+						}else{
+							Syllable = (Syllable << 8)+(0x7F & xc);
+							Kana = FindSyllableCandidate(Syllable,LanguageContext->IUtility);
+						};
+						break;
+				}
+				SetLCSTATEbyValue(Vector,LCSTATE_Syllable,LanguageContext->IUtility,Syllable);
+				break;
+			default:
+				break;
+		}
+	}
 
 	return(rc);
 }
+
+ULONG GetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility)
+{
+	ULONG rc=0L;
+	struct TagItem *Item = NULL;
+
+	if(Vector)
+		Item=IUtility->FindTagItem(Key,Vector);
+    if(Item)
+		rc=Item->ti_Data;
+
+	return(rc);
+};
+
+void  SetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility,ULONG data)
+{
+	struct TagItem *Item = NULL;
+
+	if(Vector)
+		Item=IUtility->FindTagItem(Key,Vector);
+    if(Item)
+		Item->ti_Data=data;
+
+	return;
+};
+
+ULONG FindSyllableCandidate(ULONG Key,struct UtilityIFace *IUtility)
+{
+	ULONG rc = 0L;
+	struct TagItem *Candidate = NULL;
+
+	if(Key)
+		Candidate=IUtility->FindTagItem((Key & 0x7FFFFFFF),SyllableCandidates);
+	if(Candidate)
+		rc=Candidate->ti_Data;
+
+	return(rc);
+};
+
 /*
 	ULONG rc=0L, *Message=m, c=0L, Syllable=0L, Kana=0L;
-	struct PerceptionIFace	*IPerception= lch->PerceptionLib;
-	struct TagItem *Vector = NULL, VCommand;
 
-	if(LanguageContext)
-	{
-		VCommand.ti_Tag = LCSTATE_VECTOR;
-		VCommand.ti_Data= 0L;
-        Vector=(APTR)LanguageContext->IPerception->GetLanguageContextAttr(LanguageContext,&VCommand);
-	};
 	KDEBUG("Japanese.Language[ExecLanguageHook]()[Message]\n");
 	if(Message)
 	{
-	    if((Message[1] & 0xFF000000) == Message[1])
-    	{
-			KDEBUG("Japanese.Language::ExecLanguageHook()[LCSTATE 'Syllable' Read]\n");
-			Syllable = GetLCSTATEbyValue(Vector,LCSTATE_Syllable,lch->UtilityLib);
-			if(((Message[1] >> 24)-0x00000061)<0x0000001B)
-				c = TAG_USER | (Message[1] >> 24);
-			if(((Message[1] >> 24)-0x00000041)<0x0000001B)
-				c = TAG_USER | ((Message[1] >> 24)+0x20);
-		}
 	}
 	KDEBUG("ExecLanguageContextHook[Syllable =%lx][Character=%lx]\n",Syllable,c);
 
@@ -268,56 +361,7 @@ ULONG ExecPerceptionHook(struct Hook *h,struct LanguageContext *LanguageContext,
 			};break;
 		case LANGUAGE_TRANSLATE_ANSI:
 			KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_ANSI]\n");
-			switch(Syllable)
-			{
-				case	0x00000000:	// NULL
-					switch(c)
-					{
-						case 0x00000061:
-						case 0x00000069:
-						case 0x00000075:
-						case 0x00000065:
-						case 0x0000006F:
-							Kana = FindSyllableCandidate(c,lch->UtilityLib);
-							break;
-						default:
-							Syllable = (Syllable << 8)+(0x7F & c);
-							break;
-					}
-					break;
-				case	0x0000006E:	// 'N'
-					switch(c)
-					{
-						case 0x00000061:
-						case 0x00000069:
-						case 0x00000075:
-						case 0x00000065:
-						case 0x0000006F:
-							Syllable = (Syllable << 8)+(0x7F & c);
-							Kana = FindSyllableCandidate(Syllable,lch->UtilityLib);
-							break;
-						case 0x00000079:
-							Syllable = (Syllable << 8)+(0x7F & c);
-							break;
-						default:
-							Kana = 0x00003093;
-							Syllable = (0x7F && c);
-							break;
-					}
-					break;
-				default:
-					if(Syllable==c)
-					{
-						Kana = 0x00003063;
-						Syllable = c;
-					}else{
-						Syllable = (Syllable << 8)+(0x7F & c);
-						Kana = FindSyllableCandidate(Syllable,lch->UtilityLib);
-					};
-					break;
-			}
 			KDEBUG("Japanese.Language::ExecLanguageHook()[LCSTATE 'Syllable' Write]\n");
-			SetLCSTATEbyValue(Vector,LCSTATE_Syllable,lch->UtilityLib,Syllable);
 			KDEBUG("Japanese.Language::ExecLanguageHook()[%lx]\n",Kana);
 			if(Kana)
 			{
@@ -334,44 +378,6 @@ ULONG ExecPerceptionHook(struct Hook *h,struct LanguageContext *LanguageContext,
 			KDEBUG("Japanese.Language - Unknown Command Path");
 			break;
 	}
-
-ULONG GetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility)
-{
-	ULONG rc=0L;
-	struct TagItem *Item = NULL;
-
-	if(Vector)
-		Item=IUtility->FindTagItem(Key,Vector);
-    if(Item)
-		rc=Item->ti_Data;
-
-	return(rc);
-};
-
-void  SetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility,ULONG data)
-{
-	struct TagItem *Item = NULL;
-
-	if(Vector)
-		Item=IUtility->FindTagItem(Key,Vector);
-    if(Item)
-		Item->ti_Data=data;
-
-	return;
-};
-
-ULONG FindSyllableCandidate(ULONG Key,struct UtilityIFace *IUtility)
-{
-	ULONG rc = 0L;
-	struct TagItem *Candidate = NULL;
-
-	if(Key)
-		Candidate=IUtility->FindTagItem((Key & 0x7FFFFFFF),SyllableCandidates);
-	if(Candidate)
-		rc=Candidate->ti_Data;
-
-	return(rc);
-};
 
 void  QueueSyllableCandidate(ULONG c,struct TagItem *Vector,APTR LanguageContext,struct LanguageContextHook *lch)
 {
