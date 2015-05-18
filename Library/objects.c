@@ -10,19 +10,28 @@ APTR  GetInputContext(APTR name,struct PerceptionIFace *IPerception)
 {
 	APTR rc=NULL;
 	struct LIBRARY_CLASS *PerceptionBase=NULL;
+	struct LanguageContext *cLanguage=NULL, *nLanguage=NULL;
 
 	if(IPerception)
 		PerceptionBase = (APTR)IPerception->Data.LibBase;
 	if(PerceptionBase)
 	{
-		if(name)
+		if(name==NULL)
 		{
 			PerceptionBase->IExec->ObtainSemaphore(&PerceptionBase->Lock);
-//			rc=PerceptionBase->IExec->FindName(&PerceptionBase->LanguageContextList,name);
+			rc=PerceptionBase->CurrentLanguage;
 			PerceptionBase->IExec->ReleaseSemaphore(&PerceptionBase->Lock);
 		}else{
 			PerceptionBase->IExec->ObtainSemaphore(&PerceptionBase->Lock);
-			rc=PerceptionBase->CurrentLanguage;
+			cLanguage=PerceptionBase->LanguageContextList.lh_Head
+			while(cLanguage)
+			{
+				nLanguage=cLanguage->Hook.h_MinNode.mln_Succ;
+//
+//				rc= ???	//	We want to mark rc and complete ONE iteration of the list.
+//
+				cLanguage=nLanguage;
+			};
 			PerceptionBase->IExec->ReleaseSemaphore(&PerceptionBase->Lock);
 		};
 	}

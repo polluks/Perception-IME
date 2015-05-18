@@ -60,6 +60,9 @@ void  ExitInputHandler(struct DaemonApplication *dapp);
 APTR  ExecInputHandler(APTR stream,APTR data);
 void  PerceptionInputContext(struct DaemonApplication *dapp);
 void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp);
+//
+void  IsValidPluginEntryPoint(struct LanguageContext *c, struct DaemonApplication *d);
+
 
 /*	Process Information
 */
@@ -587,19 +590,48 @@ void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 		};
 		dapp->InputState[ICSTATE_FIFO_IVR]=bInputItem;
 		dapp->InputState[ICSTATE_FIFO_PVR]=(ULONG)pInputItem;
-		cLanguage=(APTR)Self->LanguageContextList.lh_Head;
-		while(cLanguage)
+		cLanguage=Self->CurrentLanguage;
+		if(cLanguage)
 		{
-			nLanguage=(APTR)cLanguage->Hook.h_MinNode.mln_Succ;
-			cLanguage->IPerception=dapp->IPerception;
-			cLanguage->IUtility=dapp->IUtility;
-			Self->IUtility->CallHookPkt((APTR)cLanguage,(APTR)cLanguage,(APTR)Message);
-			cLanguage=nLanguage;
-		}
+            IsValidPluginEntryPoint(cLanguage,dapp);
+		}else{
+			cLanguage=(APTR)Self->LanguageContextList.lh_Head;
+			while(cLanguage)
+			{
+				nLanguage=(APTR)cLanguage->Hook.h_MinNode.mln_Succ;
+				cLanguage->IPerception=dapp->IPerception;
+				cLanguage->IUtility=dapp->IUtility;
+				//
+	            IsValidPluginEntryPoint(cLanguage,dapp);
+				//
+				cLanguage=nLanguage;
+			}
+		};
 		Self->IExec->ReleaseSemaphore(&Self->Lock);
 	}
 
 	return;
+}
+
+//
+//	DEBUGGING FUNCTIONALITY
+//
+void  IsValidPluginEntryPoint(struct LanguageContext *c, struct DaemonApplication *d)
+{
+	//	DEBUG:  IExec is pulled specifically for debugging purposes only
+    struct ExecIFace *IExec = (struct ExecIFace *)(*(struct ExecBase **)4)->MainInterface;
+	//
+	if(c)
+	{
+		c->IPerception=d->IPerception;
+		c->IUtility=d->IUtility;
+		if(IExec->IsNative(cLanguage->Hook.h_Entry)
+		{
+			KDEBUG("ExecPerceptionInputPlugin @[Addr=%lx] PPC\n",cLanguage,cLanguage->Hook.h_Entry);
+		}else{
+			KDEBUG("ExecPerceptionInputPlugin @[Addr=%lx] 68K\n",cLangauge,cLanguage->Hook.h_Entry);
+		};
+	};
 }
 
 /**/
