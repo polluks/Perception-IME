@@ -595,8 +595,8 @@ void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 		{
 			cLanguage->IPerception=dapp->IPerception;
 			cLanguage->IUtility=dapp->IUtility;
-			if(IExec->IsNative(cLanguage->Hook.h_Entry))
-				Iutility->CallHookPkt();
+			if(dapp->IExec->IsNative(cLanguage->Hook.h_Entry))
+				dapp->IUtility->CallHookPkt((APTR)cLanguage,(APTR)cLangauge,(APTR)Message);
 		}else{
 			cLanguage=(APTR)Self->LanguageContextList.lh_Head;
             do{
