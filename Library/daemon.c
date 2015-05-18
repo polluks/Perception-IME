@@ -41,6 +41,7 @@ struct	DaemonApplication
 	LONG						imSigBit;
 	ULONG						imSignal;
 //
+	struct  SignalSemaphore		InputLock;
 	ULONG                       InputState[IME_STATE_SIZE];
 	struct InputTagItem			InputVector[IME_VECTOR_SIZE];
 };
@@ -490,7 +491,7 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 			{
 				case IECLASS_RAWKEY:
 				case IECLASS_EXTENDEDRAWKEY:
-					Self->IExec->ObtainSemaphore(&Self->Lock);
+					Self->IExec->ObtainSemaphore(&dApplication->InputLock);
 					bInputItem=dApplication->InputState[ICSTATE_FIFO_IVW];
 					pInputItem=(APTR)dApplication->InputState[ICSTATE_FIFO_PVW];
 					if(pInputItem==NULL)
@@ -512,7 +513,7 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 					dApplication->InputState[ICSTATE_FIFO_IVW]=bInputItem;
 					dApplication->InputState[ICSTATE_FIFO_PVW]=(ULONG)pInputItem;
 					Self->IExec->Signal(Self->DaemonProcess,dApplication->ioSignal);
-					Self->IExec->ReleaseSemaphore(&Self->Lock);
+					Self->IExec->ReleaseSemaphore(&dApplication->InputLock);
 					break;
 				default:
 					break;
@@ -529,6 +530,7 @@ void  PerceptionInputContext(struct DaemonApplication *dapp)
 {
 	ULONG x=0L;
 
+	dapp->IExec->InitSemaphore(&dapp->InputLock);
 	for(x=0L;x<IME_STATE_SIZE;x++)
     {
 		dapp->InputState[x] = 0;
@@ -553,7 +555,7 @@ void  ExecLanguagePluginEntry(struct DaemonApplication *dapp)
 
     if(dapp->CommodityFlags && PERCEPTION_STATE_ACTIVE)
 	{
-		Self->IExec->ObtainSemaphore(&Self->Lock);
+		Self->IExec->ObtainSemaphore(&dapp->InputLock);
 		bInputItem=dapp->InputState[ICSTATE_FIFO_IVR];
 		pInputItem=(APTR)dapp->InputState[ICSTATE_FIFO_PVR];
 		if(pInputItem==NULL)
@@ -598,7 +600,7 @@ void  ExecLanguagePluginEntry(struct DaemonApplication *dapp)
 				dapp->IUtility->CallHookPkt((APTR)cLanguage,(APTR)cLanguage,(APTR)Message);
 			cLanguage=nLanguage;
 		}while(cLanguage);
-		Self->IExec->ReleaseSemaphore(&Self->Lock);
+		Self->IExec->ReleaseSemaphore(&dapp->InputLock);
 	}
 
 	return;
