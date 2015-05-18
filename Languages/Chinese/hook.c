@@ -44,7 +44,7 @@ void ExitPerceptionHook(struct LIBRARY_CLASS *Self)
 	return;
 }
 
-ULONG ExecPerceptionHook(struct Hook *h,struct LanguageContext LanguageContext,ULONG *Message)
+ULONG ExecPerceptionHook(struct Hook *h,struct LanguageContext *LanguageContext,ULONG *Message)
 {
 	ULONG rc=0L;
 	return(rc);

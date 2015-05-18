@@ -129,7 +129,6 @@ APTR LCALL_ObtainLanguageContext(struct LIBIFACE_CLASS *iface,APTR name,APTR hoo
 				TAG_END,			0L);
 			if(rc)
 			{
-				rc->Hook.h_Data=rc;
 				InitLanguageContext((APTR)rc);
 				Self->IExec->ObtainSemaphore(&Self->Lock);
 				Self->IExec->AddTail(&Self->LanguageContextList,(APTR)rc);
@@ -179,14 +178,17 @@ APTR LCALL_ReleaseLanguageContext(struct LIBIFACE_CLASS *iface, APTR o)
 *****************************************************************************
 *
 */
-ULONG LCALL_GetLanguageContextAttr(struct LIBIFACE_CLASS *iface, APTR lc, APTR m)
+ULONG LCALL_GetLanguageContextAttr(struct LIBIFACE_CLASS *iface, APTR lc, ULONG x)
 {
-	ULONG rc=0L, *msg=m;
+	ULONG rc=0L, Message=&x;
 	struct LIBRARY_CLASS *Self = (APTR) iface->Data.LibBase;
+	struct LanguageContext *Language=lc;
 
-	switch(msg[0])
+	switch(x)
 	{
-		case 0L:
+		case LCSTATE_VECTOR:
+			rc=(ULONG)&Language->Vector;
+			break;
 		default:
 			break;
 	}
@@ -206,14 +208,15 @@ ULONG LCALL_GetLanguageContextAttr(struct LIBIFACE_CLASS *iface, APTR lc, APTR m
 *****************************************************************************
 *
 */
-ULONG LCALL_SetLanguageContextAttr(struct LIBIFACE_CLASS *iface, APTR lc, APTR m)
+ULONG LCALL_SetLanguageContextAttr(struct LIBIFACE_CLASS *iface, APTR lc, ULONG x)
 {
-	ULONG rc=0L, *msg=m;
+	ULONG rc=0L, *Message=&x;
 	struct LIBRARY_CLASS *Self = (APTR) iface->Data.LibBase;
 
-	switch(msg[0])
+	switch(x)
 	{
-		case 0L:
+		case LCSTATE_VECTOR:	//	Expand the LCSTATE_VECTOR,  use of TAG_MORE is required
+			break;
 		default:
 			break;
 	}
