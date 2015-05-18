@@ -596,8 +596,7 @@ void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
             IsValidPluginEntryPoint(cLanguage,dapp);
 		}else{
 			cLanguage=(APTR)Self->LanguageContextList.lh_Head;
-			while(cLanguage)
-			{
+            do{
 				nLanguage=(APTR)cLanguage->Hook.h_MinNode.mln_Succ;
 				cLanguage->IPerception=dapp->IPerception;
 				cLanguage->IUtility=dapp->IUtility;
@@ -605,7 +604,7 @@ void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 	            IsValidPluginEntryPoint(cLanguage,dapp);
 				//
 				cLanguage=nLanguage;
-			}
+			}while(cLanguage);
 		};
 		Self->IExec->ReleaseSemaphore(&Self->Lock);
 	}
