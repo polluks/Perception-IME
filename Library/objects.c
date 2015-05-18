@@ -23,7 +23,7 @@ APTR  GetInputContext(APTR name,struct PerceptionIFace *IPerception)
 			PerceptionBase->IExec->ReleaseSemaphore(&PerceptionBase->Lock);
 		}else{
 			PerceptionBase->IExec->ObtainSemaphore(&PerceptionBase->Lock);
-			cLanguage=PerceptionBase->LanguageContextList.lh_Head
+			cLanguage=PerceptionBase->LanguageContextList.lh_Head;
 			while(cLanguage)
 			{
 				nLanguage=cLanguage->Hook.h_MinNode.mln_Succ;
