@@ -625,7 +625,7 @@ void  IsValidPluginEntryPoint(struct LanguageContext *c, struct DaemonApplicatio
 	{
 		c->IPerception=d->IPerception;
 		c->IUtility=d->IUtility;
-		if(IExec->IsNative(c->Hook.h_Entry)
+		if(IExec->IsNative(c->Hook.h_Entry))
 		{
 			KDEBUG("ExecPerceptionInputPlugin @[Addr=%lx] PPC\n",c,c->Hook.h_Entry);
 		}else{
