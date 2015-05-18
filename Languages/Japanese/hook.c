@@ -257,6 +257,10 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 						break;
 				}
 				SetLCSTATEbyValue(Vector,LCSTATE_Syllable,LanguageContext->IUtility,Syllable);
+				KDEBUG("Japanese.Language::ExecLanguageHook()[%lx]\n",Kana);
+//
+//				INSERT Additional Translation Steps here
+//
 				break;
 			default:
 				break;
@@ -305,27 +309,6 @@ ULONG FindSyllableCandidate(ULONG Key,struct UtilityIFace *IUtility)
 };
 
 /*
-	ULONG rc=0L, *Message=m, c=0L, Syllable=0L, Kana=0L;
-
-	KDEBUG("Japanese.Language[ExecLanguageHook]()[Message]\n");
-	if(Message)
-	{
-	}
-	KDEBUG("ExecLanguageContextHook[Syllable =%lx][Character=%lx]\n",Syllable,c);
-
-	return(rc);
-};
-
-	ULONG rc=0L, *Message=m, c=0L, Syllable=0L, Kana=0L;
-	struct PerceptionIFace	*IPerception= lch->PerceptionLib;
-	struct TagItem *Vector = NULL, VCommand;
-
-	switch(Message[0])
-	{
-		case LANGUAGE_TRANSLATE_AMIGA:
-			KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_AMIGA]\n");
-			switch(c)
-			{
 //	Unofficial Mappings used with Developer Restricted Keymap.Library.Kmod
 				case	0x00:	//	Change the Constant here for this Key when officially mapped
 					KDEBUG("Perception-IME//Japanese.Language::Hankaku~Zenkaku\n");
@@ -360,9 +343,6 @@ ULONG FindSyllableCandidate(ULONG Key,struct UtilityIFace *IUtility)
 					break;
 			};break;
 		case LANGUAGE_TRANSLATE_ANSI:
-			KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_ANSI]\n");
-			KDEBUG("Japanese.Language::ExecLanguageHook()[LCSTATE 'Syllable' Write]\n");
-			KDEBUG("Japanese.Language::ExecLanguageHook()[%lx]\n",Kana);
 			if(Kana)
 			{
 				if(Kana && 0x7FFF0000)
@@ -374,27 +354,4 @@ ULONG FindSyllableCandidate(ULONG Key,struct UtilityIFace *IUtility)
 
 			}
 			break;
-		default:
-			KDEBUG("Japanese.Language - Unknown Command Path");
-			break;
-	}
-
-void  QueueSyllableCandidate(ULONG c,struct TagItem *Vector,APTR LanguageContext,struct LanguageContextHook *lch)
-{
-	KDEBUG("QueueSyllableCandidate[CodePoint=%lx]\n",c);
-	return;
-};
-
-ULONG FindKanjiCandidates(void)
-{
-	ULONG rc=0L;
-	return(rc);
-};
-
-ULONG FindVocabCandidates(void)
-{
-	ULONG rc=0L;
-	return(rc);
-};
-
 */
