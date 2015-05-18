@@ -593,16 +593,18 @@ void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 		cLanguage=Self->CurrentLanguage;
 		if(cLanguage)
 		{
-            IsValidPluginEntryPoint(cLanguage,dapp);
+			cLanguage->IPerception=dapp->IPerception;
+			cLanguage->IUtility=dapp->IUtility;
+			if(IExec->IsNative(cLanguage->Hook.h_Entry))
+				Iutility->CallHookPkt();
 		}else{
 			cLanguage=(APTR)Self->LanguageContextList.lh_Head;
             do{
 				nLanguage=(APTR)cLanguage->Hook.h_MinNode.mln_Succ;
 				cLanguage->IPerception=dapp->IPerception;
 				cLanguage->IUtility=dapp->IUtility;
-				//
-	            IsValidPluginEntryPoint(cLanguage,dapp);
-				//
+				if(IExec->IsNative(cLanguage->Hook.h_Entry))
+					Iutility->CallHookPkt((APTR)cLanguage,(APTR)cLangauge,(APTR)Message);
 				cLanguage=nLanguage;
 			}while(cLanguage);
 		};
@@ -610,27 +612,6 @@ void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 	}
 
 	return;
-}
-
-//
-//	DEBUGGING FUNCTIONALITY
-//
-void  IsValidPluginEntryPoint(struct LanguageContext *c, struct DaemonApplication *d)
-{
-	//	DEBUG:  IExec is pulled specifically for debugging purposes only
-    struct ExecIFace *IExec = (struct ExecIFace *)(*(struct ExecBase **)4)->MainInterface;
-	//
-	if(c)
-	{
-		c->IPerception=d->IPerception;
-		c->IUtility=d->IUtility;
-		if(IExec->IsNative(c->Hook.h_Entry))
-		{
-			KDEBUG("ExecPerceptionInputPlugin @[Addr=%lx] PPC\n",c,c->Hook.h_Entry);
-		}else{
-			KDEBUG("ExecPerceptionInputPlugin @[Addr=%lx] 68K\n",c,c->Hook.h_Entry);
-		};
-	};
 }
 
 /**/
