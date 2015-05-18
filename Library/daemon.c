@@ -59,7 +59,7 @@ void  InitInputHandler(struct DaemonApplication *dapp);
 void  ExitInputHandler(struct DaemonApplication *dapp);
 APTR  ExecInputHandler(APTR stream,APTR data);
 void  PerceptionInputContext(struct DaemonApplication *dapp);
-void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp);
+void  ExecLanguagePluginEntry(struct DaemonApplication *dapp);
 //
 void  IsValidPluginEntryPoint(struct LanguageContext *c, struct DaemonApplication *d);
 
@@ -175,7 +175,7 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 				while((message=(APTR)IExec->GetMsg(dApplication->cxPort)))
 					exit=PerceptionCommodityEvent(dApplication,message);
 			if(signals && dApplication->ioSignal)
-				ExecPerceptionInputPlugin(dApplication);
+				ExecLanguagePluginEntry(dApplication);
 			if(signals && dApplication->rxSignal)
 				while((message=(APTR)IExec->GetMsg(dApplication->rxPort)))
 					exit=PerceptionRexxHostEvent(dApplication,message);
@@ -476,7 +476,7 @@ void  ExitInputHandler(struct DaemonApplication *Self)
 */
 APTR  ExecInputHandler(APTR stream,APTR data)
 {
-	APTR rc=stream; ULONG bInputItem=0L, bMapKey=0L; WORD l=4;
+	APTR rc=stream; ULONG bInputItem=0L, bMapKey=0L; USHORT l=4;
     struct InputEvent *cInputEvent=stream, *nInputEvent=NULL;
 	struct DaemonApplication *dApplication=data;
 	struct LIBRARY_CLASS *Self=dApplication->PerceptionBase;
@@ -543,12 +543,13 @@ void  PerceptionInputContext(struct DaemonApplication *dapp)
 
 /*  LanguageContextHook Processing of InputTagItems and Isolation
 */
-void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
+void  ExecLanguagePluginEntry(struct DaemonApplication *dapp)
 {
 	struct LIBRARY_CLASS *Self=dapp->PerceptionBase;
 	struct LanguageContext *cLanguage=NULL, *nLanguage=NULL;
 	struct InputTagItem *pInputItem=NULL;
-	ULONG	bInputItem=0L, Message[IME_MESSAGE_SIZE];
+	ULONG  bInputItem=0L, Message[IME_MESSAGE_SIZE];
+	ULONG  type=0L, glyph=0L, qual=0L;
 
     if(dapp->CommodityFlags && PERCEPTION_STATE_ACTIVE)
 	{
@@ -557,14 +558,19 @@ void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 		pInputItem=(APTR)dapp->InputState[ICSTATE_FIFO_PVR];
 		if(pInputItem==NULL)
 			pInputItem=dapp->InputVector;
-		Message[1]=pInputItem->glyph;
-		Message[2]=pInputItem->qual;
-		Message[3]=0L;
-		Message[4]=0L;
-		Message[5]=0L;
-		Message[6]=0L;
+		type=pInputItem->type;
+		qual=pInputItem->qual;
+		glyph=pInputItem->glyph;
+		//
 		Message[7]=0L;
-        switch(pInputItem->type)
+		Message[6]=0L;
+		Message[5]=0L;
+		Message[4]=0L;
+		Message[3]=0L;
+		Message[2]=qual;
+		Message[1]=glyph;
+		//
+        switch(type)
 		{
             case TRANSLATE_ANSI:
 				Message[0]=LANGUAGE_TRANSLATE_ANSI;
