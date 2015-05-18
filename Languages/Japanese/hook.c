@@ -191,7 +191,7 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 	struct TagItem *Vector=NULL;
 
 	if(LanguageContext)
-		Vector=(APTR)LanguageContext->IPerception->GetLanguageContextAttr(LanguageContext,LCSTATE_VECTOR);
+		Vector=(APTR)LanguageContext->IPerception->GetLanguageContextAttr((APTR)LanguageContext,(ULONG)LCSTATE_VECTOR);
 	if(Message)
 	{
 		switch(Message[0])
@@ -202,6 +202,7 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
             case LANGUAGE_TRANSLATE_ANSI:
 				KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_ANSI]\n");
 				Syllable = GetLCSTATEbyValue(Vector,LCSTATE_Syllable,LanguageContext->IUtility);
+				KDEBUG("Japanese.Language::[%lx]", Syllable, Message[1]);
 			    if((Message[1] & 0xFF000000) == Message[1])
     			{
 					if(((Message[1] >> 24)-0x00000061)<0x0000001B)
@@ -301,9 +302,11 @@ ULONG FindSyllableCandidate(ULONG Key,struct UtilityIFace *IUtility)
 	struct TagItem *Candidate = NULL;
 
 	if(Key)
-		Candidate=IUtility->FindTagItem((Key & 0x7FFFFFFF),SyllableCandidates);
+		Candidate=IUtility->FindTagItem(TAG_USER|(Key & 0x7FFFFFFF),SyllableCandidates);
 	if(Candidate)
 		rc=Candidate->ti_Data;
+
+	KDEBUG("Japanese.Language::[%lx]=FindSyllableCandidate()[K=%lx]", rc, Key);
 
 	return(rc);
 };

@@ -557,27 +557,20 @@ void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 		pInputItem=(APTR)dapp->InputState[ICSTATE_FIFO_PVR];
 		if(pInputItem==NULL)
 			pInputItem=dapp->InputVector;
+		Message[1]=pInputItem->glyph;
+		Message[2]=pInputItem->qual;
+		Message[3]=0L;
+		Message[4]=0L;
+		Message[5]=0L;
+		Message[6]=0L;
+		Message[7]=0L;
         switch(pInputItem->type)
 		{
             case TRANSLATE_ANSI:
 				Message[0]=LANGUAGE_TRANSLATE_ANSI;
-				Message[1]=pInputItem->glyph;
-				Message[2]=pInputItem->qual;
-				Message[3]=0L;
-				Message[4]=0L;
-				Message[5]=0L;
-				Message[6]=0L;
-				Message[7]=0L;
 				break;
             case TRANSLATE_AMIGA:
 				Message[0]=LANGUAGE_TRANSLATE_AMIGA;
-				Message[1]=pInputItem->glyph;
-				Message[2]=pInputItem->qual;
-				Message[3]=0L;
-				Message[4]=0L;
-				Message[5]=0L;
-				Message[6]=0L;
-				Message[7]=0L;
 				break;
 			default:
 				break;
@@ -590,24 +583,15 @@ void  ExecPerceptionInputPlugin(struct DaemonApplication *dapp)
 		};
 		dapp->InputState[ICSTATE_FIFO_IVR]=bInputItem;
 		dapp->InputState[ICSTATE_FIFO_PVR]=(ULONG)pInputItem;
-		cLanguage=Self->CurrentLanguage;
-		if(cLanguage)
-		{
+		cLanguage=(APTR)Self->LanguageContextList.lh_Head;
+		do{
+			nLanguage=(APTR)cLanguage->Hook.h_MinNode.mln_Succ;
 			cLanguage->IPerception=dapp->IPerception;
 			cLanguage->IUtility=dapp->IUtility;
 			if(dapp->IExec->IsNative(cLanguage->Hook.h_Entry))
 				dapp->IUtility->CallHookPkt((APTR)cLanguage,(APTR)cLanguage,(APTR)Message);
-		}else{
-			cLanguage=(APTR)Self->LanguageContextList.lh_Head;
-            do{
-				nLanguage=(APTR)cLanguage->Hook.h_MinNode.mln_Succ;
-				cLanguage->IPerception=dapp->IPerception;
-				cLanguage->IUtility=dapp->IUtility;
-				if(dapp->IExec->IsNative(cLanguage->Hook.h_Entry))
-					dapp->IUtility->CallHookPkt((APTR)cLanguage,(APTR)cLanguage,(APTR)Message);
-				cLanguage=nLanguage;
-			}while(cLanguage);
-		};
+			cLanguage=nLanguage;
+		}while(cLanguage);
 		Self->IExec->ReleaseSemaphore(&Self->Lock);
 	}
 

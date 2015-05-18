@@ -27,7 +27,7 @@ void InitPerceptionHook(struct LIBRARY_CLASS *Self)
     APTR Language=NULL;
 
 	if(Self->IPerception)
-		Language=Self->IPerception->ObtainLanguageContext((APTR)LanguageName,(APTR)&ExecPerceptionHook);
+		Language=Self->IPerception->ObtainLanguageContext((APTR)LanguageName,(APTR)&ExecLanguageHook);
 	if(Language)
 	{
         Self->IPerception->SetLanguageContextAttr(Language,(APTR)&DefaultLanguage);
@@ -44,7 +44,7 @@ void ExitPerceptionHook(struct LIBRARY_CLASS *Self)
 	return;
 }
 
-ULONG ExecPerceptionHook(struct Hook *h,struct LanguageContext *LanguageContext,ULONG *Message)
+ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,ULONG *Message)
 {
 	ULONG rc=0L;
 	return(rc);

@@ -165,7 +165,7 @@ extern LONG  LCALL_IsBlank(	struct LIBIFACE_CLASS *IFace, ULONG c);
 /*hook.c*/
 extern void  InitPerceptionHook(struct LIBRARY_CLASS *Self);
 extern void  ExitPerceptionHook(struct LIBRARY_CLASS *Self);
-extern ULONG ExecPerceptionHook(struct Hook *h,struct LanguageContext *LanguageContext,ULONG *Message);
+extern ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,ULONG *Message);
 /**/
 
 #endif
