@@ -513,7 +513,7 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 					dApplication->InputState[ICSTATE_FIFO_IVW]=bInputItem;
 					dApplication->InputState[ICSTATE_FIFO_PVW]=(ULONG)pInputItem;
 					Self->IExec->Signal(Self->DaemonProcess,dApplication->ioSignal);
-					Self->IExec->ReleaseSemaphore(&dApplication->InputLock);
+ 					Self->IExec->ReleaseSemaphore(&dApplication->InputLock);
 					break;
 				default:
 					break;
@@ -550,58 +550,59 @@ void  ExecLanguagePluginEntry(struct DaemonApplication *dapp)
 	struct LIBRARY_CLASS *Self=dapp->PerceptionBase;
 	struct LanguageContext *cLanguage=NULL, *nLanguage=NULL;
 	struct InputTagItem *pInputItem=NULL;
-	ULONG  bInputItem=0L, Message[IME_MESSAGE_SIZE];
-	ULONG  type=0L, glyph=0L, qual=0L;
+	ULONG  bInputItem=0L, type=0L, qual=0, glyph=0L, Message[IME_MESSAGE_SIZE];
 
-    if(dapp->CommodityFlags && PERCEPTION_STATE_ACTIVE)
+	Self->IExec->ObtainSemaphore(&dapp->InputLock);
+	bInputItem=dapp->InputState[ICSTATE_FIFO_IVR];
+	pInputItem=(APTR)dapp->InputState[ICSTATE_FIFO_PVR];
+	if(pInputItem==NULL)
+		pInputItem=dapp->InputVector;
+//
+	type=pInputItem->type;
+	qual=pInputItem->qual;
+	glyph=pInputItem->glyph;
+//
+	KDEBUG["Perception-IME[DAEMON]::ExecLanguagePluginEntry [type=%lx,qual=%lx,glyph=%lx]\n",
+		type,qual,glyph];
+//
+	Message[7]=0L;
+	Message[6]=0L;
+	Message[5]=0L;
+	Message[4]=0L;
+	Message[3]=0L;
+	Message[2]=qual;
+	Message[1]=glyph;
+//
+	switch(type)
 	{
-		Self->IExec->ObtainSemaphore(&dapp->InputLock);
-		bInputItem=dapp->InputState[ICSTATE_FIFO_IVR];
-		pInputItem=(APTR)dapp->InputState[ICSTATE_FIFO_PVR];
-		if(pInputItem==NULL)
-			pInputItem=dapp->InputVector;
-		type=pInputItem->type;
-		qual=pInputItem->qual;
-		glyph=pInputItem->glyph;
-		//
-		Message[7]=0L;
-		Message[6]=0L;
-		Message[5]=0L;
-		Message[4]=0L;
-		Message[3]=0L;
-		Message[2]=qual;
-		Message[1]=glyph;
-		//
-        switch(type)
-		{
-            case TRANSLATE_ANSI:
-				Message[0]=LANGUAGE_TRANSLATE_ANSI;
-				break;
-            case TRANSLATE_AMIGA:
-				Message[0]=LANGUAGE_TRANSLATE_AMIGA;
-				break;
-			default:
-				break;
-		}
-		if(bInputItem<IME_VECTOR_SIZE)
-		{
-			bInputItem++;pInputItem++;
-		}else{
-			bInputItem=0L;pInputItem=NULL;
-		};
-		dapp->InputState[ICSTATE_FIFO_IVR]=bInputItem;
-		dapp->InputState[ICSTATE_FIFO_PVR]=(ULONG)pInputItem;
-		cLanguage=(APTR)Self->LanguageContextList.lh_Head;
-		do{
-			nLanguage=(APTR)cLanguage->Hook.h_MinNode.mln_Succ;
-			cLanguage->IPerception=dapp->IPerception;
-			cLanguage->IUtility=dapp->IUtility;
-			if(dapp->IExec->IsNative(cLanguage->Hook.h_Entry))
-				dapp->IUtility->CallHookPkt((APTR)cLanguage,(APTR)cLanguage,(APTR)Message);
-			cLanguage=nLanguage;
-		}while(cLanguage);
-		Self->IExec->ReleaseSemaphore(&dapp->InputLock);
+		case TRANSLATE_ANSI:
+			Message[0]=LANGUAGE_TRANSLATE_ANSI;
+			break;
+		case TRANSLATE_AMIGA:
+			Message[0]=LANGUAGE_TRANSLATE_AMIGA;
+			break;
+		default:
+			break;
 	}
+//
+	if(bInputItem<IME_VECTOR_SIZE)
+	{
+		bInputItem++;pInputItem++;
+	}else{
+		bInputItem=0L;pInputItem=NULL;
+	};
+	dapp->InputState[ICSTATE_FIFO_IVR]=bInputItem;
+	dapp->InputState[ICSTATE_FIFO_PVR]=(ULONG)pInputItem;
+	cLanguage=(APTR)Self->LanguageContextList.lh_Head;
+//	do{
+//		nLanguage=(APTR)cLanguage->Hook.h_MinNode.mln_Succ;
+//		cLanguage->IPerception=dapp->IPerception;
+//		cLanguage->IUtility=dapp->IUtility;
+//		if(dapp->IExec->IsNative(cLanguage->Hook.h_Entry))
+//			dapp->IUtility->CallHookPkt((APTR)cLanguage,(APTR)cLanguage,(APTR)Message);
+//		cLanguage=nLanguage;
+//	}while(cLanguage);
+	Self->IExec->ReleaseSemaphore(&dapp->InputLock);
 
 	return;
 }
