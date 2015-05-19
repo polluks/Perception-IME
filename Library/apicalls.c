@@ -181,15 +181,15 @@ APTR LCALL_ReleaseLanguageContext(struct LIBIFACE_CLASS *iface, APTR o)
 *****************************************************************************
 *
 */
-ULONG LCALL_GetLanguageContextAttr(struct LIBIFACE_CLASS *iface, APTR lc, ULONG x)
+ULONG LCALL_GetLanguageContextAttr(struct LIBIFACE_CLASS *iface, APTR lc, ULONG a)
 {
-	ULONG rc=0L, Message=&x;
+	ULONG rc=0L, Message=&a;
 	struct LIBRARY_CLASS *Self = (APTR) iface->Data.LibBase;
 	struct LanguageContext *Language=lc;
 
-	KDEBUG("Perception.Library/GetLanguageContextAttr(%lx,%lx)\n",lc,x);
+	KDEBUG("Perception.Library/GetLanguageContextAttr(%lx,%lx)\n",lc,a);
 
-	switch(x)
+	switch(a)
 	{
 		case LCSTATE_VECTOR:
 			rc=(ULONG)&Language->Vector;
@@ -215,12 +215,12 @@ ULONG LCALL_GetLanguageContextAttr(struct LIBIFACE_CLASS *iface, APTR lc, ULONG 
 */
 void  LCALL_SetLanguageContextAttr(struct LIBIFACE_CLASS *iface, APTR lc, ULONG a, ULONG b)
 {
-	ULONG rc=0L, *Message=&x;
+	ULONG rc=0L, *Message=&a;
 	struct LIBRARY_CLASS *Self = (APTR) iface->Data.LibBase;
 
-	KDEBUG("Perception.Library/SetLanguageContextAttr(%lx,%lx)\n",lc,x);
+	KDEBUG("Perception.Library/SetLanguageContextAttr(%lx,%lx)\n",lc,a);
 
-	switch(x)
+	switch(a)
 	{
 		case LCSTATE_VECTOR:	//	Expand the LCSTATE_VECTOR,  use of TAG_MORE is required
 			break;
