@@ -504,6 +504,10 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 					};
 					pInputItem->glyph=bMapKey;
 					pInputItem->qual=cInputEvent->ie_Qualifier;
+//
+					KDEBUG("input.device::Perception-IME//type=%lx,qual=%lx,glyph=%lx [Item=%lx]\n",
+						pInputItem->type, pInputItem->qual, pInputItem->glyph, pInputItem);
+//
 					if(bInputItem<IME_VECTOR_SIZE)
 					{
 						bInputItem++;pInputItem++;
@@ -512,8 +516,8 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 					};
 					dApplication->InputState[ICSTATE_FIFO_IVW]=bInputItem;
 					dApplication->InputState[ICSTATE_FIFO_PVW]=(ULONG)pInputItem;
- 					Self->IExec->ReleaseSemaphore(&dApplication->InputLock);
 					Self->IExec->Signal(Self->DaemonProcess,dApplication->ioSignal);
+ 					Self->IExec->ReleaseSemaphore(&dApplication->InputLock);
 					break;
 				default:
 					break;
@@ -563,8 +567,8 @@ void  ExecLanguagePluginEntry(struct DaemonApplication *dapp)
 	glyph=pInputItem->glyph;
 	qual=pInputItem->qual;
 //
-	KDEBUG("Perception-IME[DAEMON] ExecLanguagePluginEntry [type=%lx,qual=%lx,glyph=%lx]\n",
-		type,qual,glyph);
+	KDEBUG("Perception-IME[DAEMON] ExecLanguagePluginEntry @%lx[type=%lx,qual=%lx,glyph=%lx]\n",
+		pInputItem,type,qual,glyph);
 //
 	Message[7]=0L;
 	Message[6]=0L;
