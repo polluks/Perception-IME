@@ -14,6 +14,6 @@ clean:
 	@ ${MAKE} -C Korean   -f GNUmakefile clean
 
 install:
-#	@ ${MAKE} -C Chinese  -f GNUmakefile install
+	@ ${MAKE} -C Chinese  -f GNUmakefile install
 	@ ${MAKE} -C Japanese -f GNUmakefile install
-#	@ ${MAKE} -C Korean   -f GNUmakefile install
+	@ ${MAKE} -C Korean   -f GNUmakefile install
