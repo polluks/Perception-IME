@@ -118,23 +118,24 @@ APTR LCALL_ObtainLanguageContext(struct LIBIFACE_CLASS *iface,APTR name,APTR hoo
 	if(name)
 	{
 		Self->IExec->ObtainSemaphore(&Self->Lock);
-		rc=(APTR)Self->IExec->FindName(&Self->LanguageContextList,name);
+//		rc=(APTR)Self->IExec->FindName(&Self->LanguageContextList,name);
+		KDEBUG("Perception.Library/ObtainLanguageContext(%s.%lx)\n",name,hook);
 		Self->IExec->ReleaseSemaphore(&Self->Lock);
-		if(rc==NULL)
+	};
+	if(rc==NULL)
+	{
+		rc=(APTR)Self->IExec->AllocSysObjectTags( ASOT_HOOK,
+			ASOHOOK_Size,		LHCONTEXTSIZE,
+			ASOHOOK_Entry,		(ULONG)hook,
+			ASOHOOK_Data,		0L,
+			TAG_END,			0L);
+		if(rc)
 		{
-			rc=(APTR)Self->IExec->AllocSysObjectTags( ASOT_HOOK,
-				ASOHOOK_Size,		LHCONTEXTSIZE,
-				ASOHOOK_Entry,		(ULONG)hook,
-				ASOHOOK_Data,		0L,
-				TAG_END,			0L);
-			if(rc)
-			{
-				InitLanguageContext((APTR)rc);
-				Self->IExec->ObtainSemaphore(&Self->Lock);
-				Self->IExec->AddTail(&Self->LanguageContextList,(APTR)rc);
-				Self->IExec->ReleaseSemaphore(&Self->Lock);
-			}
-		}
+			InitLanguageContext((APTR)rc);
+			Self->IExec->ObtainSemaphore(&Self->Lock);
+			Self->IExec->AddTail(&Self->LanguageContextList,(APTR)rc);
+			Self->IExec->ReleaseSemaphore(&Self->Lock);
+		};
 	};
 
 	return((APTR)rc);
@@ -156,6 +157,8 @@ APTR LCALL_ReleaseLanguageContext(struct LIBIFACE_CLASS *iface, APTR o)
 {
 	APTR rc=NULL;
 	struct LIBRARY_CLASS *Self = (APTR) iface->Data.LibBase;
+
+	KDEBUG("Perception.Library/ReleaseLanguageContext(o=%lx)\n",o);
 
 	ExitLanguageContext(o);
 	Self->IExec->ObtainSemaphore(&Self->Lock);
@@ -184,6 +187,8 @@ ULONG LCALL_GetLanguageContextAttr(struct LIBIFACE_CLASS *iface, APTR lc, ULONG 
 	struct LIBRARY_CLASS *Self = (APTR) iface->Data.LibBase;
 	struct LanguageContext *Language=lc;
 
+	KDEBUG("Perception.Library/GetLanguageContextAttr(%lx,%lx)\n",lc,x);
+
 	switch(x)
 	{
 		case LCSTATE_VECTOR:
@@ -208,10 +213,12 @@ ULONG LCALL_GetLanguageContextAttr(struct LIBIFACE_CLASS *iface, APTR lc, ULONG 
 *****************************************************************************
 *
 */
-ULONG LCALL_SetLanguageContextAttr(struct LIBIFACE_CLASS *iface, APTR lc, ULONG x)
+void  LCALL_SetLanguageContextAttr(struct LIBIFACE_CLASS *iface, APTR lc, ULONG a, ULONG b)
 {
 	ULONG rc=0L, *Message=&x;
 	struct LIBRARY_CLASS *Self = (APTR) iface->Data.LibBase;
+
+	KDEBUG("Perception.Library/SetLanguageContextAttr(%lx,%lx)\n",lc,x);
 
 	switch(x)
 	{

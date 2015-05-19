@@ -34,6 +34,7 @@
 		<method name="SetLanguageContextAttr" result="int32">
 			<arg name="object" type="APTR"/>
 			<arg name="attribute" type="int32"/>
+			<arg name="value" type="int32"/>
 		</method>
 	</interface>
 </library>

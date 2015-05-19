@@ -69,7 +69,7 @@ void  IsValidPluginEntryPoint(struct LanguageContext *c, struct DaemonApplicatio
 */
 STATIC CONST BYTE	DaemonName[]			= "Perception-IME\0";
 STATIC CONST ULONG	DaemonStackSize			= 131072L;
-STATIC CONST ULONG	DaemonPriority			= 121L;
+STATIC CONST ULONG	DaemonPriority			= 96L;
 STATIC CONST BYTE	DaemonDescription[]		= "Input Method Editing\0\0";
 STATIC CONST BYTE	DaemonReleaseString[]	= "Open Source Edition\0";
 STATIC CONST BYTE	DaemonConfiguration[]	= "Perception-IME\0";
@@ -484,8 +484,8 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 	struct InputTagItem *pInputItem=NULL;
 
     if(dApplication->CommodityFlags && PERCEPTION_STATE_ACTIVE)
-		while(cInputEvent!=NULL)
-		{
+	{
+        do{
 			nInputEvent=cInputEvent->ie_NextEvent;
 			switch(cInputEvent->ie_Class)
 			{
@@ -496,7 +496,6 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 					pInputItem=(APTR)dApplication->InputState[ICSTATE_FIFO_PVW];
 					if(pInputItem==NULL)
 						pInputItem=dApplication->InputVector;
-					pInputItem->qual=cInputEvent->ie_Qualifier;
 					if(Self->IKeymap->MapRawKey((APTR)cInputEvent,(APTR)&bMapKey,l,NULL))
 					{
 						pInputItem->type=TRANSLATE_ANSI;
@@ -504,6 +503,7 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 						pInputItem->type=TRANSLATE_AMIGA;
 					};
 					pInputItem->glyph=bMapKey;
+					pInputItem->qual=cInputEvent->ie_Qualifier;
 					if(bInputItem<IME_VECTOR_SIZE)
 					{
 						bInputItem++;pInputItem++;
@@ -512,14 +512,15 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 					};
 					dApplication->InputState[ICSTATE_FIFO_IVW]=bInputItem;
 					dApplication->InputState[ICSTATE_FIFO_PVW]=(ULONG)pInputItem;
-					Self->IExec->Signal(Self->DaemonProcess,dApplication->ioSignal);
  					Self->IExec->ReleaseSemaphore(&dApplication->InputLock);
+					Self->IExec->Signal(Self->DaemonProcess,dApplication->ioSignal);
 					break;
 				default:
 					break;
 			}
 			cInputEvent=nInputEvent;
-		};
+		}while(cInputEvent);
+	};
 
 	return(rc);
 }
@@ -559,10 +560,10 @@ void  ExecLanguagePluginEntry(struct DaemonApplication *dapp)
 		pInputItem=dapp->InputVector;
 //
 	type=pInputItem->type;
-	qual=pInputItem->qual;
 	glyph=pInputItem->glyph;
+	qual=pInputItem->qual;
 //
-	KDEBUG("Perception-IME[DAEMON]::ExecLanguagePluginEntry [type=%lx,qual=%lx,glyph=%lx]\n",
+	KDEBUG("Perception-IME[DAEMON] ExecLanguagePluginEntry [type=%lx,qual=%lx,glyph=%lx]\n",
 		type,qual,glyph);
 //
 	Message[7]=0L;
@@ -572,7 +573,6 @@ void  ExecLanguagePluginEntry(struct DaemonApplication *dapp)
 	Message[3]=0L;
 	Message[2]=qual;
 	Message[1]=glyph;
-//
 	switch(type)
 	{
 		case TRANSLATE_ANSI:
@@ -584,7 +584,6 @@ void  ExecLanguagePluginEntry(struct DaemonApplication *dapp)
 		default:
 			break;
 	}
-//
 	if(bInputItem<IME_VECTOR_SIZE)
 	{
 		bInputItem++;pInputItem++;
@@ -594,14 +593,14 @@ void  ExecLanguagePluginEntry(struct DaemonApplication *dapp)
 	dapp->InputState[ICSTATE_FIFO_IVR]=bInputItem;
 	dapp->InputState[ICSTATE_FIFO_PVR]=(ULONG)pInputItem;
 	cLanguage=(APTR)Self->LanguageContextList.lh_Head;
-//	do{
-//		nLanguage=(APTR)cLanguage->Hook.h_MinNode.mln_Succ;
-//		cLanguage->IPerception=dapp->IPerception;
-//		cLanguage->IUtility=dapp->IUtility;
-//		if(dapp->IExec->IsNative(cLanguage->Hook.h_Entry))
-//			dapp->IUtility->CallHookPkt((APTR)cLanguage,(APTR)cLanguage,(APTR)Message);
-//		cLanguage=nLanguage;
-//	}while(cLanguage);
+	do{
+		nLanguage=(APTR)cLanguage->Hook.h_MinNode.mln_Succ;
+		cLanguage->IPerception=dapp->IPerception;
+		cLanguage->IUtility=dapp->IUtility;
+		if(dapp->IExec->IsNative(cLanguage->Hook.h_Entry))
+			dapp->IUtility->CallHookPkt((APTR)cLanguage,(APTR)cLanguage,(APTR)Message);
+		cLanguage=nLanguage;
+	}while(cLanguage);
 	Self->IExec->ReleaseSemaphore(&dapp->InputLock);
 
 	return;
