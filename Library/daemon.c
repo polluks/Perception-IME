@@ -562,8 +562,8 @@ void  ExecLanguagePluginEntry(struct DaemonApplication *dapp)
 	qual=pInputItem->qual;
 	glyph=pInputItem->glyph;
 //
-	KDEBUG["Perception-IME[DAEMON]::ExecLanguagePluginEntry [type=%lx,qual=%lx,glyph=%lx]\n",
-		type,qual,glyph];
+	KDEBUG("Perception-IME[DAEMON]::ExecLanguagePluginEntry [type=%lx,qual=%lx,glyph=%lx]\n",
+		type,qual,glyph);
 //
 	Message[7]=0L;
 	Message[6]=0L;
