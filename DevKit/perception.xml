@@ -11,7 +11,7 @@
 	<interface name="main" version="1.0" struct="PerceptionIFace" prefix="_Perception_" asmprefix="IPerception" global="IPerception">
 		<method name="Obtain" result="uint32"/>
 		<method name="Release" result="uint32"/>
-		<method name="Expunge" result="void" status="unimplemented"/>
+		<method name="Expunge" result="void"/>
 		<method name="Clone" result="struct Interface *" status="unimplemented"/>
 		<method name="ScriptExec" result="LONG" status="private">
 			<arg name="rmsg" type="struct RexxMsg *"/>
@@ -31,7 +31,7 @@
 			<arg name="object" type="APTR"/>
 			<arg name="attribute" type="int32"/>
 		</method>
-		<method name="SetLanguageContextAttr" result="int32">
+		<method name="SetLanguageContextAttr" result="void">
 			<arg name="object" type="APTR"/>
 			<arg name="attribute" type="int32"/>
 			<arg name="value" type="int32"/>

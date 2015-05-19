@@ -148,7 +148,7 @@ extern APTR  LCALL_OptionTagList(struct LIBIFACE_CLASS *Self, struct TagItem *op
 extern APTR  LCALL_ObtainLanguageContext(struct LIBIFACE_CLASS *Self, APTR name, APTR hook);
 extern APTR  LCALL_ReleaseLanguageContext(struct LIBIFACE_CLASS *Self, APTR name);
 extern ULONG LCALL_GetLanguageContextAttr(struct LIBIFACE_CLASS *Self, APTR lc, ULONG x);
-extern ULONG LCALL_SetLanguageContextAttr(struct LIBIFACE_CLASS *Self, APTR lc, ULONG x);
+extern void  LCALL_SetLanguageContextAttr(struct LIBIFACE_CLASS *Self, APTR lc, ULONG a, ULONG b);
 /*daemon.c*/
 extern void  InitPerceptionDaemon(struct LIBRARY_CLASS *Self);
 extern void  ExitPerceptionDaemon(struct LIBRARY_CLASS *Self);
