@@ -57,6 +57,7 @@ void  InitRexxHost(struct DaemonApplication *Self);
 void  ExitRexxHost(struct DaemonApplication *Self);
 void  InitInputHandler(struct DaemonApplication *dapp);
 void  ExitInputHandler(struct DaemonApplication *dapp);
+void  MainEventHandler(struct DaemonApplication *dapp);
 ULONG PerceptionCommodityEvent(struct DaemonApplication *Self, APTR message);
 ULONG PerceptionRexxHostEvent(struct DaemonApplication *Self, APTR message);
 APTR  ExecInputHandler(APTR stream,APTR data);
@@ -111,13 +112,10 @@ void ExitPerceptionDaemon(struct LIBRARY_CLASS *Self)
 /**/
 int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 {
-	uint32	rc=0L, exit=0L;
+	uint32 rc=0L;
     struct ExecIFace *IExec = (struct ExecIFace *)(*(struct ExecBase **)4)->MainInterface;
 	struct Library *Base = NULL;
 	struct DaemonApplication *dApplication=NULL;
-
-	ULONG	signals = 0L, sigmask = 0L;
-	APTR	message = NULL;
 
 	dApplication=IExec->AllocVecTags(sizeof(struct DaemonApplication),
 		AVT_Type,MEMF_SHARED,AVT_ClearWithValue,0L,TAG_DONE);
@@ -172,19 +170,7 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 		}
 		InitInputHandler(dApplication);
 
-		do{
-			sigmask = dApplication->ioSignal | dApplication->cxSignal | dApplication->rxSignal;
-			signals = IExec->Wait(sigmask);
-
-			if(signals && dApplication->cxSignal)
-				while((message=(APTR)IExec->GetMsg(dApplication->cxPort)))
-					exit=PerceptionCommodityEvent(dApplication,message);
-			if(signals && dApplication->ioSignal)
-				ExecLanguagePluginEntry(dApplication);
-			if(signals && dApplication->rxSignal)
-				while((message=(APTR)IExec->GetMsg(dApplication->rxPort)))
-					exit=PerceptionRexxHostEvent(dApplication,message);
-		}while(!exit);
+		MainEventHandler(dApplication);
 
 		ExitInputHandler(dApplication);
 
@@ -441,6 +427,31 @@ void  ExitInputHandler(struct DaemonApplication *Self)
 
 	return;
 };
+
+void  MainEventHandler(struct DaemonApplication *dapp)
+{
+	ULONG sigmask=0L, signals=0L, exit=0L,
+		cxSignal=dApplication->cxSignal,
+		ioSignal=dApplication->ioSignal,
+		rxSignal=dApplication->rxSignal;
+	APTR	message = NULL;
+
+	do{
+		sigmask = ioSignal | rxSignal | cxSignal;
+		signals = IExec->Wait(sigmask);
+
+		if(signals & cxSignal)
+			while((message=(APTR)IExec->GetMsg(dApplication->cxPort)))
+				exit=PerceptionCommodityEvent(dApplication,message);
+		if(signals & rxSignal)
+			while((message=(APTR)IExec->GetMsg(dApplication->rxPort)))
+				exit=PerceptionRexxHostEvent(dApplication,message);
+		if(signals & ioSignal)
+			ExecLanguagePluginEntry(dApplication);
+		if(exit)
+			sigmask=0L;
+	}while(sigmask);
+}
 
 /*
 //	Commodities Event Handling
