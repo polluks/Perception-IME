@@ -13,6 +13,7 @@ struct	DaemonApplication
 //
 	struct	ExecIFace			*IExec;
 	struct  PerceptionIFace		*IPerception;
+	struct  NewLibIFace			*INewLib;
 	struct	DOSIFace			*IDOS;
 	struct	CommoditiesIFace	*ICX;
 	struct	UtilityIFace		*IUtility;
@@ -128,6 +129,9 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 		if(dApplication->PerceptionBase)
 			dApplication->IPerception = (APTR)IExec->GetInterface(Base,"main",1L,NULL);
 
+		if((Base = (APTR)IExec->OpenLibrary("newlib.library", 0L)))
+			dApplication->INewLib	 = (APTR)IExec->GetInterface(Base,"main",1L,NULL);
+
 		if((Base = (APTR)IExec->OpenLibrary("dos.library", 50L)))
 			dApplication->IDOS		 = (APTR)IExec->GetInterface(Base,"main",1L,NULL);
 
@@ -228,6 +232,13 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 		{
 			Base = dApplication->IDOS->Data.LibBase;
 			IExec->DropInterface((APTR)dApplication->IDOS);
+			IExec->CloseLibrary((APTR)Base);
+		}
+
+		if(dApplication->INewLib)
+		{
+			Base = dApplication->INewLib->Data.LibBase;
+			IExec->DropInterface((APTR)dApplication->INewLib);
 			IExec->CloseLibrary((APTR)Base);
 		}
 
@@ -490,7 +501,7 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 			case IECLASS_RAWKEY:
 			case IECLASS_EXTENDEDRAWKEY:
 				Self->IExec->ObtainSemaphore(&dapp->InputLock);
-				bInputItem=dapp->InputState[ICSTATE_FIFO_IVW];
+/*				bInputItem=dapp->InputState[ICSTATE_FIFO_IVW];
 				pInputItem=(APTR)dapp->InputState[ICSTATE_FIFO_PVW];
 				if(pInputItem==NULL)
 					pInputItem=&dapp->InputVector;
@@ -512,10 +523,13 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 					}else{
 						bInputItem=0L;pInputItem=NULL;
 					};
+					pInputItem->type=0;
+					pInputItem->qual=0;
+					pInputItem->glyph=0L;
 					dapp->InputState[ICSTATE_FIFO_IVW]=bInputItem;
 					dapp->InputState[ICSTATE_FIFO_PVW]=(ULONG)pInputItem;
 				};
-				Self->IExec->Signal(Self->DaemonProcess,dapp->ioSignal);
+*/				Self->IExec->Signal(Self->DaemonProcess,dapp->ioSignal);
 				Self->IExec->ReleaseSemaphore(&dapp->InputLock);
 				break;
 			default:
@@ -576,17 +590,8 @@ void  ExecLanguagePluginEntry(struct DaemonApplication *dapp)
 	Message[3]=0L;
 	Message[2]=qual;
 	Message[1]=glyph;
-	switch(type)
-	{
-		case TRANSLATE_ANSI:
-			Message[0]=LANGUAGE_TRANSLATE_ANSI;
-			break;
-		case TRANSLATE_AMIGA:
-			Message[0]=LANGUAGE_TRANSLATE_AMIGA;
-			break;
-		default:
-			break;
-	}
+	Message[0]=type;
+
     if(dapp->CommodityFlags && PERCEPTION_STATE_ACTIVE)
 	{
 		if(bInputItem<IME_VECTOR_SIZE)
