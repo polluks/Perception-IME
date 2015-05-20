@@ -215,7 +215,7 @@ ULONG LCALL_GetLanguageContextAttr(struct LIBIFACE_CLASS *iface, APTR lc, ULONG 
 */
 void  LCALL_SetLanguageContextAttr(struct LIBIFACE_CLASS *iface, APTR lc, ULONG a, ULONG b)
 {
-	ULONG rc=0L, *Message=&a;
+	ULONG *Message=&a;
 	struct LIBRARY_CLASS *Self = (APTR) iface->Data.LibBase;
 
 	KDEBUG("Perception.Library/SetLanguageContextAttr(%lx,%lx)\n",lc,a);
@@ -228,7 +228,7 @@ void  LCALL_SetLanguageContextAttr(struct LIBIFACE_CLASS *iface, APTR lc, ULONG 
 			break;
 	}
 
-	return(rc);
+	return;
 }
 
 /**/
