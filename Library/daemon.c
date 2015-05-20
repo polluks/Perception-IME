@@ -483,19 +483,19 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 	struct LIBRARY_CLASS *Self=dApplication->PerceptionBase;
 	struct InputTagItem *pInputItem=NULL;
 
-    if(dApplication->CommodityFlags && PERCEPTION_STATE_ACTIVE)
-	{
-        do{
-			nInputEvent=cInputEvent->ie_NextEvent;
-			switch(cInputEvent->ie_Class)
-			{
-				case IECLASS_RAWKEY:
-				case IECLASS_EXTENDEDRAWKEY:
-					Self->IExec->ObtainSemaphore(&dApplication->InputLock);
-					bInputItem=dApplication->InputState[ICSTATE_FIFO_IVW];
-					pInputItem=(APTR)dApplication->InputState[ICSTATE_FIFO_PVW];
-					if(pInputItem==NULL)
-						pInputItem=dApplication->InputVector;
+	do{
+		nInputEvent=cInputEvent->ie_NextEvent;
+		switch(cInputEvent->ie_Class)
+		{
+			case IECLASS_RAWKEY:
+			case IECLASS_EXTENDEDRAWKEY:
+				Self->IExec->ObtainSemaphore(&dApplication->InputLock);
+				bInputItem=dApplication->InputState[ICSTATE_FIFO_IVW];
+				pInputItem=(APTR)dApplication->InputState[ICSTATE_FIFO_PVW];
+				if(pInputItem==NULL)
+					pInputItem=&dApplication->InputVector;
+			    if(dApplication->CommodityFlags && PERCEPTION_STATE_ACTIVE)
+				{
 					if(Self->IKeymap->MapRawKey((APTR)cInputEvent,(APTR)&bMapKey,l,NULL))
 					{
 						pInputItem->type=TRANSLATE_ANSI;
@@ -504,10 +504,8 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 					};
 					pInputItem->glyph=bMapKey;
 					pInputItem->qual=cInputEvent->ie_Qualifier;
-//
 					KDEBUG("input.device::Perception-IME//type=%lx,qual=%lx,glyph=%lx [Item=%lx]\n",
 						pInputItem->type, pInputItem->qual, pInputItem->glyph, pInputItem);
-//
 					if(bInputItem<IME_VECTOR_SIZE)
 					{
 						bInputItem++;pInputItem++;
@@ -516,15 +514,16 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 					};
 					dApplication->InputState[ICSTATE_FIFO_IVW]=bInputItem;
 					dApplication->InputState[ICSTATE_FIFO_PVW]=(ULONG)pInputItem;
-					Self->IExec->Signal(Self->DaemonProcess,dApplication->ioSignal);
- 					Self->IExec->ReleaseSemaphore(&dApplication->InputLock);
-					break;
-				default:
-					break;
-			}
-			cInputEvent=nInputEvent;
-		}while(cInputEvent);
-	};
+				};
+				Self->IExec->Signal(Self->DaemonProcess,dApplication->ioSignal);
+				Self->IExec->ReleaseSemaphore(&dApplication->InputLock);
+				break;
+			default:
+				rc=stream;
+				break;
+		};
+		cInputEvent=nInputEvent;
+	}while(cInputEvent);
 
 	return(rc);
 }
@@ -561,7 +560,7 @@ void  ExecLanguagePluginEntry(struct DaemonApplication *dapp)
 	bInputItem=dapp->InputState[ICSTATE_FIFO_IVR];
 	pInputItem=(APTR)dapp->InputState[ICSTATE_FIFO_PVR];
 	if(pInputItem==NULL)
-		pInputItem=dapp->InputVector;
+		pInputItem=dapp->&InputVector;
 //
 	type=pInputItem->type;
 	glyph=pInputItem->glyph;
@@ -588,23 +587,27 @@ void  ExecLanguagePluginEntry(struct DaemonApplication *dapp)
 		default:
 			break;
 	}
-	if(bInputItem<IME_VECTOR_SIZE)
+    if(dApplication->CommodityFlags && PERCEPTION_STATE_ACTIVE)
 	{
-		bInputItem++;pInputItem++;
-	}else{
-		bInputItem=0L;pInputItem=NULL;
+		if(bInputItem<IME_VECTOR_SIZE)
+		{
+			bInputItem++;pInputItem++;
+		}else{
+			bInputItem=0L;pInputItem=NULL;
+		};
+		dapp->InputState[ICSTATE_FIFO_IVR]=bInputItem;
+		dapp->InputState[ICSTATE_FIFO_PVR]=(ULONG)pInputItem;
+//
+		cLanguage=(APTR)Self->LanguageContextList.lh_Head;
+		do{
+			nLanguage=(APTR)cLanguage->Hook.h_MinNode.mln_Succ;
+			cLanguage->IPerception=dapp->IPerception;
+			cLanguage->IUtility=dapp->IUtility;
+			if(dapp->IExec->IsNative(cLanguage->Hook.h_Entry))
+				dapp->IUtility->CallHookPkt((APTR)cLanguage,(APTR)cLanguage,(APTR)Message);
+			cLanguage=nLanguage;
+		}while(cLanguage);
 	};
-	dapp->InputState[ICSTATE_FIFO_IVR]=bInputItem;
-	dapp->InputState[ICSTATE_FIFO_PVR]=(ULONG)pInputItem;
-	cLanguage=(APTR)Self->LanguageContextList.lh_Head;
-	do{
-		nLanguage=(APTR)cLanguage->Hook.h_MinNode.mln_Succ;
-		cLanguage->IPerception=dapp->IPerception;
-		cLanguage->IUtility=dapp->IUtility;
-		if(dapp->IExec->IsNative(cLanguage->Hook.h_Entry))
-			dapp->IUtility->CallHookPkt((APTR)cLanguage,(APTR)cLanguage,(APTR)Message);
-		cLanguage=nLanguage;
-	}while(cLanguage);
 	Self->IExec->ReleaseSemaphore(&dapp->InputLock);
 
 	return;
