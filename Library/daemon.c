@@ -514,7 +514,7 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 			case IECLASS_RAWKEY:
 			case IECLASS_EXTENDEDRAWKEY:
 				Self->IExec->ObtainSemaphore(&dapp->InputLock);
-/*				bInputItem=dapp->InputState[ICSTATE_FIFO_IVW];
+				bInputItem=dapp->InputState[ICSTATE_FIFO_IVW];
 				pInputItem=(APTR)dapp->InputState[ICSTATE_FIFO_PVW];
 				if(pInputItem==NULL)
 					pInputItem=&dapp->InputVector;
@@ -542,7 +542,8 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 					dapp->InputState[ICSTATE_FIFO_IVW]=bInputItem;
 					dapp->InputState[ICSTATE_FIFO_PVW]=(ULONG)pInputItem;
 				};
-*/				Self->IExec->Signal(Self->DaemonProcess,dapp->ioSignal);
+				if(Self->DaemonProcess)
+					Self->IExec->Signal(Self->DaemonProcess,dapp->ioSignal);
 				Self->IExec->ReleaseSemaphore(&dapp->InputLock);
 				break;
 			default:
