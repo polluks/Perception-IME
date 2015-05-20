@@ -13,7 +13,7 @@ struct	DaemonApplication
 //
 	struct	ExecIFace			*IExec;
 	struct  PerceptionIFace		*IPerception;
-	struct  NewLibIFace			*INewLib;
+	struct  Interface			*INewLib;
 	struct	DOSIFace			*IDOS;
 	struct	CommoditiesIFace	*ICX;
 	struct	UtilityIFace		*IUtility;
