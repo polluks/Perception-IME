@@ -112,7 +112,7 @@ void ExitPerceptionDaemon(struct LIBRARY_CLASS *Self)
 /**/
 int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 {
-	uint32 rc=0L;
+	uint32 rc=0L, i=0L;
     struct ExecIFace *IExec = (struct ExecIFace *)(*(struct ExecBase **)4)->MainInterface;
 	struct Library *Base = NULL;
 	struct DaemonApplication *dApplication=NULL;
@@ -160,13 +160,13 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 		if(dApplication->IREXX)
 			InitRexxHost(dApplication);
 
-		for(sigmask=0L;sigmask<IME_STATE_SIZE;sigmask++)
-			dApplication->InputState[sigmask]=0L;
-		for(sigmask=0L;sigmask<IME_VECTOR_SIZE;sigmask++)
+		for(i=0L;i<IME_STATE_SIZE;i++)
+			dApplication->InputState[i]=0L;
+		for(i=0L;i<IME_VECTOR_SIZE;i++)
 		{
-			dApplication->InputVector[sigmask].type=0;
-			dApplication->InputVector[sigmask].qual=0;
-			dApplication->InputVector[sigmask].glyph=0;
+			dApplication->InputVector[i].type=0;
+			dApplication->InputVector[i].qual=0;
+			dApplication->InputVector[i].glyph=0;
 		}
 		InitInputHandler(dApplication);
 
@@ -431,23 +431,23 @@ void  ExitInputHandler(struct DaemonApplication *Self)
 void  MainEventHandler(struct DaemonApplication *dapp)
 {
 	ULONG sigmask=0L, signals=0L, exit=0L,
-		cxSignal=dApplication->cxSignal,
-		ioSignal=dApplication->ioSignal,
-		rxSignal=dApplication->rxSignal;
+		cxSignal=dapp->cxSignal,
+		ioSignal=dapp->ioSignal,
+		rxSignal=dapp->rxSignal;
 	APTR	message = NULL;
 
 	do{
 		sigmask = ioSignal | rxSignal | cxSignal;
-		signals = IExec->Wait(sigmask);
+		signals = dapp->IExec->Wait(sigmask);
 
 		if(signals & cxSignal)
-			while((message=(APTR)IExec->GetMsg(dApplication->cxPort)))
-				exit=PerceptionCommodityEvent(dApplication,message);
+			while((message=(APTR)dapp->IExec->GetMsg(dapp->cxPort)))
+				exit=PerceptionCommodityEvent(dapp,message);
 		if(signals & rxSignal)
-			while((message=(APTR)IExec->GetMsg(dApplication->rxPort)))
-				exit=PerceptionRexxHostEvent(dApplication,message);
+			while((message=(APTR)dapp->IExec->GetMsg(dapp->rxPort)))
+				exit=PerceptionRexxHostEvent(dapp,message);
 		if(signals & ioSignal)
-			ExecLanguagePluginEntry(dApplication);
+			ExecLanguagePluginEntry(dapp);
 		if(exit)
 			sigmask=0L;
 	}while(sigmask);
