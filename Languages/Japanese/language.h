@@ -22,7 +22,6 @@
 #include <utility/hooks.h>
 #include <rexx/storage.h>
 
-#include <libraries/codesets.h>
 #include <libraries/perception.h>
 
 #define __USE_SYSBASE
@@ -32,13 +31,11 @@
 #include <proto/exec.h>
 #include <proto/locale.h>
 #include <proto/utility.h>
-#include <proto/codesets.h>
 #include <proto/perception.h>
 
 #include <interfaces/exec.h>
 #include <interfaces/locale.h>
 #include <interfaces/utility.h>
-#include <interfaces/codesets.h>
 #include <interfaces/perception.h>
 
 /*
