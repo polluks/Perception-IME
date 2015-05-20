@@ -49,16 +49,16 @@ struct	DaemonApplication
 
 void  InitCommodity(struct DaemonApplication *Self,LONG active);
 void  ExitCommodity(struct DaemonApplication *Self);
-ULONG PerceptionCommodityEvent(struct DaemonApplication *Self, APTR message);
 void  InitApplication(struct DaemonApplication *Self);
 void  ExitApplication(struct DaemonApplication *Self);
 void  InitLocalization(struct DaemonApplication *Self);
 void  ExitLocalization(struct DaemonApplication *Self);
 void  InitRexxHost(struct DaemonApplication *Self);
 void  ExitRexxHost(struct DaemonApplication *Self);
-ULONG PerceptionRexxHostEvent(struct DaemonApplication *Self, APTR message);
 void  InitInputHandler(struct DaemonApplication *dapp);
 void  ExitInputHandler(struct DaemonApplication *dapp);
+ULONG PerceptionCommodityEvent(struct DaemonApplication *Self, APTR message);
+ULONG PerceptionRexxHostEvent(struct DaemonApplication *Self, APTR message);
 APTR  ExecInputHandler(APTR stream,APTR data);
 void  PerceptionInputContext(struct DaemonApplication *dapp);
 void  ExecLanguagePluginEntry(struct DaemonApplication *dapp);
@@ -298,40 +298,6 @@ void ExitCommodity(struct DaemonApplication *Self)
 	return;
 }
 
-/*
-//	Commodities Event Handling
-
-	Disable	-> Stop Input Editing
-	Enable	-> Start Input Editing
-	Kill	-> Flush Everything
-*/
-ULONG PerceptionCommodityEvent(struct DaemonApplication *Self, APTR message)
-{
-	ULONG rc=0L;
-	if((Self->ICX->CxMsgType(message))==CXM_COMMAND)
-		switch(Self->ICX->CxMsgID(message))
-		{
-			case	CXCMD_DISABLE:
-				Self->CommodityFlags = Self->CommodityFlags & (!PERCEPTION_STATE_ACTIVE);
-				break;
-			case	CXCMD_ENABLE:
-				Self->CommodityFlags = Self->CommodityFlags | PERCEPTION_STATE_ACTIVE;
-				break;
-			case	CXCMD_APPEAR:   	/* External Forwarded? */
-				break;
-			case	CXCMD_DISAPPEAR:	/* External Forwarded? */
-				break;
-			case	CXCMD_KILL:			/* External then Internal */
-				rc=TRUE;
-				break;
-			case	CXCMD_UNIQUE:		/* Internal Special */
-				break;
-			default:
-				break;
-		}
-	return(rc);
-}
-
 /**/
 void  InitApplication(struct DaemonApplication *Self)
 {
@@ -411,16 +377,6 @@ void  ExitRexxHost(struct DaemonApplication *Self)
 }
 
 /**/
-ULONG PerceptionRexxHostEvent(struct DaemonApplication *Self, APTR message)
-{
-	ULONG rc=0L;
-
-	KDEBUG("Perception-IME[Daemon]::PerceptionRexxHost();\n");
-
-	return(rc);
-}
-
-/**/
 void  InitInputHandler(struct DaemonApplication *Self)
 {
 	uint32	ioError=0L;
@@ -434,6 +390,8 @@ void  InitInputHandler(struct DaemonApplication *Self)
 	if(Self->ioPort)
 		Self->imFilter			= (APTR)Self->IExec->AllocSysObjectTags( ASOT_INTERRUPT,
 			ASOINTR_Size,		sizeof(struct Interrupt),
+			ASOINTR_Code,		(APTR)&ExecInputHandler,
+			ASOINTR_Data,		Self,
 			NULL,				NULL);
 	if(Self->ioPort)
 		Self->ioSignal=1L << Self->ioPort->mp_SigBit;
@@ -448,8 +406,8 @@ void  InitInputHandler(struct DaemonApplication *Self)
 	{
 		Self->imFilter->is_Node.ln_Pri	= 52L; // Follow Commodities, Precede Intuition
 		Self->imFilter->is_Node.ln_Name	= Self->PerceptionBase->Library.lib_Node.ln_Name;
-		Self->imFilter->is_Data			= (APTR)Self;
-		Self->imFilter->is_Code			= (APTR)&ExecInputHandler;
+//		Self->imFilter->is_Data			= (APTR)Self;
+//		Self->imFilter->is_Code			= (APTR)&ExecInputHandler;
 		Self->imRequest->io_Data		= (APTR)Self->imFilter;
 		Self->imRequest->io_Command		= IND_ADDHANDLER;
 
@@ -483,6 +441,50 @@ void  ExitInputHandler(struct DaemonApplication *Self)
 
 	return;
 };
+
+/*
+//	Commodities Event Handling
+
+	Disable	-> Stop Input Editing
+	Enable	-> Start Input Editing
+	Kill	-> Flush Everything
+*/
+ULONG PerceptionCommodityEvent(struct DaemonApplication *Self, APTR message)
+{
+	ULONG rc=0L;
+	if((Self->ICX->CxMsgType(message))==CXM_COMMAND)
+		switch(Self->ICX->CxMsgID(message))
+		{
+			case	CXCMD_DISABLE:
+				Self->CommodityFlags = Self->CommodityFlags & (!PERCEPTION_STATE_ACTIVE);
+				break;
+			case	CXCMD_ENABLE:
+				Self->CommodityFlags = Self->CommodityFlags | PERCEPTION_STATE_ACTIVE;
+				break;
+			case	CXCMD_APPEAR:   	/* External Forwarded? */
+				break;
+			case	CXCMD_DISAPPEAR:	/* External Forwarded? */
+				break;
+			case	CXCMD_KILL:			/* External then Internal */
+				rc=TRUE;
+				break;
+			case	CXCMD_UNIQUE:		/* Internal Special */
+				break;
+			default:
+				break;
+		}
+	return(rc);
+}
+
+/**/
+ULONG PerceptionRexxHostEvent(struct DaemonApplication *Self, APTR message)
+{
+	ULONG rc=0L;
+
+	KDEBUG("Perception-IME[Daemon]::PerceptionRexxHost();\n");
+
+	return(rc);
+}
 
 /*	EntryPoint:Input.Device	- This needs to be refactored
 */
