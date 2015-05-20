@@ -479,8 +479,8 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 {
 	APTR rc=stream; ULONG bInputItem=0L, bMapKey=0L; USHORT l=4;
     struct InputEvent *cInputEvent=stream, *nInputEvent=NULL;
-	struct DaemonApplication *dApplication=data;
-	struct LIBRARY_CLASS *Self=dApplication->PerceptionBase;
+	struct DaemonApplication *dapp=data;
+	struct LIBRARY_CLASS *Self=dapp->PerceptionBase;
 	struct InputTagItem *pInputItem=NULL;
 
 	do{
@@ -489,12 +489,12 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 		{
 			case IECLASS_RAWKEY:
 			case IECLASS_EXTENDEDRAWKEY:
-				Self->IExec->ObtainSemaphore(&dApplication->InputLock);
-				bInputItem=dApplication->InputState[ICSTATE_FIFO_IVW];
-				pInputItem=(APTR)dApplication->InputState[ICSTATE_FIFO_PVW];
+				Self->IExec->ObtainSemaphore(&dapp->InputLock);
+				bInputItem=dapp->InputState[ICSTATE_FIFO_IVW];
+				pInputItem=(APTR)dapp->InputState[ICSTATE_FIFO_PVW];
 				if(pInputItem==NULL)
-					pInputItem=&dApplication->InputVector;
-			    if(dApplication->CommodityFlags && PERCEPTION_STATE_ACTIVE)
+					pInputItem=&dapp->InputVector;
+			    if(dapp->CommodityFlags && PERCEPTION_STATE_ACTIVE)
 				{
 					if(Self->IKeymap->MapRawKey((APTR)cInputEvent,(APTR)&bMapKey,l,NULL))
 					{
@@ -512,11 +512,11 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 					}else{
 						bInputItem=0L;pInputItem=NULL;
 					};
-					dApplication->InputState[ICSTATE_FIFO_IVW]=bInputItem;
-					dApplication->InputState[ICSTATE_FIFO_PVW]=(ULONG)pInputItem;
+					dapp->InputState[ICSTATE_FIFO_IVW]=bInputItem;
+					dapp->InputState[ICSTATE_FIFO_PVW]=(ULONG)pInputItem;
 				};
-				Self->IExec->Signal(Self->DaemonProcess,dApplication->ioSignal);
-				Self->IExec->ReleaseSemaphore(&dApplication->InputLock);
+				Self->IExec->Signal(Self->DaemonProcess,dapp->ioSignal);
+				Self->IExec->ReleaseSemaphore(&dapp->InputLock);
 				break;
 			default:
 				rc=stream;
@@ -560,7 +560,7 @@ void  ExecLanguagePluginEntry(struct DaemonApplication *dapp)
 	bInputItem=dapp->InputState[ICSTATE_FIFO_IVR];
 	pInputItem=(APTR)dapp->InputState[ICSTATE_FIFO_PVR];
 	if(pInputItem==NULL)
-		pInputItem=dapp->&InputVector;
+		pInputItem=&dapp->InputVector;
 //
 	type=pInputItem->type;
 	glyph=pInputItem->glyph;
@@ -587,7 +587,7 @@ void  ExecLanguagePluginEntry(struct DaemonApplication *dapp)
 		default:
 			break;
 	}
-    if(dApplication->CommodityFlags && PERCEPTION_STATE_ACTIVE)
+    if(dapp->CommodityFlags && PERCEPTION_STATE_ACTIVE)
 	{
 		if(bInputItem<IME_VECTOR_SIZE)
 		{
