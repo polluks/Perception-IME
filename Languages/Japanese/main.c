@@ -57,83 +57,86 @@ LONG _start( VOID )
   return -1;
 }
 
-struct library *LCALL_Init(struct LIBRARY_CLASS *SelfBase,
+struct library *LCALL_Init(struct LIBRARY_CLASS *Self,
 				 BPTR SegmentList,
 				 struct Interface *Executive)
 {
-	APTR rc=SelfBase;
+	APTR rc=Self;
 	struct ExecIFace *IExec = (struct ExecIFace *)Executive;
 	struct Library *Base = NULL;
 
-	SelfBase->Library.lib_Node.ln_Type	= NT_LIBRARY;
-	SelfBase->Library.lib_Node.ln_Pri	= 0;
-	SelfBase->Library.lib_Node.ln_Name = (APTR)LibName;
-	SelfBase->Library.lib_Flags = LIBF_SUMUSED | LIBF_CHANGED;
-	SelfBase->Library.lib_Version = LIBRARY_VERSION;
-	SelfBase->Library.lib_Revision = LIBRARY_REVISION;
-	SelfBase->Library.lib_IdString = (APTR)LibIdentity;
-	SelfBase->SegmentList = SegmentList;
-	SelfBase->IExec = (struct ExecIFace *)Executive;
+	Self->Library.lib_Node.ln_Type	= NT_LIBRARY;
+	Self->Library.lib_Node.ln_Pri	= 0;
+	Self->Library.lib_Node.ln_Name = (APTR)LibName;
+	Self->Library.lib_Flags = LIBF_SUMUSED | LIBF_CHANGED;
+	Self->Library.lib_Version = LIBRARY_VERSION;
+	Self->Library.lib_Revision = LIBRARY_REVISION;
+	Self->Library.lib_IdString = (APTR)LibIdentity;
+	Self->SegmentList = SegmentList;
+	Self->IExec = (struct ExecIFace *)Executive;
 
 	if((Base = IExec->OpenLibrary("utility.library",0L)))
-		SelfBase->IUtility = (APTR)IExec->GetInterface(Base,"main",1L,NULL);
+		Self->IUtility = (APTR)IExec->GetInterface(Base,"main",1L,NULL);
 
 	if((Base = IExec->OpenLibrary("perception.library",0L)))
-		SelfBase->IPerception = (APTR)IExec->GetInterface(Base,"main",1L,NULL);
+		Self->IPerception = (APTR)IExec->GetInterface(Base,"main",1L,NULL);
 
-	if(SelfBase->IPerception)
-		InitPerceptionHook(SelfBase);
+
 
 	return(rc);
 }
 
-struct Library *LCALL_Open(struct LibraryManagerInterface *Self, ULONG version)
+struct Library *LCALL_Open(struct LibraryManagerInterface *Iface, ULONG version)
 {
-	APTR rc = (APTR) Self->Data.LibBase;
-	struct LIBRARY_CLASS *SelfBase = (APTR) Self->Data.LibBase;
-	SelfBase->Library.lib_Flags &= ~LIBF_DELEXP;
-	SelfBase->Library.lib_OpenCnt++;
+	APTR rc = (APTR) Iface->Data.LibBase;
+	struct LIBRARY_CLASS *Self = (APTR) Iface->Data.LibBase;
+	Self->Library.lib_Flags &= ~LIBF_DELEXP;
+	Self->Library.lib_OpenCnt++;
+
+	if(Self->IPerception)
+		InitPerceptionHook(Self);
 
 	return(rc);
 }
 
-APTR LCALL_Close(struct LibraryManagerInterface *Self)
+APTR LCALL_Close(struct LibraryManagerInterface *Iface)
 {
 	APTR rc=NULL;
-	struct LIBRARY_CLASS *SelfBase = (APTR) Self->Data.LibBase;
-	SelfBase->Library.lib_OpenCnt--;
+	struct LIBRARY_CLASS *Self = (APTR) Iface->Data.LibBase;
+	Self->Library.lib_OpenCnt--;
+
+    ExitPerceptionHook(Self);
 
 	return(rc);
 }
 
-APTR LCALL_Expunge(struct LibraryManagerInterface *Self)
+APTR LCALL_Expunge(struct LibraryManagerInterface *Iface)
 {
     struct ExecIFace *IExec = (struct ExecIFace *)(*(struct ExecBase **)4)->MainInterface;
 	APTR rc=NULL;
-	struct LIBRARY_CLASS *SelfBase = (APTR) Self->Data.LibBase;
+	struct LIBRARY_CLASS *Self = (APTR) Iface->Data.LibBase;
 	struct Library *Base = NULL;
-	if(SelfBase->Library.lib_OpenCnt)
+	if(Self->Library.lib_OpenCnt)
 	{
-		SelfBase->Library.lib_Flags |= LIBF_DELEXP;
+		Self->Library.lib_Flags |= LIBF_DELEXP;
 	}else{
-		if(SelfBase->IPerception)
+		if(Self->IPerception)
 		{
-			ExitPerceptionHook(SelfBase);
-			Base = SelfBase->IPerception->Data.LibBase;
-			IExec->DropInterface((APTR)SelfBase->IPerception);
+			Base = Self->IPerception->Data.LibBase;
+			IExec->DropInterface((APTR)Self->IPerception);
             IExec->CloseLibrary((APTR)Base);
 		}
 
-		if(SelfBase->IUtility)
+		if(Self->IUtility)
 		{
-			Base = SelfBase->IUtility->Data.LibBase;
-			IExec->DropInterface((APTR)SelfBase->IUtility);
+			Base = Self->IUtility->Data.LibBase;
+			IExec->DropInterface((APTR)Self->IUtility);
             IExec->CloseLibrary((APTR)Base);
 		}
 
 
-		IExec->Remove((APTR)SelfBase);
-		IExec->DeleteLibrary((APTR)SelfBase);
+		IExec->Remove((APTR)Self);
+		IExec->DeleteLibrary((APTR)Self);
 	};
 	return(rc);
 }
@@ -143,12 +146,12 @@ APTR LCALL_Reserved(void)
 	return(NULL);
 }
 
-ULONG MCALL_Obtain(struct Interface *Self)
+ULONG MCALL_Obtain(struct Interface *Iface)
 {
-	return(Self->Data.RefCount++);
+	return(Iface->Data.RefCount++);
 };
 
-ULONG MCALL_Release(struct Interface *Self)
+ULONG MCALL_Release(struct Interface *Iface)
 {
-	return(Self->Data.RefCount--);
+	return(Iface->Data.RefCount--);
 };

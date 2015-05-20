@@ -133,38 +133,38 @@ extern CONST struct TagItem LibEmulationTags[];
 
 /*main.c*/
 extern int32 _start(void);
-extern struct library *LCALL_Init(struct LIBRARY_CLASS *SelfBase,
+extern struct library *LCALL_Init(struct LIBRARY_CLASS *Self,
 				 BPTR SegmentList,
 				 struct Interface *Executive);
-extern struct Library *LCALL_Open(struct LibraryManagerInterface *Self, ULONG version);
-extern APTR  LCALL_Close(struct LibraryManagerInterface *Self);
-extern APTR  LCALL_Expunge(struct LibraryManagerInterface *Self);
+extern struct Library *LCALL_Open(struct LibraryManagerInterface *Iface, ULONG version);
+extern APTR  LCALL_Close(struct LibraryManagerInterface *Iface);
+extern APTR  LCALL_Expunge(struct LibraryManagerInterface *Iface);
 extern APTR  LCALL_Reserved(void);
-extern ULONG MCALL_Obtain(struct Interface *Self);
-extern ULONG MCALL_Release(struct Interface *Self);
+extern ULONG MCALL_Obtain(struct Interface *Iface);
+extern ULONG MCALL_Release(struct Interface *Iface);
 /*apicalls.c*/
-extern ULONG LCALL_GetDriverInfo(struct LIBIFACE_CLASS *IFace);
-extern ULONG LCALL_ConvToLower(struct LIBIFACE_CLASS *IFace,ULONG c);
-extern ULONG LCALL_ConvToUpper(struct LIBIFACE_CLASS *IFace,ULONG c);
-extern ULONG LCALL_GetCodeSet(struct LIBIFACE_CLASS *IFace);
-extern APTR  LCALL_GetLocaleStr(struct LIBIFACE_CLASS *IFace,ULONG cStringID);
-extern LONG  LCALL_IsAlNum(struct LIBIFACE_CLASS *IFace, ULONG c);
-extern LONG  LCALL_IsAlpha(struct LIBIFACE_CLASS *IFace, ULONG c);
-extern LONG  LCALL_IsCntrl(struct LIBIFACE_CLASS *IFace, ULONG c);
-extern LONG  LCALL_IsDigit(struct LIBIFACE_CLASS *IFace, ULONG c);
-extern LONG  LCALL_IsLower(struct LIBIFACE_CLASS *IFace, ULONG c);
-extern LONG  LCALL_IsPrint(struct LIBIFACE_CLASS *IFace, ULONG c);
-extern LONG  LCALL_IsPunct(struct LIBIFACE_CLASS *IFace, ULONG c);
-extern LONG  LCALL_IsSpace(struct LIBIFACE_CLASS *IFace, ULONG c);
-extern LONG  LCALL_IsUpper(struct LIBIFACE_CLASS *IFace, ULONG c);
-extern LONG  LCALL_IsXDigit(struct LIBIFACE_CLASS *IFace, ULONG c);
-extern APTR  LCALL_StrConvert(	struct LIBIFACE_CLASS *IFace,
+extern ULONG LCALL_GetDriverInfo(struct LIBIFACE_CLASS *Iface);
+extern ULONG LCALL_ConvToLower(struct LIBIFACE_CLASS *Iface,ULONG c);
+extern ULONG LCALL_ConvToUpper(struct LIBIFACE_CLASS *Iface,ULONG c);
+extern ULONG LCALL_GetCodeSet(struct LIBIFACE_CLASS *Iface);
+extern APTR  LCALL_GetLocaleStr(struct LIBIFACE_CLASS *Iface,ULONG cStringID);
+extern LONG  LCALL_IsAlNum(struct LIBIFACE_CLASS *Iface, ULONG c);
+extern LONG  LCALL_IsAlpha(struct LIBIFACE_CLASS *Iface, ULONG c);
+extern LONG  LCALL_IsCntrl(struct LIBIFACE_CLASS *Iface, ULONG c);
+extern LONG  LCALL_IsDigit(struct LIBIFACE_CLASS *Iface, ULONG c);
+extern LONG  LCALL_IsLower(struct LIBIFACE_CLASS *Iface, ULONG c);
+extern LONG  LCALL_IsPrint(struct LIBIFACE_CLASS *Iface, ULONG c);
+extern LONG  LCALL_IsPunct(struct LIBIFACE_CLASS *Iface, ULONG c);
+extern LONG  LCALL_IsSpace(struct LIBIFACE_CLASS *Iface, ULONG c);
+extern LONG  LCALL_IsUpper(struct LIBIFACE_CLASS *Iface, ULONG c);
+extern LONG  LCALL_IsXDigit(struct LIBIFACE_CLASS *Iface, ULONG c);
+extern APTR  LCALL_StrConvert(	struct LIBIFACE_CLASS *Iface,
 								ULONG srcLength,	ULONG dstLength,
 								APTR srcStringPtr,	APTR dstStringPtr);
-extern APTR  LCALL_StrnCmp(	struct LIBIFACE_CLASS *IFace,
+extern APTR  LCALL_StrnCmp(	struct LIBIFACE_CLASS *Iface,
 							ULONG srcLength,	ULONG dstLength,
 							APTR srcStringPtr,	APTR dstStringPtr);
-extern LONG  LCALL_IsBlank(	struct LIBIFACE_CLASS *IFace, ULONG c);
+extern LONG  LCALL_IsBlank(	struct LIBIFACE_CLASS *Iface, ULONG c);
 /*hook.c*/
 extern void  InitPerceptionHook(struct LIBRARY_CLASS *Self);
 extern void  ExitPerceptionHook(struct LIBRARY_CLASS *Self);

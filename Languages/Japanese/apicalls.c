@@ -178,24 +178,24 @@ CONST UBYTE *InternalCatalogString[] =
 
 /*  32bit Mask Value for Routines Actually implimented
 */
-ULONG LCALL_GetDriverInfo(struct LIBIFACE_CLASS *IFace)
+ULONG LCALL_GetDriverInfo(struct LIBIFACE_CLASS *Iface)
 {
 	return(ALL_LANGFUNCS);
 };
 
-ULONG LCALL_ConvToLower(struct LIBIFACE_CLASS *IFace,ULONG c)
+ULONG LCALL_ConvToLower(struct LIBIFACE_CLASS *Iface,ULONG c)
 {
 	ULONG rc=0L;
 	return(rc);
 };
 
-ULONG LCALL_ConvToUpper(struct LIBIFACE_CLASS *IFace,ULONG c)
+ULONG LCALL_ConvToUpper(struct LIBIFACE_CLASS *Iface,ULONG c)
 {
 	ULONG rc=0L;
 	return(rc);
 };
 
-ULONG LCALL_GetCodeSet(struct LIBIFACE_CLASS *IFace)
+ULONG LCALL_GetCodeSet(struct LIBIFACE_CLASS *Iface)
 {
 	ULONG rc=LOCALECODESET;
 	return(rc);
@@ -205,7 +205,7 @@ ULONG LCALL_GetCodeSet(struct LIBIFACE_CLASS *IFace)
  *   and the value comparison,  this allows for a shorter routine to be written.
  *   No point in wasting space without need is there?
 */
-APTR  LCALL_GetLocaleStr(struct LIBIFACE_CLASS *IFace,ULONG cStringID)
+APTR  LCALL_GetLocaleStr(struct LIBIFACE_CLASS *Iface,ULONG cStringID)
 {
 	APTR rc=NULL;
 	if(cStringID < MAXLOCALESTRINGS)
@@ -213,67 +213,67 @@ APTR  LCALL_GetLocaleStr(struct LIBIFACE_CLASS *IFace,ULONG cStringID)
 	return(rc);
 };
 
-LONG  LCALL_IsAlNum(struct LIBIFACE_CLASS *IFace, ULONG c)
+LONG  LCALL_IsAlNum(struct LIBIFACE_CLASS *Iface, ULONG c)
 {
 	LONG rc=0L;
 	return(rc);
 };
 
-LONG  LCALL_IsAlpha(struct LIBIFACE_CLASS *IFace, ULONG c)
+LONG  LCALL_IsAlpha(struct LIBIFACE_CLASS *Iface, ULONG c)
 {
 	LONG rc=0L;
 	return(rc);
 };
 
-LONG  LCALL_IsCntrl(struct LIBIFACE_CLASS *IFace, ULONG c)
+LONG  LCALL_IsCntrl(struct LIBIFACE_CLASS *Iface, ULONG c)
 {
 	LONG rc=0L;
 	return(rc);
 };
 
-LONG  LCALL_IsDigit(struct LIBIFACE_CLASS *IFace, ULONG c)
+LONG  LCALL_IsDigit(struct LIBIFACE_CLASS *Iface, ULONG c)
 {
 	LONG rc=0L;
 	return(rc);
 };
 
-LONG  LCALL_IsLower(struct LIBIFACE_CLASS *IFace, ULONG c)
+LONG  LCALL_IsLower(struct LIBIFACE_CLASS *Iface, ULONG c)
 {
 	LONG rc=0L;
 	return(rc);
 };
 
-LONG  LCALL_IsPrint(struct LIBIFACE_CLASS *IFace, ULONG c)
+LONG  LCALL_IsPrint(struct LIBIFACE_CLASS *Iface, ULONG c)
 {
 	LONG rc=0L;
 	return(rc);
 };
 
-LONG  LCALL_IsPunct(struct LIBIFACE_CLASS *IFace, ULONG c)
+LONG  LCALL_IsPunct(struct LIBIFACE_CLASS *Iface, ULONG c)
 {
 	LONG rc=0L;
 	return(rc);
 };
 
-LONG  LCALL_IsSpace(struct LIBIFACE_CLASS *IFace, ULONG c)
+LONG  LCALL_IsSpace(struct LIBIFACE_CLASS *Iface, ULONG c)
 {
 	LONG rc=0L;
 	return(rc);
 };
 
-LONG  LCALL_IsUpper(struct LIBIFACE_CLASS *IFace, ULONG c)
+LONG  LCALL_IsUpper(struct LIBIFACE_CLASS *Iface, ULONG c)
 {
 	LONG rc=0L;
 	return(rc);
 };
 
-LONG  LCALL_IsXDigit(struct LIBIFACE_CLASS *IFace, ULONG c)
+LONG  LCALL_IsXDigit(struct LIBIFACE_CLASS *Iface, ULONG c)
 {
 	LONG rc=0L;
 	return(rc);
 };
 
-APTR  LCALL_StrConvert(	struct LIBIFACE_CLASS *IFace,
+APTR  LCALL_StrConvert(	struct LIBIFACE_CLASS *Iface,
 						ULONG srcLength,	ULONG dstLength,
 						APTR srcStringPtr,	APTR dstStringPtr)
 {
@@ -281,7 +281,7 @@ APTR  LCALL_StrConvert(	struct LIBIFACE_CLASS *IFace,
 	return(rc);
 };
 
-APTR  LCALL_StrnCmp(	struct LIBIFACE_CLASS *IFace,
+APTR  LCALL_StrnCmp(	struct LIBIFACE_CLASS *Iface,
 					ULONG srcLength,	ULONG dstLength,
 					APTR srcStringPtr,	APTR dstStringPtr)
 {
@@ -289,7 +289,7 @@ APTR  LCALL_StrnCmp(	struct LIBIFACE_CLASS *IFace,
 	return(rc);
 };
 
-LONG  LCALL_IsBlank(	struct LIBIFACE_CLASS *IFace, ULONG c)
+LONG  LCALL_IsBlank(	struct LIBIFACE_CLASS *Iface, ULONG c)
 {
 	LONG rc=0L;
 	return(rc);
