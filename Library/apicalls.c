@@ -126,11 +126,11 @@ APTR LCALL_ObtainLanguageContext(struct LIBIFACE_CLASS *iface,APTR name,APTR hoo
 	{
 		rc=(APTR)Self->IExec->AllocSysObjectTags( ASOT_HOOK,
 			ASOHOOK_Size,		LHCONTEXTSIZE,
-			ASOHOOK_Entry,		(ULONG)hook,
-			ASOHOOK_Data,		0L,
 			TAG_END,			0L);
 		if(rc)
 		{
+            rc->Hook.h_Entry=(APTR)hook;
+			rc->Hook.h_Data=(APTR)rc;
 			InitLanguageContext((APTR)rc);
 			Self->IExec->ObtainSemaphore(&Self->Lock);
 			Self->IExec->AddTail(&Self->LanguageContextList,(APTR)rc);
