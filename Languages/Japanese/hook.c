@@ -194,7 +194,8 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 		Vector=(APTR)LanguageContext->IPerception->GetLanguageContextAttr((APTR)LanguageContext,(ULONG)LCSTATE_VECTOR);
 	if(Message)
 	{
-		switch(Message[0])
+		KDEBUG("Japanese.Language Message=[%lx:%lx:%lx:%lx]\n",Message[0],Message[1],Message[2],Message[3]);
+/*		switch(Message[0])
 		{
             case TRANSLATE_AMIGA:
 				KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_AMIGA]\n");
@@ -265,7 +266,8 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 			default:
 				break;
 		}
-	}
+*/
+	};
 
 	return(rc);
 }
