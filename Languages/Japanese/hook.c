@@ -199,26 +199,18 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 		Vector=(APTR)LanguageContext->IPerception->GetLanguageContextAttr((APTR)LanguageContext,(ULONG)LCSTATE_VECTOR);
 	if(Message)
 	{
-		KDEBUG("Japanese.Language Message=[%lx:%lx:%lx:%lx]\n",Message[0],Message[1],Message[2],Message[3]);
 		switch(Message[0])
 		{
             case TRANSLATE_AMIGA:
-				KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_AMIGA]\n");
+KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_AMIGA:%lx:%lx:%lx]\n",
+	Message[1],Message[2],Message[3]);
 				break;
             case TRANSLATE_ANSI:
-				KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_ANSI]\n");
+KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_ANSI:%lx:%lx:%lx]\n",
+	Message[1],Message[2],Message[3]);
 //
 //	ANSI Translation of Romaji to Hiragana
 //
-				break;
-			default:
-				break;
-		}
-	};
-
-	return(rc);
-}
-/*
 				Syllable = GetLCSTATEbyValue(Vector,LCSTATE_Syllable,LanguageContext->IUtility);
 			    if((Message[1] & 0xFF000000) == Message[1])
     			{
@@ -279,8 +271,16 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 //
 //				INSERT Additional Translation Steps here
 //
-*/
+				break;
+			default:
+				break;
+		}
+	};
 
+	return(rc);
+}
+
+/**/
 ULONG GetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility)
 {
 	ULONG rc=0L;
