@@ -160,6 +160,8 @@ int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc)
 		if(dApplication->IREXX)
 			InitRexxHost(dApplication);
 
+		IExec->InitSemaphore(&dApplication->InputLock);
+
 		for(i=0L;i<IME_STATE_SIZE;i++)
 			dApplication->InputState[i]=0L;
 		for(i=0L;i<IME_VECTOR_SIZE;i++)
