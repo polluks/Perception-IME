@@ -196,13 +196,12 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 	{
 		switch(Message[0])
 		{
-            case LANGUAGE_TRANSLATE_AMIGA:
+            case TRANSLATE_AMIGA:
 				KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_AMIGA]\n");
 				break;
-            case LANGUAGE_TRANSLATE_ANSI:
+            case TRANSLATE_ANSI:
 				KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_ANSI]\n");
 				Syllable = GetLCSTATEbyValue(Vector,LCSTATE_Syllable,LanguageContext->IUtility);
-				KDEBUG("Japanese.Language::[%lx]", Syllable, Message[1]);
 			    if((Message[1] & 0xFF000000) == Message[1])
     			{
 					if(((Message[1] >> 24)-0x00000061)<0x0000001B)
@@ -258,7 +257,7 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 						break;
 				}
 				SetLCSTATEbyValue(Vector,LCSTATE_Syllable,LanguageContext->IUtility,Syllable);
-				KDEBUG("Japanese.Language::ExecLanguageHook()[%lx]\n",Kana);
+				KDEBUG("Japanese.Language::[%lx:%lx:%lx]", Syllable, Message[1], Kana);
 //
 //				INSERT Additional Translation Steps here
 //
