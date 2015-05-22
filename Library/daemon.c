@@ -503,7 +503,7 @@ ULONG PerceptionRexxHostEvent(struct DaemonApplication *Self, APTR message)
 */
 APTR  ExecInputHandler(APTR stream,APTR data)
 {
-	APTR rc=stream; ULONG bInputItem=0L, bMapKey=0L; USHORT l=4;
+	APTR rc=stream; ULONG bInputItem=0L, bMapKey=0L; WORD l=4;
     struct InputEvent *cInputEvent=stream, *nInputEvent=NULL;
 	struct DaemonApplication *dapp=data;
 	struct LIBRARY_CLASS *Self=dapp->PerceptionBase;
@@ -519,7 +519,7 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 				bInputItem=dapp->InputState[ICSTATE_FIFO_IVW];
 				pInputItem=(APTR)dapp->InputState[ICSTATE_FIFO_PVW];
 				if(pInputItem==NULL)
-					pInputItem=&dapp->InputVector;
+					pInputItem=dapp->InputVector;
 			    if(dapp->CommodityFlags && PERCEPTION_STATE_ACTIVE)
 				{
 					if(Self->IKeymap->MapRawKey((APTR)cInputEvent,(APTR)&bMapKey,l,NULL))
@@ -530,8 +530,6 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 					};
 					pInputItem->glyph=bMapKey;
 					pInputItem->qual=cInputEvent->ie_Qualifier;
-					KDEBUG("input.device::Perception-IME//type=%lx,qual=%lx,glyph=%lx [Item=%lx]\n",
-						pInputItem->type, pInputItem->qual, pInputItem->glyph, pInputItem);
 					if(bInputItem<IME_VECTOR_SIZE)
 					{
 						bInputItem++;pInputItem++;
@@ -590,15 +588,10 @@ void  ExecLanguagePluginEntry(struct DaemonApplication *dapp)
 	bInputItem=dapp->InputState[ICSTATE_FIFO_IVR];
 	pInputItem=(APTR)dapp->InputState[ICSTATE_FIFO_PVR];
 	if(pInputItem==NULL)
-		pInputItem=&dapp->InputVector;
-//
+		pInputItem=dapp->InputVector;
 	type=pInputItem->type;
 	glyph=pInputItem->glyph;
 	qual=pInputItem->qual;
-//
-	KDEBUG("Perception-IME[DAEMON] ExecLanguagePluginEntry @%lx[type=%lx,qual=%lx,glyph=%lx]\n",
-		pInputItem,type,qual,glyph);
-//
 	Message[7]=0L;
 	Message[6]=0L;
 	Message[5]=0L;
@@ -618,14 +611,12 @@ void  ExecLanguagePluginEntry(struct DaemonApplication *dapp)
 		};
 		dapp->InputState[ICSTATE_FIFO_IVR]=bInputItem;
 		dapp->InputState[ICSTATE_FIFO_PVR]=(ULONG)pInputItem;
-//
 		cLanguage=(APTR)Self->LanguageContextList.lh_Head;
 		do{
 			nLanguage=(APTR)cLanguage->Hook.h_MinNode.mln_Succ;
 			cLanguage->IPerception=dapp->IPerception;
 			cLanguage->IUtility=dapp->IUtility;
-			if(dapp->IExec->IsNative(cLanguage->Hook.h_Entry))
-				dapp->IUtility->CallHookPkt((APTR)cLanguage,(APTR)cLanguage,(APTR)Message);
+			dapp->IUtility->CallHookPkt((APTR)cLanguage,(APTR)cLanguage,(APTR)Message);
 			cLanguage=nLanguage;
 		}while(cLanguage);
 	};
