@@ -71,12 +71,12 @@
 \\	"Perception"	Developer Materials
 */
 #define LIBRARY_NAME		"perception.library"
-#define LIBRARY_IDENTITY	"perception.library v1.0"
+#define LIBRARY_IDENTITY	"perception.library v3.0"
 
 #define LIBRARY_CLASS		PerceptionBase
 #define	LIBIFACE_CLASS		PerceptionIFace
-#define LIBRARY_VERSION     2
-#define LIBRARY_REVISION    80
+#define LIBRARY_VERSION     3
+#define LIBRARY_REVISION    1
 
 struct LIBRARY_CLASS
 {

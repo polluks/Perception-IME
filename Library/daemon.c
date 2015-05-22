@@ -616,7 +616,11 @@ void  ExecLanguagePluginEntry(struct DaemonApplication *dapp)
 			nLanguage=(APTR)cLanguage->Hook.h_MinNode.mln_Succ;
 			cLanguage->IPerception=dapp->IPerception;
 			cLanguage->IUtility=dapp->IUtility;
-			dapp->IUtility->CallHookPkt((APTR)cLanguage,(APTR)cLanguage,(APTR)Message);
+//
+// The following check enforces native code exclusivity,  and works around an extra plugin registration.
+//
+			if(dapp->IExec->IsNative(cLanguage->Hook.h_Entry))
+				dapp->IUtility->CallHookPkt((APTR)cLanguage,(APTR)cLanguage,(APTR)Message);
 			cLanguage=nLanguage;
 		}while(cLanguage);
 	};
