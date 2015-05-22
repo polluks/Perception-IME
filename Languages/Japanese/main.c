@@ -81,8 +81,6 @@ struct library *LCALL_Init(struct LIBRARY_CLASS *Self,
 	if((Base = IExec->OpenLibrary("perception.library",0L)))
 		Self->IPerception = (APTR)IExec->GetInterface(Base,"main",1L,NULL);
 
-
-
 	return(rc);
 }
 
