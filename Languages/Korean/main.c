@@ -103,9 +103,9 @@ APTR LCALL_Close(struct LibraryManagerInterface *Iface)
 {
 	APTR rc=NULL;
 	struct LIBRARY_CLASS *Self = (APTR) Iface->Data.LibBase;
-	Self->Library.lib_OpenCnt--;
 
     ExitPerceptionHook(Self);
+	Self->Library.lib_OpenCnt--;
 
 	return(rc);
 }

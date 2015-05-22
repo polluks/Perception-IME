@@ -617,7 +617,9 @@ void  ExecLanguagePluginEntry(struct DaemonApplication *dapp)
 			cLanguage->IPerception=dapp->IPerception;
 			cLanguage->IUtility=dapp->IUtility;
 			KDEBUG("Perception-IME[DAEMON] [%lx][%lx] @[%lx]\n",cLanguage,nLanguage,cLanguage->Hook.h_Entry);
-			dapp->IUtility->CallHookPkt((APTR)cLanguage,(APTR)cLanguage,(APTR)Message);
+// IsNative workaround for an execution issue...
+			if(dapp->IExec->IsNative(cLanguage->Hook.h_Entry))
+				dapp->IUtility->CallHookPkt((APTR)cLanguage,(APTR)cLanguage,(APTR)Message);
 			cLanguage=nLanguage;
 		}while(cLanguage);
 	};
