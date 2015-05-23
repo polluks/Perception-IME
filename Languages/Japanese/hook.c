@@ -209,67 +209,70 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 //KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_ANSI:%lx:%lx:%lx]\n",
 //	Message[1],Message[2],Message[3]);
 				if(Message[1] == (Message[1] & 0x7F000000))
+					xc=(Message[1] >> 24);
+				if(xc-0x41<0x1B)
+					xc+=20;
+//				if(!(xc-0x61<0x1B))
+//					xc=0L;
+
+/*					if(((Message[1] >> 24)-0x41)<0x1B)
+//						xc=(Message[1] >> 24)+0x20;
+//					if(((Message[1] >> 24)-0x61)<0x1B)
+*/
+/*				if(xc)
 				{
-					if(((Message[1] >> 24)-0x41)<0x1B)
-						xc=(Message[1] >> 24)+0x20;
-					if(((Message[1] >> 24)-0x61)<0x1B)
-						xc=(Message[1] >> 24);
-				}
-				if(xc)
 					Syllable = GetLCSTATEbyValue(Vector,LCSTATE_Syllable,LanguageContext->IUtility);
-KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_ANSI:%lx:%lx]\n",xc,Syllable);
-				switch(Syllable)
-				{
-					case 0x00000000: // No Syllable
-						switch(xc)
-						{
-							case 0x00000061: // A
-							case 0x00000069: // I
-							case 0x00000075: // U
-							case 0x00000065: // E
-							case 0x0000006F: // O
+					switch(Syllable)
+					{
+						case 0x00000000:
+							switch(xc)
+							{
+								case 0x00000061: // A
+								case 0x00000069: // I
+								case 0x00000075: // U
+								case 0x00000065: // E
+								case 0x0000006F: // O
+									Kana = FindSyllableCandidate(Syllable,LanguageContext->IUtility);
+							        break;
+								default:
+									Syllable = (Syllable << 8)+(0x7F & xc);
+									break;
+							}
+							break;
+						case 0x0000006E:
+							switch(xc)
+							{
+								case 0x00000061: // A
+								case 0x00000069: // I
+								case 0x00000075: // U
+								case 0x00000065: // E
+								case 0x0000006F: // O
+									Syllable = (Syllable << 8)+(0x7F & xc);
+									Kana = FindSyllableCandidate(Syllable,LanguageContext->IUtility);
+									break;
+								case 0x00000079: // Y
+									Syllable = (Syllable << 8)+(0x7F & xc);
+									break;
+								default:
+									Kana = 0x00003093;
+									Syllable = (0x7F && xc);
+									break;
+							}
+							break;
+						default:
+							if(Syllable==xc)
+							{
+								Kana = 0x00003063;
+							}else{
+								Syllable = (Syllable << 8)+(0x7F & xc);
 								Kana = FindSyllableCandidate(Syllable,LanguageContext->IUtility);
-                                break;
-							default:
-								Syllable = (Syllable << 8)+(0x7F & xc);
-								break;
-						}
-						break;
-					case 0x0000006E: // 'N' Singular Usage exception
-						switch(xc)
-						{
-							case 0x00000061: // A
-							case 0x00000069: // I
-							case 0x00000075: // U
-							case 0x00000065: // E
-							case 0x0000006F: // O
-								Syllable = (Syllable << 8)+(0x7F & xc);
-								Kana = FindSyllableCandidate(Syllable,LanguageContext->IUtility);
-								break;
-							case 0x00000079: // Y
-								Syllable = (Syllable << 8)+(0x7F & xc);
-								break;
-							default:
-								Kana = 0x00003093;
-								Syllable = (0x7F && xc);
-								break;
-						}
-						break;
-					default:
-						if(Syllable==xc)
-						{
-							Kana = 0x00003063;
-						}else{
-							Syllable = (Syllable << 8)+(0x7F & xc);
-							Kana = FindSyllableCandidate(Syllable,LanguageContext->IUtility);
-						};
-						break;
+							};
+							break;
+					}
+	KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_ANSI:%lx:%lx]\n",Syllable,xc);
+					SetLCSTATEbyValue(Vector,LCSTATE_Syllable,LanguageContext->IUtility,Syllable);
 				}
-				SetLCSTATEbyValue(Vector,LCSTATE_Syllable,LanguageContext->IUtility,Syllable);
-KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_ANSI:%lx:%lx:%lx]\n",xc,Syllable, Kana);
-//
-//				INSERT Additional Translation Steps here
-//
+
 				break;
 			default:
 				break;
