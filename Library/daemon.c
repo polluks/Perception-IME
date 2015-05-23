@@ -520,25 +520,22 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 				pInputItem=(APTR)dapp->InputState[ICSTATE_FIFO_PVW];
 				if(pInputItem==NULL)
 					pInputItem=dapp->InputVector;
+				if(Self->IKeymap->MapRawKey((APTR)cInputEvent,(APTR)&bMapKey,l,NULL))
+				{
+					pInputItem->type=TRANSLATE_ANSI;
+				}else{
+					pInputItem->type=TRANSLATE_AMIGA;
+				};
+				pInputItem->glyph=bMapKey;
+				pInputItem->qual=cInputEvent->ie_Qualifier;
 			    if(dapp->CommodityFlags && PERCEPTION_STATE_ACTIVE)
 				{
-					if(Self->IKeymap->MapRawKey((APTR)cInputEvent,(APTR)&bMapKey,l,NULL))
-					{
-						pInputItem->type=TRANSLATE_ANSI;
-					}else{
-						pInputItem->type=TRANSLATE_AMIGA;
-					};
-					pInputItem->glyph=bMapKey;
-					pInputItem->qual=cInputEvent->ie_Qualifier;
 					if(bInputItem<IME_VECTOR_SIZE)
 					{
 						bInputItem++;pInputItem++;
 					}else{
-						bInputItem=0L;pInputItem=NULL;
+						bInputItem=0L;pInputItem=dapp->InputVector;
 					};
-					pInputItem->type=0;
-					pInputItem->qual=0;
-					pInputItem->glyph=0L;
 					dapp->InputState[ICSTATE_FIFO_IVW]=bInputItem;
 					dapp->InputState[ICSTATE_FIFO_PVW]=(ULONG)pInputItem;
 				};
@@ -607,7 +604,7 @@ void  ExecLanguagePluginEntry(struct DaemonApplication *dapp)
 		{
 			bInputItem++;pInputItem++;
 		}else{
-			bInputItem=0L;pInputItem=NULL;
+			bInputItem=0L;pInputItem=dapp->InputVector;
 		};
 		dapp->InputState[ICSTATE_FIFO_IVR]=bInputItem;
 		dapp->InputState[ICSTATE_FIFO_PVR]=(ULONG)pInputItem;

@@ -202,24 +202,22 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 		switch(Message[0])
 		{
             case TRANSLATE_AMIGA:
-KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_AMIGA:%lx:%lx:%lx]\n",
-	Message[1],Message[2],Message[3]);
+//KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_AMIGA:%lx:%lx:%lx]\n",
+//	Message[1],Message[2],Message[3]);
 				break;
             case TRANSLATE_ANSI:
 //KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_ANSI:%lx:%lx:%lx]\n",
 //	Message[1],Message[2],Message[3]);
-//
-//	ANSI Translation of Romaji to Hiragana
-//
-				Syllable = GetLCSTATEbyValue(Vector,LCSTATE_Syllable,LanguageContext->IUtility);
-			    if((Message[1] & 0xFF000000) == Message[1])
-    			{
-					if(((Message[1] >> 24)-0x00000061)<0x0000001B)
-						xc = TAG_USER | (Message[1] >> 24);
-					if(((Message[1] >> 24)-0x00000041)<0x0000001B)
-						xc = TAG_USER | ((Message[1] >> 24)+0x20);
+				if(Message[1] == (Message[1] & 0x7F000000))
+				{
+					if(((Message[1] >> 24)-0x41)<0x1B)
+						xc=(Message[1] >> 24)+0x20;
+					if(((Message[1] >> 24)-0x61)<0x1B)
+						xc=(Message[1] >> 24);
 				}
-	KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_ANSI:%lx:%lx]\n",xc,Syllable);
+				if(xc)
+					Syllable = GetLCSTATEbyValue(Vector,LCSTATE_Syllable,LanguageContext->IUtility);
+KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_ANSI:%lx:%lx]\n",xc,Syllable);
 				switch(Syllable)
 				{
 					case 0x00000000: // No Syllable
@@ -268,7 +266,7 @@ KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_AMIGA:%lx:%lx:%
 						break;
 				}
 				SetLCSTATEbyValue(Vector,LCSTATE_Syllable,LanguageContext->IUtility,Syllable);
-				KDEBUG("Japanese.Language::[%lx:%lx:%lx]\n", Syllable, Message[1], Kana);
+KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_ANSI:%lx:%lx:%lx]\n",xc,Syllable, Kana);
 //
 //				INSERT Additional Translation Steps here
 //
