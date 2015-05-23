@@ -202,24 +202,16 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 		switch(Message[0])
 		{
             case TRANSLATE_AMIGA:
-//KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_AMIGA:%lx:%lx:%lx]\n",
-//	Message[1],Message[2],Message[3]);
 				break;
             case TRANSLATE_ANSI:
-//KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_ANSI:%lx:%lx:%lx]\n",
-//	Message[1],Message[2],Message[3]);
 				if(Message[1] == (Message[1] & 0x7F000000))
-					xc=(Message[1] >> 24);
-				if(xc-0x41<0x1B)
-					xc+=20;
-//				if(!(xc-0x61<0x1B))
-//					xc=0L;
-
-/*					if(((Message[1] >> 24)-0x41)<0x1B)
-//						xc=(Message[1] >> 24)+0x20;
-//					if(((Message[1] >> 24)-0x61)<0x1B)
-*/
-/*				if(xc)
+				{
+					if(((Message[1] >> 24)-0x41)<0x1B)
+						xc=(Message[1] >> 24)+0x20;
+					if(((Message[1] >> 24)-0x61)<0x1B)
+						xc=(Message[1] >> 24);
+				}
+				if(xc)
 				{
 					Syllable = GetLCSTATEbyValue(Vector,LCSTATE_Syllable,LanguageContext->IUtility);
 					switch(Syllable)
@@ -269,10 +261,12 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 							};
 							break;
 					}
-	KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_ANSI:%lx:%lx]\n",Syllable,xc);
 					SetLCSTATEbyValue(Vector,LCSTATE_Syllable,LanguageContext->IUtility,Syllable);
 				}
-
+	KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_ANSI:%lx:%lx]\n",Syllable,xc);
+//
+//  Now... Modality options happen here... Katakana and 2nd-layer-Kanji-by-reading lookups
+//
 				break;
 			default:
 				break;
