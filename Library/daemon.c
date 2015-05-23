@@ -45,6 +45,7 @@ struct	DaemonApplication
 	struct  SignalSemaphore		InputLock;
 	ULONG                       InputState[IME_STATE_SIZE];
 	struct InputTagItem			InputVector[IME_VECTOR_SIZE];
+	struct InputTagItem			Reservation;
 };
 
 void  InitCommodity(struct DaemonApplication *Self,LONG active);
@@ -536,6 +537,9 @@ APTR  ExecInputHandler(APTR stream,APTR data)
 					}else{
 						bInputItem=0L;pInputItem=dapp->InputVector;
 					};
+					pInputItem->type=0;
+					pInputItem->qual=0;
+					pInputItem->glyph=0;
 					dapp->InputState[ICSTATE_FIFO_IVW]=bInputItem;
 					dapp->InputState[ICSTATE_FIFO_PVW]=(ULONG)pInputItem;
 				};
