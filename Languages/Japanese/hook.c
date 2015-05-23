@@ -206,8 +206,8 @@ KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_AMIGA:%lx:%lx:%
 	Message[1],Message[2],Message[3]);
 				break;
             case TRANSLATE_ANSI:
-KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_ANSI:%lx:%lx:%lx]\n",
-	Message[1],Message[2],Message[3]);
+//KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_ANSI:%lx:%lx:%lx]\n",
+//	Message[1],Message[2],Message[3]);
 //
 //	ANSI Translation of Romaji to Hiragana
 //
@@ -219,6 +219,7 @@ KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_ANSI:%lx:%lx:%l
 					if(((Message[1] >> 24)-0x00000041)<0x0000001B)
 						xc = TAG_USER | ((Message[1] >> 24)+0x20);
 				}
+	KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_ANSI:%lx:%lx]\n",xc,Syllable);
 				switch(Syllable)
 				{
 					case 0x00000000: // No Syllable
