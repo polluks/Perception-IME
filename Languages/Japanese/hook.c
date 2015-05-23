@@ -267,7 +267,7 @@ KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_ANSI:%lx:%lx:%l
 						break;
 				}
 				SetLCSTATEbyValue(Vector,LCSTATE_Syllable,LanguageContext->IUtility,Syllable);
-				KDEBUG("Japanese.Language::[%lx:%lx:%lx]", Syllable, Message[1], Kana);
+				KDEBUG("Japanese.Language::[%lx:%lx:%lx]\n", Syllable, Message[1], Kana);
 //
 //				INSERT Additional Translation Steps here
 //
