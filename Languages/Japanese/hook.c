@@ -36,114 +36,114 @@ UpdateVocabCandidacy(Vector,LanguageContext,lch);
 */
 STATIC CONST struct TagItem SyllableCandidates[] =
 {
-	{0X00000000,0x00000000},{0X0000003D,0x000030A0},		    				/* NULL, EQUALS */
-	{0X00000061,0x00003042},                            						/* A			*/
-	{0X00000069,0x00003044},                            						/* I			*/
-	{0X00000075,0x00003046},                            						/* U			*/
-	{0X00000065,0x00003048},                            						/* E	 		*/
-	{0X0000006F,0x0000304A},                            						/* O			*/
-	{0X00006B61,0x0000304B},{0X00006761,0x0000304C},    						/* KA/GA		*/
-	{0X00006B69,0x0000304D},{0X00006769,0x0000304E},    						/* KI/GI		*/
-	{0X00006B75,0x0000304F},{0X00006775,0x00003050},    						/* KU/GU		*/
-	{0X00006B65,0x00003051},{0X00006765,0x00003052},    						/* KE/GE		*/
-	{0X00006B6F,0x00003053},{0X0000676F,0x00003054},    						/* KO/GO		*/
-    {0X00007361,0x00003055},{0X00007A61,0x00003056},							/* SA/ZA		*/
-	{0X00736869,0x00003057},{0X00006A69,0x00003058},							/* SHI/JI		*/
-	{0X00007369,0x00003057},{0X00007A69,0x00003058},							/* SI/ZI		*/
-	{0X00007375,0x00003059},{0X00007A75,0x0000305A},							/* SU/ZU		*/
-	{0X00007365,0x0000305B},{0X00007A65,0x0000305C},            				/* SE/ZE		*/
-	{0X0000736F,0x0000305D},{0X00007A6F,0x0000305E},							/* SO/ZO		*/
-	{0X00007461,0x0000305F},{0X00006461,0x00003060},							/* TA/DA		*/
-	{0X00636869,0x00003061},{0X00006469,0x00003062},							/* CHI/DI		*/
-	{0X00006369,0x00003061},{0X00007469,0x00003061},							/* CI/TI		*/
-	{0X00747375,0x00003064},{0X00647A75,0x00003065},							/* TSU/DZU		*/
-	{0X00007475,0x00003064},{0X00006475,0x00003065},							/* TU/DU		*/
-	{0X00007465,0x00003066},{0X00006465,0x00003067},							/* TE/DE		*/
-	{0X0000746F,0x00003068},{0X0000646F,0x00003069},							/* TO/DO		*/
-	{0X00006E61,0x0000306A},													/* NA			*/
-	{0X00006E69,0x0000306B},													/* NI			*/
-	{0X00006E75,0x0000306C},													/* NU			*/
-	{0X00006E65,0x0000306D},													/* NE			*/
-	{0X00006E6F,0x0000306E},													/* NO			*/
-	{0X00006861,0x0000306F},{0X00006261,0x00003070},{0X00007061,0x00003071},	/* HA/BA/PA		*/
-	{0X00006869,0x00003072},{0X00006269,0x00003073},{0X00007069,0x00003074},	/* HI/BI/PI		*/
-	{0X00006675,0x00003075},													/* FU			*/
-	{0X00006875,0x00003075},{0X00006275,0x00003076},{0X00007075,0x00003077},	/* HU/BU/PU		*/
-	{0X00006865,0x00003078},{0X00006265,0x00003079},{0X00007065,0x0000307A},	/* HE/BE/PE		*/
-	{0X0000686F,0x0000307B},{0X0000626F,0x0000307C},{0X0000706F,0x0000307D},	/* HO/BO/PO		*/
-	{0X00006D61,0x0000307E},													/* MA			*/
-	{0X00006D69,0x0000307F},													/* MI			*/
-	{0X00006D75,0x00003080},													/* MU			*/
-	{0X00006D65,0x00003081},													/* ME			*/
-	{0X00006D6F,0x00003082},													/* MO			*/
-	{0X00007961,0x00003084},													/* YA			*/
-	{0X00007975,0x00003086},													/* YU			*/
-	{0X0000796F,0x00003088},													/* YO			*/
-	{0X00007261,0x00003089},													/* RA			*/
-	{0X00007269,0x0000308A},													/* RI			*/
-	{0X00007275,0x0000308B},													/* RU			*/
-	{0X00007265,0x0000308C},													/* RE			*/
-	{0X0000726F,0x0000308D},													/* RO			*/
-	{0X00007761,0x0000308F},													/* WA			*/
-	{0X00007769,0x00003090},													/* WI			*/
-	{0X00007765,0x00003091},													/* WE			*/
-	{0X0000776F,0x00003092},													/* WO			*/
-	{0X00006E6E,0x00003093},													/* N			*/
-	{0X00007675,0x00003094},													/* VU			*/
-	{0X00007661,0x000030F7},													/* VA			*/
-	{0X00007669,0x000030F8},													/* VI			*/
-	{0X00007665,0x000030F9},													/* VE			*/
-	{0X0000766F,0x000030FA},													/* RO			*/
+	{0X80000000,0x00000000},{0X8000003D,0x000030A0},		    				/* NULL, EQUALS */
+	{0X80000061,0x00003042},                            						/* A			*/
+	{0X80000069,0x00003044},                            						/* I			*/
+	{0X80000075,0x00003046},                            						/* U			*/
+	{0X80000065,0x00003048},                            						/* E	 		*/
+	{0X8000006F,0x0000304A},                            						/* O			*/
+	{0X80006B61,0x0000304B},{0X80006761,0x0000304C},    						/* KA/GA		*/
+	{0X80006B69,0x0000304D},{0X80006769,0x0000304E},    						/* KI/GI		*/
+	{0X80006B75,0x0000304F},{0X80006775,0x00003050},    						/* KU/GU		*/
+	{0X80006B65,0x00003051},{0X80006765,0x00003052},    						/* KE/GE		*/
+	{0X80006B6F,0x00003053},{0X8000676F,0x00003054},    						/* KO/GO		*/
+    {0X00007361,0x00003055},{0X80007A61,0x00003056},							/* SA/ZA		*/
+	{0X80736869,0x00003057},{0X80006A69,0x00003058},							/* SHI/JI		*/
+	{0X80007369,0x00003057},{0X80007A69,0x00003058},							/* SI/ZI		*/
+	{0X80007375,0x00003059},{0X80007A75,0x0000305A},							/* SU/ZU		*/
+	{0X80007365,0x0000305B},{0X80007A65,0x0000305C},            				/* SE/ZE		*/
+	{0X8000736F,0x0000305D},{0X80007A6F,0x0000305E},							/* SO/ZO		*/
+	{0X80007461,0x0000305F},{0X80006461,0x00003060},							/* TA/DA		*/
+	{0X80636869,0x00003061},{0X80006469,0x00003062},							/* CHI/DI		*/
+	{0X80006369,0x00003061},{0X80007469,0x00003061},							/* CI/TI		*/
+	{0X80747375,0x00003064},{0X80647A75,0x00003065},							/* TSU/DZU		*/
+	{0X80007475,0x00003064},{0X80006475,0x00003065},							/* TU/DU		*/
+	{0X80007465,0x00003066},{0X80006465,0x00003067},							/* TE/DE		*/
+	{0X8000746F,0x00003068},{0X8000646F,0x00003069},							/* TO/DO		*/
+	{0X80006E61,0x0000306A},													/* NA			*/
+	{0X80006E69,0x0000306B},													/* NI			*/
+	{0X80006E75,0x0000306C},													/* NU			*/
+	{0X80006E65,0x0000306D},													/* NE			*/
+	{0X80006E6F,0x0000306E},													/* NO			*/
+	{0X80006861,0x0000306F},{0X80006261,0x00003070},{0X80007061,0x00003071},	/* HA/BA/PA		*/
+	{0X80006869,0x00003072},{0X80006269,0x00003073},{0X80007069,0x00003074},	/* HI/BI/PI		*/
+	{0X80006675,0x00003075},													/* FU			*/
+	{0X80006875,0x00003075},{0X80006275,0x00003076},{0X80007075,0x00003077},	/* HU/BU/PU		*/
+	{0X80006865,0x00003078},{0X80006265,0x00003079},{0X80007065,0x0000307A},	/* HE/BE/PE		*/
+	{0X8000686F,0x0000307B},{0X8000626F,0x0000307C},{0X8000706F,0x0000307D},	/* HO/BO/PO		*/
+	{0X80006D61,0x0000307E},													/* MA			*/
+	{0X80006D69,0x0000307F},													/* MI			*/
+	{0X80006D75,0x00003080},													/* MU			*/
+	{0X80006D65,0x00003081},													/* ME			*/
+	{0X80006D6F,0x00003082},													/* MO			*/
+	{0X80007961,0x00003084},													/* YA			*/
+	{0X80007975,0x00003086},													/* YU			*/
+	{0X8000796F,0x00003088},													/* YO			*/
+	{0X80007261,0x00003089},													/* RA			*/
+	{0X80007269,0x0000308A},													/* RI			*/
+	{0X80007275,0x0000308B},													/* RU			*/
+	{0X80007265,0x0000308C},													/* RE			*/
+	{0X8000726F,0x0000308D},													/* RO			*/
+	{0X80007761,0x0000308F},													/* WA			*/
+	{0X80007769,0x00003090},													/* WI			*/
+	{0X80007765,0x00003091},													/* WE			*/
+	{0X8000776F,0x00003092},													/* WO			*/
+	{0X80006E6E,0x00003093},													/* N			*/
+	{0X80007675,0x00003094},													/* VU			*/
+	{0X80007661,0x000030F7},													/* VA			*/
+	{0X80007669,0x000030F8},													/* VI			*/
+	{0X80007665,0x000030F9},													/* VE			*/
+	{0X8000766F,0x000030FA},													/* RO			*/
 /*
 		Syllable Chords follow
 */
-	{0X006B7961,0x304D3083},{0X00677961,0x304E3083},    						/* KYA/GYA		*/
-	{0X006B7975,0x304D3085},{0X00677975,0x304E3085},    						/* KYU/GYU		*/
-	{0X006B796F,0x304D3087},{0X0067796F,0x304E3087},    						/* KYO/GYO		*/
-	{0X00736861,0x30573083},{0X00006A61,0x30583083},{0X00647961,0x30583083},	/* SHA/JA/DYA	*/
-	{0X00737961,0x30573083},{0X006A7961,0x30583083},							/* SYA/JYA		*/
-	{0X00736875,0x30573085},{0X00006A75,0x30583085},{0X00647975,0x30583085},	/* SHU/JU/DYU	*/
-	{0X00737975,0x30573085},{0X006A7975,0x30583085},							/* SYU/JYU		*/
-	{0X00006A65,0x30583047},													/* JE			*/
-	{0X0073686F,0x30573087},{0X00006A6F,0x30583087},{0X0064796F,0x30583087},	/* SHO/JO/DYO	*/
-    {0X0073796F,0x30573087},{0X006A796F,0x30583087},							/* SYO/JYO		*/
-	{0X00636861,0x30613083},{0X00637961,0x30613083},							/* CHA/CYA		*/
-	{0X00636875,0x30613085},{0X00637975,0x30613085},							/* CHU/CYU		*/
-	{0X0063686F,0x30613087},{0X0063796F,0x30613087},							/* CHO/CYO		*/
-	{0X006E7961,0x306B3083},													/* NYA			*/
-	{0X006E7975,0x306B3085},													/* NYU			*/
-	{0X006E796F,0x306B3087},													/* NYO			*/
-	{0X00687961,0x30723083},{0X00627961,0x30733083},{0X00707961,0x30743083},	/* HYA/BYA/PYA	*/
-	{0X00687975,0x30723085},{0X00627975,0x30733085},{0X00707975,0x30743085},	/* HYU/BYU/PYU	*/
-	{0X0068796F,0x30723087},{0X0062796F,0x30733087},{0X0070796F,0x30743087},	/* HYO/BYO/PYO	*/
-	{0X006D7961,0x307F3083},													/* MYA			*/
-	{0X006D7975,0x307F3085},													/* MYU			*/
-	{0X006D796F,0x307F3087},													/* MYO			*/
-	{0X00727961,0x308A3083},													/* RYA			*/
-	{0X00727975,0x308A3085},													/* RYU			*/
-	{0X0072796F,0x308A3087},													/* RYO			*/
+	{0X806B7961,0x304D3083},{0X80677961,0x304E3083},    						/* KYA/GYA		*/
+	{0X806B7975,0x304D3085},{0X80677975,0x304E3085},    						/* KYU/GYU		*/
+	{0X806B796F,0x304D3087},{0X8067796F,0x304E3087},    						/* KYO/GYO		*/
+	{0X80736861,0x30573083},{0X80006A61,0x30583083},{0X80647961,0x30583083},	/* SHA/JA/DYA	*/
+	{0X80737961,0x30573083},{0X806A7961,0x30583083},							/* SYA/JYA		*/
+	{0X80736875,0x30573085},{0X80006A75,0x30583085},{0X80647975,0x30583085},	/* SHU/JU/DYU	*/
+	{0X80737975,0x30573085},{0X806A7975,0x30583085},							/* SYU/JYU		*/
+	{0X80006A65,0x30583047},													/* JE			*/
+	{0X8073686F,0x30573087},{0X80006A6F,0x30583087},{0X8064796F,0x30583087},	/* SHO/JO/DYO	*/
+    {0X0073796F,0x30573087},{0X806A796F,0x30583087},							/* SYO/JYO		*/
+	{0X80636861,0x30613083},{0X80637961,0x30613083},							/* CHA/CYA		*/
+	{0X80636875,0x30613085},{0X80637975,0x30613085},							/* CHU/CYU		*/
+	{0X8063686F,0x30613087},{0X8063796F,0x30613087},							/* CHO/CYO		*/
+	{0X806E7961,0x306B3083},													/* NYA			*/
+	{0X806E7975,0x306B3085},													/* NYU			*/
+	{0X806E796F,0x306B3087},													/* NYO			*/
+	{0X80687961,0x30723083},{0X80627961,0x30733083},{0X80707961,0x30743083},	/* HYA/BYA/PYA	*/
+	{0X80687975,0x30723085},{0X80627975,0x30733085},{0X80707975,0x30743085},	/* HYU/BYU/PYU	*/
+	{0X8068796F,0x30723087},{0X8062796F,0x30733087},{0X8070796F,0x30743087},	/* HYO/BYO/PYO	*/
+	{0X806D7961,0x307F3083},													/* MYA			*/
+	{0X806D7975,0x307F3085},													/* MYU			*/
+	{0X806D796F,0x307F3087},													/* MYO			*/
+	{0X80727961,0x308A3083},													/* RYA			*/
+	{0X80727975,0x308A3085},													/* RYU			*/
+	{0X8072796F,0x308A3087},													/* RYO			*/
 	{TAG_END,	TAG_END}
 };
 
 STATIC CONST struct TagItem SyllableMiniCandidates[] =
 {
 	/* mini a i u e o */
-	{0X00000041,0x00003041},
-	{0X00000049,0x00003043},
-	{0X00000055,0x00003045},
-	{0X00000045,0x00003047},
-	{0X0000004F,0x00003049},
+	{0X80000041,0x00003041},
+	{0X80000049,0x00003043},
+	{0X80000055,0x00003045},
+	{0X80000045,0x00003047},
+	{0X8000004F,0x00003049},
 	/* mini tsu */
-	{0X00545355,0x00003063},
+	{0X80545355,0x00003063},
 	/* mini ya yu yo */
-	{0X00005941,0x00003083},
-	{0X00007955,0x00003085},
-	{0X0000594F,0x00003087},
+	{0X80005941,0x00003083},
+	{0X80007955,0x00003085},
+	{0X8000594F,0x00003087},
 	/* mini wa */
-	{0X00005741,0x0000308E},
+	{0X80005741,0x0000308E},
 	/* mini ka ke */
-	{0X0000B441,0x00003095},
-	{0X0000B445,0x00003096},
+	{0X8000B441,0x00003095},
+	{0X8000B445,0x00003096},
 	{TAG_END,	TAG_END}
 };
 
@@ -192,16 +192,17 @@ void ExitPerceptionHook(struct LIBRARY_CLASS *Self)
 */
 ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,ULONG *Message)
 {
-	ULONG rc=0L, xc=0L, Syllable=0L, Kana=0L;
+	ULONG rc=0L, xc=0L, Syllable=0L, Kana=0L, mode=0L;
 	struct TagItem *Vector=NULL;
 
 	if(LanguageContext)
-		Vector=(APTR)LanguageContext->IPerception->GetLanguageContextAttr((APTR)LanguageContext,(ULONG)LCSTATE_VECTOR);
+		Vector=(APTR)LanguageContext->IPerception->GetLanguageContextAttr((APTR)LanguageContext,(LONG)LCSTATE_VECTOR);
 	if(Message)
 	{
 		switch(Message[0])
 		{
             case TRANSLATE_AMIGA:
+				KDEBUG("Perception-IME::Japanese.Language::[TRANSLATE_AMIGA:%lx:%lx]\n",Message[1],Message[2]);
 				break;
             case TRANSLATE_ANSI:
 				if(Message[1] == (Message[1] & 0x7F000000))
@@ -261,12 +262,21 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 							};
 							break;
 					}
-					SetLCSTATEbyValue(Vector,LCSTATE_Syllable,LanguageContext->IUtility,Syllable);
+					if(Kana)
+					{
+						SetLCSTATEbyValue(Vector,LCSTATE_Syllable,LanguageContext->IUtility,0L);
+					}else{
+						SetLCSTATEbyValue(Vector,LCSTATE_Syllable,LanguageContext->IUtility,Syllable);
+					};
 				}
-	KDEBUG("Japanese.Language::ExecLanguageHook()[LANGUAGE_TRANSLATE_ANSI:%lx:%lx]\n",Syllable,xc);
-//
-//  Now... Modality options happen here... Katakana and 2nd-layer-Kanji-by-reading lookups
-//
+				//
+                switch(mode)
+				{
+//					case LANG_MODE_KATAKANA:			//	Mode[2]
+//					case LANG_MODE_HIRAGANA_KANJI:		//	Mode[1]
+					default:							//  Mode[0]
+						break;
+				}
 				break;
 			default:
 				break;
@@ -302,20 +312,21 @@ void  SetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility,ULON
 	return;
 };
 
-ULONG FindSyllableCandidate(ULONG Key,struct UtilityIFace *IUtility)
+/**/
+ULONG FindSyllableCandidate(ULONG Key, struct UtilityIFace *IUtility)
 {
-	ULONG rc = 0L;
-	struct TagItem *Candidate = NULL;
+	ULONG rc=0L;
+	struct TagItem *item=NULL;
 
-	if(Key)
-		Candidate=IUtility->FindTagItem(TAG_USER|(Key & 0x7FFFFFFF),SyllableCandidates);
-	if(Candidate)
-		rc=Candidate->ti_Data;
+	KDEBUG("::FindSyllableCandidate(Key=%lx)\n",Key);
 
-	KDEBUG("Japanese.Language::[%lx]=FindSyllableCandidate()[K=%lx]", rc, Key);
+	if(IUtility)
+		item=IUtility->FindTagItem(TAG_USER|Key,SyllableCandidates);
+	if(item)
+		rc=item->ti_Data;
 
 	return(rc);
-};
+}
 
 /*
 //	Unofficial Mappings used with Developer Restricted Keymap.Library.Kmod
