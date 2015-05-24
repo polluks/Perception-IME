@@ -30,9 +30,9 @@ struct InputTagItem
 
 	This structure is for record-keeping within each Language plugin.
 */
-#define     IME_STATE_SIZE		96L		/* Size is Arbitrary and subject to change				*/
-#define		IME_MESSAGE_SIZE	8L		/* Size is Arbitrary and subject to change				*/
+#define     IME_STATE_SIZE		128L	/* Size is Arbitrary and subject to change				*/
 #define     IME_VECTOR_SIZE     512L	/* Size is NOT-Arbitrary and still subject to change!	*/
+#define		IME_MESSAGE_SIZE	8L		/* Size is Arbitrary and subject to change				*/
 
 struct LanguageContext
 {
