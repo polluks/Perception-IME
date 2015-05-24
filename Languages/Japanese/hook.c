@@ -21,8 +21,8 @@ STATIC CONST BYTE LanguageName[] = LIBRARY_NAME;
 #define CODEPOINT_KATAKANA_KEY		0x30A0
 #define	CODEPOINT_KANATOGGLE_MASK	0x00E0	// Reversible Hiragana<->Katakana Transform Key
 
-ULONG GetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility);
-void  SetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility,ULONG data);
+ULONG GetLCSTATEvalue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility);
+void  SetLCSTATEvalue(APTR Vector,ULONG Key,ULONG data,struct UtilityIFace *IUtility);
 ULONG FindSyllableCandidate(ULONG Key,struct UtilityIFace *IUtility);
 
 /*
@@ -214,7 +214,7 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 				}
 				if(xc)
 				{
-					Syllable = GetLCSTATEbyValue(Vector,LCSTATE_Syllable,LanguageContext->IUtility);
+					Syllable = GetLCSTATEvalue(Vector,LCSTATE_Syllable,LanguageContext->IUtility);
 					switch(Syllable)
 					{
 						case 0x00000000:
@@ -225,7 +225,7 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 								case 0x00000075: // U
 								case 0x00000065: // E
 								case 0x0000006F: // O
-									Kana = FindSyllableCandidate(Syllable,LanguageContext->IUtility);
+									Kana = FindSyllableCandidate(xc,LanguageContext->IUtility);
 							        break;
 								default:
 									Syllable = (Syllable << 8)+(0x7F & xc);
@@ -263,11 +263,8 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 							break;
 					}
 					if(Kana)
-					{
-						SetLCSTATEbyValue(Vector,LCSTATE_Syllable,LanguageContext->IUtility,0L);
-					}else{
-						SetLCSTATEbyValue(Vector,LCSTATE_Syllable,LanguageContext->IUtility,Syllable);
-					};
+						Syllable=0L;
+					SetLCSTATEvalue(Vector,LCSTATE_Syllable,LanguageContext->IUtility,Syllable);
 				}
 				//
                 switch(mode)
@@ -287,7 +284,7 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 }
 
 /**/
-ULONG GetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility)
+ULONG GetLCSTATEvalue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility)
 {
 	ULONG rc=0L;
 	struct TagItem *Item = NULL;
@@ -300,7 +297,7 @@ ULONG GetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility)
 	return(rc);
 };
 
-void  SetLCSTATEbyValue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility,ULONG data)
+void  SetLCSTATEvalue(APTR Vector,ULONG Key,ULONG data,struct UtilityIFace *IUtility)
 {
 	struct TagItem *Item = NULL;
 
