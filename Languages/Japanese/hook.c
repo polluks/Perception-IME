@@ -171,7 +171,6 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 					KDEBUG("Perception-IME//Japanese.Language::Enter\n");
 					KDEBUG("Perception-IME//Japanese.Language::Return\n");
 					KDEBUG("Perception-IME//Japanese.Language::Delete\n");
-*/
 //  Anything Unhandled as an AMIGA key translation					default:
 						break;
 				}
