@@ -147,10 +147,10 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 		switch(Message[0])
 		{
             case TRANSLATE_AMIGA:
+//				KDEBUG("Perception-IME::Japanese.Language::[TRANSLATE_AMIGA:%lx:%lx]\n",Message[1],Message[2]);
 				xc=Message[1];
-				switch(xc)
+/*				switch(xc)
 				{
-/*
 //	Unofficial Mappings used with Developer Restricted Keymap.Library.Kmod
 					case	0x00:	//	Change the Constant here for this Key when officially mapped
 					case	0x78:	//	Change the Constant here for this Key when officially mapped
@@ -175,20 +175,21 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 //  Anything Unhandled as an AMIGA key translation					default:
 						break;
 				}
-//				KDEBUG("Perception-IME::Japanese.Language::[TRANSLATE_AMIGA:%lx:%lx]\n",Message[1],Message[2]);
+*/				LanguageContext->IPerception->SetLanguageContextAttr(
+					(APTR)LanguageContext,
+					(ULONG)LCSTATE_Syllable,
+					(ULONG)Syllable);
 				break;
             case TRANSLATE_ANSI:
 				Mode=LanguageContext->IPerception->GetLanguageContextAttr(
 					(APTR)LanguageContext,
 					(ULONG)LCSTATE_LMODE);
-				if(Message[1] == (Message[1] & 0x7F000000))
-				{
-					if(((Message[1] >> 24)-0x41)<0x1B)
-						xc=(Message[1] >> 24)+0x20;
-					if(((Message[1] >> 24)-0x61)<0x1B)
-						xc=(Message[1] >> 24);
-				}
-				KDEBUG("##Japanese.Language::LanguageHook(ANSI/%lx/%lx)##\n",Message[1],Message[2]);
+				xc=((Message[1] >> 24) & 0x7F000000)
+				if((xc-0x61)<0x1B)
+					xc=((Message[1] >> 24) & 0x7F000000);
+				if((xc-0x41)<0x1B)
+					xc=((Message[1] >> 24) & 0x7F000000)+0x20;
+				KDEBUG("#1#Japanese.Language::LanguageHook(ANSI/%lx/%lx)\n",Message[1],Message[2]);
 				if(xc)
 				{
 					Syllable=LanguageContext->IPerception->GetLanguageContextAttr(
@@ -227,7 +228,7 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 									break;
 								default:
 									Kana = 0x00003093;
-									Syllable = (0x7F && xc);
+									Syllable = (0x0000007F && xc);
 									break;
 							}
 							break;
@@ -241,14 +242,12 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 							};
 							break;
 					}
-					if(Kana)
-						Syllable=0L;
-					LanguageContext->IPerception->SetLanguageContextAttr(
-						(APTR)LanguageContext,
-						(ULONG)LCSTATE_Syllable,
-						(ULONG)Syllable);
 				KDEBUG("LOCALE:/Japanese.Language::LanguageHook()[ANSI/%lx/%lx/%lx]\n",Syllable,xc,Kana);
 				}
+				LanguageContext->IPerception->SetLanguageContextAttr(
+					(APTR)LanguageContext,
+					(ULONG)LCSTATE_Syllable,
+					(ULONG)Syllable);
 				break;
 			default:
 				break;
