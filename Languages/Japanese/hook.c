@@ -7,31 +7,12 @@
 
 STATIC CONST BYTE LanguageName[] = LIBRARY_NAME;
 
-#define	LCSTATE_Syllable		(LCSTATE_EXPANDED)
-#define	LCSTATE_IDEOGRAPH_IDX	(LCSTATE_EXPANDED+1)
-#define	LCSTATE_IDEOGRAPH_BUFF	(LCSTATE_EXPANDED+2)
-#define	IDEOGRAPH_CNT			(32)
-#define	LCSTATE_IDEOGRAPH_MAX	(LCSTATE_IDEOGRAPH_BUFF+IDEOGRAPH_CNT)
-
-#define LC_MODE_ROMAJI_DIRECT	(2)
-#define LC_MODE_KANA_KANJI		(0)
-#define LC_MODE_KATAKANA_ONLY	(1)
-
 #define CODEPOINT_HIRAGANA_KEY		0x3040
 #define CODEPOINT_KATAKANA_KEY		0x30A0
 #define	CODEPOINT_KANATOGGLE_MASK	0x00E0	// Reversible Hiragana<->Katakana Transform Key
 
-ULONG GetLCSTATEvalue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility);
-void  SetLCSTATEvalue(APTR Vector,ULONG Key,ULONG data,struct UtilityIFace *IUtility);
-ULONG FindSyllableCandidate(ULONG Key,struct UtilityIFace *IUtility);
+#define	LCSTATE_Syllable			(TAG_USER+LCSTATE_EXPANDED)
 
-/*
-
-void  QueueSyllableCandidate(ULONG c,struct TagItem *Vector,APTR LanguageContext,struct LanguageContextHook *lch);
-
-UpdateKanjiCandidacy(Vector,LanguageContext,lch);
-UpdateVocabCandidacy(Vector,LanguageContext,lch);
-*/
 /*	The SyllableCandidate Table has TagItems mapping Romaji to Hiragana
 */
 STATIC CONST struct TagItem SyllableCandidates[] =
@@ -125,33 +106,6 @@ STATIC CONST struct TagItem SyllableCandidates[] =
 	{TAG_END,	TAG_END}
 };
 
-STATIC CONST struct TagItem SyllableMiniCandidates[] =
-{
-	/* mini a i u e o */
-	{0X80000041,0x00003041},
-	{0X80000049,0x00003043},
-	{0X80000055,0x00003045},
-	{0X80000045,0x00003047},
-	{0X8000004F,0x00003049},
-	/* mini tsu */
-	{0X80545355,0x00003063},
-	/* mini ya yu yo */
-	{0X80005941,0x00003083},
-	{0X80007955,0x00003085},
-	{0X8000594F,0x00003087},
-	/* mini wa */
-	{0X80005741,0x0000308E},
-	/* mini ka ke */
-	{0X8000B441,0x00003095},
-	{0X8000B445,0x00003096},
-	{TAG_END,	TAG_END}
-};
-
-/*  Set the Primary System Input Language
-*/
-STATIC CONST unsigned char LanguageKanjiCatalog[] = "Ideographs";
-STATIC CONST unsigned char LanguageVocabCatalog[] = "Vocabulary";
-
 /* Once-or-more Init & Exit calls will occur...
 */
 void InitPerceptionHook(struct LIBRARY_CLASS *Self)
@@ -178,18 +132,7 @@ void ExitPerceptionHook(struct LIBRARY_CLASS *Self)
 	return;
 }
 
-/*
-	This is where ALL of the Language Specific "Magic" happens...
-
-	Please note...Characters are given in the HIGHEST octet of a 32bit value.
-
-	CodePoints are given using a full 32bit value as EmitBuffer ti_Data points for UTF8 conversion.
-
-	the return value is the number of Emitted CodePoints
-
-	DEBUG: RE-FACTORING IN PROGRESS... THIS FUNCTION IS ACTIVELY BROKEN...
-
-*/
+/**/
 ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,ULONG *Message)
 {
 	ULONG rc=0L, xc=0L, Syllable=0L, Kana=0L, mode=0L;
@@ -212,67 +155,17 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 					if(((Message[1] >> 24)-0x61)<0x1B)
 						xc=(Message[1] >> 24);
 				}
+				KDEBUG("##Japanese.Language::LanguageHook(ANSI/%lx/%lx)##\n",Message[1],Message[2]);
 				if(xc)
 				{
-					Syllable = GetLCSTATEvalue(Vector,LCSTATE_Syllable,LanguageContext->IUtility);
-					switch(Syllable)
-					{
-						case 0x00000000:
-							switch(xc)
-							{
-								case 0x00000061: // A
-								case 0x00000069: // I
-								case 0x00000075: // U
-								case 0x00000065: // E
-								case 0x0000006F: // O
-									Kana = FindSyllableCandidate(xc,LanguageContext->IUtility);
-							        break;
-								default:
-									Syllable = (Syllable << 8)+(0x7F & xc);
-									break;
-							}
-							break;
-						case 0x0000006E:
-							switch(xc)
-							{
-								case 0x00000061: // A
-								case 0x00000069: // I
-								case 0x00000075: // U
-								case 0x00000065: // E
-								case 0x0000006F: // O
-									Syllable = (Syllable << 8)+(0x7F & xc);
-									Kana = FindSyllableCandidate(Syllable,LanguageContext->IUtility);
-									break;
-								case 0x00000079: // Y
-									Syllable = (Syllable << 8)+(0x7F & xc);
-									break;
-								default:
-									Kana = 0x00003093;
-									Syllable = (0x7F && xc);
-									break;
-							}
-							break;
-						default:
-							if(Syllable==xc)
-							{
-								Kana = 0x00003063;
-							}else{
-								Syllable = (Syllable << 8)+(0x7F & xc);
-								Kana = FindSyllableCandidate(Syllable,LanguageContext->IUtility);
-							};
-							break;
-					}
-					if(Kana)
-						Syllable=0L;
-					SetLCSTATEvalue(Vector,LCSTATE_Syllable,LanguageContext->IUtility,Syllable);
-				}
-				//
-                switch(mode)
-				{
-//					case LANG_MODE_KATAKANA:			//	Mode[2]
-//					case LANG_MODE_HIRAGANA_KANJI:		//	Mode[1]
-					default:							//  Mode[0]
-						break;
+					Syllable=LanguageContext->IPerception->GetLanguageContextAttr(
+						(APTR)LanguageContext,
+						(ULONG)LCSTATE_Syllable);
+
+					LanguageContext->IPerception->SetLanguageContextAttr(
+						(APTR)LanguageContext,
+						(ULONG)LCSTATE_Syllable,
+						(ULONG)Syllable);
 				}
 				break;
 			default:
@@ -284,91 +177,3 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 }
 
 /**/
-ULONG GetLCSTATEvalue(APTR Vector,ULONG Key,struct UtilityIFace *IUtility)
-{
-	ULONG rc=0L;
-	struct TagItem *Item = NULL;
-
-	if(Vector)
-		Item=IUtility->FindTagItem(Key,Vector);
-    if(Item)
-		rc=Item->ti_Data;
-
-	return(rc);
-};
-
-void  SetLCSTATEvalue(APTR Vector,ULONG Key,ULONG data,struct UtilityIFace *IUtility)
-{
-	struct TagItem *Item = NULL;
-
-	if(Vector)
-		Item=IUtility->FindTagItem(Key,Vector);
-    if(Item)
-		Item->ti_Data=data;
-
-	return;
-};
-
-/**/
-ULONG FindSyllableCandidate(ULONG Key, struct UtilityIFace *IUtility)
-{
-	ULONG rc=0L;
-	struct TagItem *item=NULL;
-
-	KDEBUG("::FindSyllableCandidate(Key=%lx)\n",Key);
-
-	if(IUtility)
-		item=IUtility->FindTagItem(TAG_USER|Key,SyllableCandidates);
-	if(item)
-		rc=item->ti_Data;
-
-	return(rc);
-}
-
-/*
-//	Unofficial Mappings used with Developer Restricted Keymap.Library.Kmod
-				case	0x00:	//	Change the Constant here for this Key when officially mapped
-					KDEBUG("Perception-IME//Japanese.Language::Hankaku~Zenkaku\n");
-					break;
-				case	0x78:	//	Change the Constant here for this Key when officially mapped
-					KDEBUG("Perception-IME//Japanese.Language::Romaji~Hiragana~Katakana\n");
-					break;
-				case	0x79:	//	Change the Constant here for this Key when officially mapped
-					KDEBUG("Perception-IME//Japanese.Language::Henkan\n");
-					break;
-				case	0x7A:	//	Change the Constant here for this Key when officially mapped
-					KDEBUG("Perception-IME//Japanese.Language::MuHenkan\n");
-					break;
-//	Official Mappings that need to be recognised
-				case	0x08:	//  Official Key mapping
-					KDEBUG("Perception-IME//Japanese.Language::Backspace\n");
-					break;
-				case	0x40:	//  Official Key mapping
-					KDEBUG("Perception-IME//Japanese.Language::Space\n");
-					break;
-				case	0x43:	//  Official Key mapping
-					KDEBUG("Perception-IME//Japanese.Language::Enter\n");
-					break;
-				case	0x44:	//  Official Key mapping
-					KDEBUG("Perception-IME//Japanese.Language::Return\n");
-					break;
-				case	0x7F:	//  Official Key mapping
-					KDEBUG("Perception-IME//Japanese.Language::Delete\n");
-					break;
-//  Anything Unhandled as an AMIGA key translation				default:
-  					KDEBUG("Perception-IME//Japanese.Language::[%lx] is Unknown!\n", Message[1]);
-					break;
-			};break;
-		case LANGUAGE_TRANSLATE_ANSI:
-			if(Kana)
-			{
-				if(Kana && 0x7FFF0000)
-					QueueSyllableCandidate((Kana >> 16),Vector,LanguageContext,lch);
-				if(Kana && 0x00007FFF)
-					QueueSyllableCandidate((Kana & 0xFFFF),Vector,LanguageContext,lch);
-				UpdateKanjiCandidacy(Vector,LanguageContext,lch);
-				UpdateVocabCandidacy(Vector,LanguageContext,lch);
-
-			}
-			break;
-*/

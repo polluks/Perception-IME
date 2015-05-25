@@ -54,9 +54,9 @@ struct LanguageContext
 #define	LCSTATE_LTEMP				(TAG_USER+4)
 #define	LCSTATE_EMIT				(TAG_USER+5)
 //
-#define	LCSTATE_EXPANDED			(TAG_USER+64)
+#define	LCSTATE_EXPANDED			(TAG_USER+0x40)
 //
-#define	LCSTATE_MAX					(TAG_USER+128)
+#define	LCSTATE_MAX					(TAG_USER+IME_STATE_SIZE)
 
 /*
 **	EMIT_BLOCK is an Array with 16 Entries

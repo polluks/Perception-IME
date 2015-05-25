@@ -195,6 +195,7 @@ ULONG LCALL_GetLanguageContextAttr(struct LIBIFACE_CLASS *iface, APTR lc, ULONG 
 			rc=(ULONG)&Language->Vector;
 			break;
 		default:
+			rc=Language->State[a];
 			break;
 	}
 
@@ -217,14 +218,14 @@ void  LCALL_SetLanguageContextAttr(struct LIBIFACE_CLASS *iface, APTR lc, ULONG 
 {
 	ULONG *Message=&a;
 	struct LIBRARY_CLASS *Self = (APTR) iface->Data.LibBase;
-
-//	KDEBUG("Perception.Library/SetLanguageContextAttr(%lx,%lx)\n",lc,a);
+	struct LanguageContext *Language=lc;
 
 	switch(a)
 	{
 		case LCSTATE_VECTOR:	//	Expand the LCSTATE_VECTOR,  use of TAG_MORE is required
 			break;
 		default:
+			Language->State[a]=b;
 			break;
 	}
 
