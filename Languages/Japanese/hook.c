@@ -194,6 +194,8 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 					(LONG)LCSTATE_Syllable);
 				switch(xc)
 				{
+                    case 0x00000000: // NULL
+						break;
 					case 0x00000061: // A
 					case 0x00000069: // I
 					case 0x00000075: // U
