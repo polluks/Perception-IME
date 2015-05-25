@@ -183,11 +183,11 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 				Mode=LanguageContext->IPerception->GetLanguageContextAttr(
 					(APTR)LanguageContext,
 					(ULONG)LCSTATE_LMODE);
-				xc=((Message[1] >> 24) & 0x7F000000);
+				xc=((Message[1] >> 24) & 0x7F);
 				if((xc-0x61)<0x1B)
-					xc=((Message[1] >> 24) & 0x7F000000);
+					xc=((Message[1] >> 24) & 0x7F);
 				if((xc-0x41)<0x1B)
-					xc=((Message[1] >> 24) & 0x7F000000)+0x20;
+					xc=((Message[1] >> 24) & 0x7F)+0x20;
 				KDEBUG("#1#Japanese.Language::LanguageHook(ANSI/%lx/%lx)\n",Message[1],Message[2]);
 				if(xc)
 				{
