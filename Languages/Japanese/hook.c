@@ -242,7 +242,7 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 							};
 							break;
 					}
-				KDEBUG("LOCALE:/Japanese.Language::LanguageHook()[ANSI/%lx/%lx/%lx]\n",Syllable,xc,Kana);
+					KDEBUG("LOCALE:/Japanese.Language::LanguageHook()[ANSI/%lx/%lx/%lx]\n",Syllable,xc,Kana);
 				}
 				LanguageContext->IPerception->SetLanguageContextAttr(
 					(APTR)LanguageContext,
