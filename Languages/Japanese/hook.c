@@ -13,6 +13,8 @@ STATIC CONST BYTE LanguageName[] = LIBRARY_NAME;
 
 #define	LCSTATE_Syllable			(TAG_USER+LCSTATE_EXPANDED)
 
+ULONG FindSyllableCandidate(ULONG Key, struct UtilityIFace *IUtility);
+
 /*	The SyllableCandidate Table has TagItems mapping Romaji to Hiragana
 */
 STATIC CONST struct TagItem SyllableCandidates[] =
@@ -145,6 +147,34 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 		switch(Message[0])
 		{
             case TRANSLATE_AMIGA:
+				xc=Message[1];
+				switch(xc)
+				{
+/*
+//	Unofficial Mappings used with Developer Restricted Keymap.Library.Kmod
+					case	0x00:	//	Change the Constant here for this Key when officially mapped
+					case	0x78:	//	Change the Constant here for this Key when officially mapped
+					case	0x79:	//	Change the Constant here for this Key when officially mapped
+					case	0x7A:	//	Change the Constant here for this Key when officially mapped
+					KDEBUG("Perception-IME//Japanese.Language::Hankaku~Zenkaku\n");
+					KDEBUG("Perception-IME//Japanese.Language::Romaji~Hiragana~Katakana\n");
+					KDEBUG("Perception-IME//Japanese.Language::Henkan\n");
+					KDEBUG("Perception-IME//Japanese.Language::MuHenkan\n");
+//	Official Mappings that need to be recognised
+					case	0x08:	//  Official Key mapping
+					case	0x40:	//  Official Key mapping
+					case	0x43:	//  Official Key mapping
+					case	0x44:	//  Official Key mapping
+					case	0x7F:	//  Official Key mapping
+					KDEBUG("Perception-IME//Japanese.Language::Backspace\n");
+					KDEBUG("Perception-IME//Japanese.Language::Space\n");
+					KDEBUG("Perception-IME//Japanese.Language::Enter\n");
+					KDEBUG("Perception-IME//Japanese.Language::Return\n");
+					KDEBUG("Perception-IME//Japanese.Language::Delete\n");
+*/
+//  Anything Unhandled as an AMIGA key translation					default:
+						break;
+				}
 //				KDEBUG("Perception-IME::Japanese.Language::[TRANSLATE_AMIGA:%lx:%lx]\n",Message[1],Message[2]);
 				break;
             case TRANSLATE_ANSI:
@@ -224,6 +254,22 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 				break;
 		}
 	};
+
+	return(rc);
+}
+
+/**/
+ULONG FindSyllableCandidate(ULONG Key, struct UtilityIFace *IUtility)
+{
+	ULONG rc=0L;
+	struct TagItem *item=NULL;
+
+	KDEBUG("::FindSyllableCandidate(Key=%lx)\n",Key);
+
+	if(IUtility)
+		item=IUtility->FindTagItem(TAG_USER|Key,SyllableCandidates);
+	if(item)
+		rc=item->ti_Data;
 
 	return(rc);
 }
