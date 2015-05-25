@@ -194,7 +194,8 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 					(LONG)LCSTATE_Syllable);
 				switch(xc)
 				{
-                    case 0x00000000: // NULL
+                    case 0x00000000: // NULL // Everything NOT an English Character Glyph
+						Syllable=0L;
 						break;
 					case 0x00000061: // A
 					case 0x00000069: // I
