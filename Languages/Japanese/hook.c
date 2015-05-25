@@ -135,7 +135,7 @@ void ExitPerceptionHook(struct LIBRARY_CLASS *Self)
 /**/
 ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,ULONG *Message)
 {
-	ULONG rc=0L, xc=0L, Syllable=0L, Kana=0L, mode=0L;
+	ULONG rc=0L, Mode=0L, Syllable=0L, xc=0L, Kana=0L;
 	struct TagItem *Vector=NULL;
 
 	if(LanguageContext)
@@ -145,9 +145,12 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 		switch(Message[0])
 		{
             case TRANSLATE_AMIGA:
-				KDEBUG("Perception-IME::Japanese.Language::[TRANSLATE_AMIGA:%lx:%lx]\n",Message[1],Message[2]);
+//				KDEBUG("Perception-IME::Japanese.Language::[TRANSLATE_AMIGA:%lx:%lx]\n",Message[1],Message[2]);
 				break;
             case TRANSLATE_ANSI:
+				Mode=LanguageContext->IPerception->GetLanguageContextAttr(
+					(APTR)LanguageContext,
+					(ULONG)LCSTATE_LMODE);
 				if(Message[1] == (Message[1] & 0x7F000000))
 				{
 					if(((Message[1] >> 24)-0x41)<0x1B)
@@ -161,11 +164,60 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 					Syllable=LanguageContext->IPerception->GetLanguageContextAttr(
 						(APTR)LanguageContext,
 						(ULONG)LCSTATE_Syllable);
-
+					switch(Syllable)
+					{
+						case 0x00000000:
+							switch(xc)
+							{
+								case 0x00000061: // A
+								case 0x00000069: // I
+								case 0x00000075: // U
+								case 0x00000065: // E
+								case 0x0000006F: // O
+									Kana = FindSyllableCandidate(xc,LanguageContext->IUtility);
+							        break;
+								default:
+									Syllable = (Syllable << 8)+(0x7F & xc);
+									break;
+							}
+							break;
+						case 0x0000006E:
+							switch(xc)
+							{
+								case 0x00000061: // A
+								case 0x00000069: // I
+								case 0x00000075: // U
+								case 0x00000065: // E
+								case 0x0000006F: // O
+									Syllable = (Syllable << 8)+(0x7F & xc);
+									Kana = FindSyllableCandidate(Syllable,LanguageContext->IUtility);
+									break;
+								case 0x00000079: // Y
+									Syllable = (Syllable << 8)+(0x7F & xc);
+									break;
+								default:
+									Kana = 0x00003093;
+									Syllable = (0x7F && xc);
+									break;
+							}
+							break;
+						default:
+							if(Syllable==xc)
+							{
+								Kana = 0x00003063;
+							}else{
+								Syllable = (Syllable << 8)+(0x7F & xc);
+								Kana = FindSyllableCandidate(Syllable,LanguageContext->IUtility);
+							};
+							break;
+					}
+					if(Kana)
+						Syllable=0L;
 					LanguageContext->IPerception->SetLanguageContextAttr(
 						(APTR)LanguageContext,
 						(ULONG)LCSTATE_Syllable,
 						(ULONG)Syllable);
+				KDEBUG("LOCALE:/Japanese.Language::LanguageHook()[ANSI/%lx/%lx/%lx]\n",Syllable,xc,Kana);
 				}
 				break;
 			default:
