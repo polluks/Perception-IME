@@ -162,7 +162,7 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 //  Anything Unhandled as an AMIGA key translation					default:
 						break;
 				}
-				KDEBUG("Perception-IME::Japanese.Language::[TRANSLATE_AMIGA:%lx:%lx]\n",Message[1],Message[2]);
+//				KDEBUG("LOCALE:/Japanese.Language::LanguageHook() [AMIGA:%lx:%lx]\n",Message[1],Message[2]);
 				break;
             case TRANSLATE_ANSI:  // Mapped "Vanilla" Keyboard Input
 				Mode=LanguageContext->IPerception->GetLanguageContextAttr(
@@ -171,7 +171,7 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 				Syllable=LanguageContext->IPerception->GetLanguageContextAttr(
 					(APTR)LanguageContext,
 					(LONG)LCSTATE_Syllable);
-				KDEBUG("LOCALE:/Japanese.Language::LanguageHook() Input [ANSI/%lx/%lx]\n", (Message[1] >> 24) & 0x7F, Message[2]);
+//				KDEBUG("LOCALE:/Japanese.Language::LanguageHook() [ANSI/%lx/%lx]\n", (Message[1] >> 24) & 0x7F, Message[2]);
 				switch((Message[1] >> 24) & 0x7F)
 				{
 					case 0x7A: // z
@@ -291,6 +291,8 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 					(APTR)LanguageContext,
 					(LONG)LCSTATE_Syllable,
 					(LONG)Syllable);
+				KDEBUG("LOCALE:/Japanese.Language::LanguageHook() [ASCII=%lx,CodePoints=%lx:%lx]\n",
+					Syllable,(Kana >> 16),(Kana & 0xFFFF));
 // Extend Processing Here...
 				break;
 			default:
@@ -298,7 +300,6 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 		}
 	};
 
-	KDEBUG("Japanese.Language Output [ASCII=%lx,CodePoints=%lx:%lx]",Syllable,(Kana >> 16),(Kana & 0xFFFF));
 
 	return(rc);
 }
