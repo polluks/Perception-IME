@@ -297,21 +297,21 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 					(LONG)Syllable);
 				switch(Mode)
 				{
-					case 15:	// Mode 15=
-					case 14:	// Mode 14=
-					case 13:	// Mode 13=
-					case 12:	// Mode 12=
-					case 11:	// Mode 11=
-					case 10:	// Mode 10=
-					case 09:	// Mode 09=
-					case 08:	// Mode 08=
-					case 07:	// Mode 07=
-					case 06:	// Mode 06=
-					case 05:	// Mode 05=
-					case 04:	// Mode 04=
-					case 03:	// Mode 03=
-					case 02:	// Mode 02=
-					case 01:	// Mode 01=
+					case 0x0F:	// Mode 15=
+					case 0x0E:	// Mode 14=
+					case 0x0D:	// Mode 13=
+					case 0x0C:	// Mode 12=
+					case 0x0B:	// Mode 11=
+					case 0x0A:	// Mode 10=
+					case 0x09:	// Mode 09=
+					case 0x08:	// Mode 08=
+					case 0x07:	// Mode 07=
+					case 0x06:	// Mode 06=
+					case 0x05:	// Mode 05=
+					case 0x04:	// Mode 04=
+					case 0x03:	// Mode 03=
+					case 0x02:	// Mode 02=
+					case 0x01:	// Mode 01=
 					default:	// Mode 00= Pass-Through
 						break;
 				}
