@@ -144,6 +144,9 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 		Vector=(APTR)LanguageContext->IPerception->GetLanguageContextAttr((APTR)LanguageContext,(LONG)LCSTATE_VECTOR);
 	if(Message)
 	{
+		Mode=LanguageContext->IPerception->GetLanguageContextAttr(
+			(APTR)LanguageContext,
+			(LONG)LCSTATE_LMODE);
 		switch(Message[0])
 		{
             case TRANSLATE_AMIGA: // Unmapped "Raw" Keyboard Input
@@ -165,9 +168,6 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 //				KDEBUG("LOCALE:/Japanese.Language::LanguageHook() [AMIGA:%lx:%lx]\n",Message[1],Message[2]);
 				break;
             case TRANSLATE_ANSI:  // Mapped "Vanilla" Keyboard Input
-				Mode=LanguageContext->IPerception->GetLanguageContextAttr(
-					(APTR)LanguageContext,
-					(LONG)LCSTATE_LMODE);
 				Syllable=LanguageContext->IPerception->GetLanguageContextAttr(
 					(APTR)LanguageContext,
 					(LONG)LCSTATE_Syllable);
@@ -287,17 +287,42 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 						};
 						break;
 				}
+				KDEBUG("LOCALE:/Japanese.Language::LanguageHook() [ASCII=%lx,CodePoints=%lx:%lx]\n",
+					Syllable,(Kana >> 16),(Kana & 0xFFFF));
+				if(Kana)
+					Syllable=0L;
 				LanguageContext->IPerception->SetLanguageContextAttr(
 					(APTR)LanguageContext,
 					(LONG)LCSTATE_Syllable,
 					(LONG)Syllable);
-				KDEBUG("LOCALE:/Japanese.Language::LanguageHook() [ASCII=%lx,CodePoints=%lx:%lx]\n",
-					Syllable,(Kana >> 16),(Kana & 0xFFFF));
-// Extend Processing Here...
+				switch(Mode)
+				{
+					case 15:	// Mode 15=
+					case 14:	// Mode 14=
+					case 13:	// Mode 13=
+					case 12:	// Mode 12=
+					case 11:	// Mode 11=
+					case 10:	// Mode 10=
+					case 09:	// Mode 09=
+					case 08:	// Mode 08=
+					case 07:	// Mode 07=
+					case 06:	// Mode 06=
+					case 05:	// Mode 05=
+					case 04:	// Mode 04=
+					case 03:	// Mode 03=
+					case 02:	// Mode 02=
+					case 01:	// Mode 01=
+					default:	// Mode 00= Pass-Through
+						break;
+				}
 				break;
 			default:
 				break;
 		}
+		LanguageContext->IPerception->SetLanguageContextAttr(
+			(APTR)LanguageContext,
+			(LONG)LCSTATE_LMODE,
+			(LONG)Mode);
 	};
 
 
