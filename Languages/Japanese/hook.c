@@ -146,6 +146,24 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 	{
 		switch(Message[0])
 		{
+            case TRANSLATE_AMIGA: // Unmapped "Raw" Keyboard Input
+				switch(Message[1]);
+				{
+//	Unofficial Mappings used with Developer Restricted Keymap.Library.Kmod
+					case 0x00000000:	// Perception-IME//Japanese.Language::Hankaku~Zenkaku
+					case 0x78000000:	// Perception-IME//Japanese.Language::Romaji~Hiragana~Katakana
+					case 0x79000000:	// Perception-IME//Japanese.Language::Henkan
+					case 0x7A000000:	// Perception-IME//Japanese.Language::MuHenkan
+//	Official Mappings that need to be recognised
+					case 0x40000000:	// Perception-IME//Japanese.Language::Space
+					case 0x43000000:	// Perception-IME//Japanese.Language::Enter
+					case 0x44000000:	// Perception-IME//Japanese.Language::Return
+					case 0x7F000000:	// Perception-IME//Japanese.Language::Delete
+//  Anything Unhandled as an AMIGA key translation					default:
+						break;
+				}
+				KDEBUG("Perception-IME::Japanese.Language::[TRANSLATE_AMIGA:%lx:%lx]\n",Message[1],Message[2]);
+				break;
             case TRANSLATE_ANSI:  // Mapped "Vanilla" Keyboard Input
 				Mode=LanguageContext->IPerception->GetLanguageContextAttr(
 					(APTR)LanguageContext,
@@ -153,7 +171,7 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 				Syllable=LanguageContext->IPerception->GetLanguageContextAttr(
 					(APTR)LanguageContext,
 					(LONG)LCSTATE_Syllable);
-//				KDEBUG("LOCALE:/Japanese.Language::LanguageHook() Input [ANSI/%lx/%lx]\n", (Message[1] >> 24) & 0x7F, Message[2]);
+				KDEBUG("LOCALE:/Japanese.Language::LanguageHook() Input [ANSI/%lx/%lx]\n", (Message[1] >> 24) & 0x7F, Message[2]);
 				switch((Message[1] >> 24) & 0x7F)
 				{
 					case 0x7A: // z
@@ -273,30 +291,14 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 					(APTR)LanguageContext,
 					(LONG)LCSTATE_Syllable,
 					(LONG)Syllable);
-				KDEBUG("Japanese.Language Output [ASCII=%lx,CodePoints=%lx:%lx]",Syllable,(Kana >> 16),(Kana & 0xFFFF));
-				break;
-            case TRANSLATE_AMIGA: // Unmapped "Raw" Keyboard Input
-				switch(Message[1]);
-				{
-//	Unofficial Mappings used with Developer Restricted Keymap.Library.Kmod
-					case 0x00000000:	// Perception-IME//Japanese.Language::Hankaku~Zenkaku
-					case 0x78000000:	// Perception-IME//Japanese.Language::Romaji~Hiragana~Katakana
-					case 0x79000000:	// Perception-IME//Japanese.Language::Henkan
-					case 0x7A000000:	// Perception-IME//Japanese.Language::MuHenkan
-//	Official Mappings that need to be recognised
-					case 0x40000000:	// Perception-IME//Japanese.Language::Space
-					case 0x43000000:	// Perception-IME//Japanese.Language::Enter
-					case 0x44000000:	// Perception-IME//Japanese.Language::Return
-					case 0x7F000000:	// Perception-IME//Japanese.Language::Delete
-//  Anything Unhandled as an AMIGA key translation					default:
-						break;
-				}
-//				KDEBUG("Perception-IME::Japanese.Language::[TRANSLATE_AMIGA:%lx:%lx]\n",Message[1],Message[2]);
+// Extend Processing Here...
 				break;
 			default:
 				break;
 		}
 	};
+
+	KDEBUG("Japanese.Language Output [ASCII=%lx,CodePoints=%lx:%lx]",Syllable,(Kana >> 16),(Kana & 0xFFFF));
 
 	return(rc);
 }
