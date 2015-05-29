@@ -287,7 +287,7 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 						};
 						break;
 				}
-				KDEBUG("LOCALE:/Japanese.Language::LanguageHook() [ASCII=%lx,CodePoints=%lx:%lx]\n",
+				KDEBUG("LOCALE:/Japanese.Language/:Hiragana [ASCII=%lx,CodePoints=%lx:%lx]\n",
 					Syllable,(Kana >> 16),(Kana & 0xFFFF));
 				if(Kana)
 					Syllable=0L;
@@ -295,6 +295,12 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 					(APTR)LanguageContext,
 					(LONG)LCSTATE_Syllable,
 					(LONG)Syllable);
+				if(Kana & 0xFFFF0000)
+					Kana = (!(Kana & 0x00E00000))+(Kana & 0xFF1FFFFF);
+				if(Kana & 0x0000FFFF)
+					Kana = (!(Kana & 0x000000E0))+(Kana & 0xFFFFFF1F);
+				KDEBUG("LOCALE:/Japanese.Language/:Katakana [ASCII=%lx,CodePoints=%lx:%lx]\n",
+					Syllable,(Kana >> 16),(Kana & 0xFFFF));
 				switch(Mode)
 				{
 					case 0x0F:	// Mode 15=
