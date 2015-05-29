@@ -9,7 +9,7 @@ STATIC CONST BYTE LanguageName[] = LIBRARY_NAME;
 
 #define CODEPOINT_HIRAGANA_KEY		0x3040
 #define CODEPOINT_KATAKANA_KEY		0x30A0
-#define	CODEPOINT_KANATOGGLE_MASK	0x00E0	// Reversible Hiragana<->Katakana Transform Key
+#define	CODEPOINT_KANAMASK_KEY		0xFF1F
 
 #define	LCSTATE_Syllable			(TAG_USER+LCSTATE_EXPANDED)
 
@@ -296,9 +296,9 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 					(LONG)LCSTATE_Syllable,
 					(LONG)Syllable);
 				if(Kana & 0xFFFF0000)
-					Kana = (!(Kana & 0x00E00000))+(Kana & 0xFF1FFFFF);
+					Kana = (Kana & (0x0000FFFF+(CODEPOINT_KANAMASK_KEY << 16))) | (CODEPOINT_KATAKANA_KEY << 16);
 				if(Kana & 0x0000FFFF)
-					Kana = (!(Kana & 0x000000E0))+(Kana & 0xFFFFFF1F);
+					Kana = (Kana & (0xFFFF0000+CODEPOINT_KANAMASK_KEY)) | CODEPOINT_KATAKANA_KEY;
 				KDEBUG("LOCALE:/Japanese.Language/:Katakana [ASCII=%lx,CodePoints=%lx:%lx]\n",
 					Syllable,(Kana >> 16),(Kana & 0xFFFF));
 				switch(Mode)
