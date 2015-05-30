@@ -9,11 +9,16 @@ STATIC CONST BYTE LanguageName[] = LIBRARY_NAME;
 
 #define CODEPOINT_HIRAGANA_KEY		0x3040
 #define CODEPOINT_KATAKANA_KEY		0x30A0
+#define CODEPOINT_KANATOGGLE_KEY	0x00E0
 #define	CODEPOINT_KANAMASK_KEY		0xFF1F
 
-#define	LCSTATE_Syllable			(TAG_USER+LCSTATE_EXPANDED)
+#define	LCSTATE_Syllable			(TAG_USER+0x00+LCSTATE_EXPANDED)
 
 ULONG FindSyllableCandidate(ULONG Key, struct UtilityIFace *IUtility);
+ULONG TransformSyllableCodepoint(ULONG Kana);
+ULONG QueueSyllableCandidate(ULONG codepoint,struct LanguageContext *LanguageContext);
+ULONG UpdateKanjiCandidates(ULONG codepoint,struct LanguageContext *LanguageContext);
+ULONG UpdateVocabCandidates(ULONG codepoint,struct LanguageContext *LanguageContext);
 
 /*	The SyllableCandidate Table has TagItems mapping Romaji to Hiragana
 */
@@ -295,10 +300,8 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 					(APTR)LanguageContext,
 					(LONG)LCSTATE_Syllable,
 					(LONG)Syllable);
-				if(Kana & 0xFFFF0000)
-					Kana = (Kana & (0x0000FFFF+(CODEPOINT_KANAMASK_KEY << 16))) | (CODEPOINT_KATAKANA_KEY << 16);
-				if(Kana & 0x0000FFFF)
-					Kana = (Kana & (0xFFFF0000+CODEPOINT_KANAMASK_KEY)) | CODEPOINT_KATAKANA_KEY;
+				if(Kana)
+					Kana=TransformSyllableCodepoint(Kana);
 				KDEBUG("LOCALE:/Japanese.Language/:Katakana [ASCII=%lx,CodePoints=%lx:%lx]\n",
 					Syllable,(Kana >> 16),(Kana & 0xFFFF));
 				switch(Mode)
@@ -348,5 +351,45 @@ ULONG FindSyllableCandidate(ULONG Key, struct UtilityIFace *IUtility)
 
 	return(rc);
 }
+
+/**/
+ULONG TransformSyllableCodepoint(ULONG Kana)
+{
+	ULONG rc=0L, h=0L, l=0L;
+
+	if(Kana & 0xFFFF0000)
+		h=(Kana & 0xFFFF0000) >> 16;
+	if(Kana & 0xFFFF0000)
+		l=(Kana & 0xFFFF0000);
+	if(h)
+		h = (!(h & CODEPOINT_KANATOGGLE_KEY))|(h & CODEPOINT_KANAMASK_KEY);
+	if(l)
+		l = (!(l & CODEPOINT_KANATOGGLE_KEY))|(l & CODEPOINT_KANAMASK_KEY);
+
+	rc=(h << 16)|l;
+
+	return(rc);
+};
+
+/**/
+ULONG QueueSyllableCandidate(ULONG codepoint,struct LanguageContext *LanguageContext)
+{
+	ULONG rc=0L;
+	return(rc);
+};
+
+/**/
+ULONG UpdateKanjiCandidates(ULONG codepoint,struct LanguageContext *LanguageContext)
+{
+	ULONG rc=0L;
+	return(rc);
+};
+
+/**/
+ULONG UpdateVocabCandidates(ULONG codepoint,struct LanguageContext *LanguageContext)
+{
+	ULONG rc=0L;
+	return(rc);
+};
 
 /**/
