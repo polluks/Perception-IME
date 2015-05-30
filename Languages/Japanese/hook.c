@@ -15,7 +15,7 @@ STATIC CONST BYTE LanguageName[] = LIBRARY_NAME;
 #define	LCSTATE_Syllable			(TAG_USER+0x00+LCSTATE_EXPANDED)
 
 ULONG FindSyllableCandidate(ULONG Key, struct UtilityIFace *IUtility);
-ULONG TransformSyllableCodepoint(ULONG Kana);
+ULONG TransformSyllableCodepoint(ULONG Kana,ULONG Base);
 ULONG QueueSyllableCandidate(ULONG codepoint,struct LanguageContext *LanguageContext);
 ULONG UpdateKanjiCandidates(ULONG codepoint,struct LanguageContext *LanguageContext);
 ULONG UpdateVocabCandidates(ULONG codepoint,struct LanguageContext *LanguageContext);
@@ -301,7 +301,7 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 					(LONG)LCSTATE_Syllable,
 					(LONG)Syllable);
 				if(Kana)
-					Kana=TransformSyllableCodepoint(Kana);
+					Kana=TransformSyllableCodepoint(Kana,CODEPOINT_KATAKANA_KEY);
 				KDEBUG("LOCALE:/Japanese.Language/:Katakana [ASCII=%lx,CodePoints=%lx:%lx]\n",
 					Syllable,(Kana >> 16),(Kana & 0xFFFF));
 				switch(Mode)
@@ -353,7 +353,7 @@ ULONG FindSyllableCandidate(ULONG Key, struct UtilityIFace *IUtility)
 }
 
 /**/
-ULONG TransformSyllableCodepoint(ULONG Kana)
+ULONG TransformSyllableCodepoint(ULONG Kana, ULONG Base)
 {
 	ULONG rc=0L, h=0L, l=0L;
 
@@ -362,10 +362,9 @@ ULONG TransformSyllableCodepoint(ULONG Kana)
 	if(Kana & 0xFFFF0000)
 		l=(Kana & 0xFFFF0000);
 	if(h)
-		h = (!(h & CODEPOINT_KANATOGGLE_KEY))|(h & CODEPOINT_KANAMASK_KEY);
+		h = (h & CODEPOINT_KANAMASK_KEY)|Base;
 	if(l)
-		l = (!(l & CODEPOINT_KANATOGGLE_KEY))|(l & CODEPOINT_KANAMASK_KEY);
-
+		l = (l & CODEPOINT_KANAMASK_KEY)|Base;
 	rc=(h << 16)|l;
 
 	return(rc);
