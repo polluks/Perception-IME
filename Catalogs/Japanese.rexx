@@ -39,20 +39,12 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 		End;
 		Select
 			When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1
-/*
-		REFACTOR: Change the Output into a file based on the Translated SYLLABLE CodePoint as well as the individual Kanji CodePoint.
-			Syllable CodePoint Text,	Append the Kanji
-			Kanji CodePoint Text,		Append the Reading in UTF8 Encoded Syllables ( Hiragana )
-*/
-				Echo 'U='||CodePoint||'['||Glyph||']='||Translate(Word(Vector,i),alpha,Upper(alpha))||'['||KanaConvert(Upper(Word(Vector,i))||' Hiragana')||']';
+				XS='U='||CodePoint||'['||Glyph||']=K:'||Translate(Word(Vector,i),alpha,Upper(alpha))||'['||KanaConvert(Upper(Word(Vector,i))||' Hiragana')||']';
+				Echo XS;
 			End;
 			When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1
-/*
-		REFACTOR: Change the Output into a file based on the Translated SYLLABLE CodePoint as well as the individual Kanji CodePoint.
-			Syllable CodePoint Text,	Append the Kanji
-			Kanji CodePoint Text,		Append the Reading in UTF8 Encoded Syllables ( Katakana )
-*/
-				Echo 'U='||CodePoint||'['||Glyph||']='||Translate(Word(Vector,i),alpha,Upper(alpha))||'['||KanaConvert(Upper(Word(Vector,i))||' Katakana')||']';
+				XS='U='||CodePoint||'['||Glyph||']=O:'||Translate(Word(Vector,i),alpha,Upper(alpha))||'['||KanaConvert(Upper(Word(Vector,i))||' Katakana')||']';
+				Echo XS;
 			End;
 			OtherWise NOP;
 		End;
@@ -171,6 +163,7 @@ KanaCandidate: PROCEDURE	/* Encoded UTF8 Hiragana Sequences are output as rc */
 		When Romaji='WO'	Then rc=X2C('E38292');
 		When Romaji='N'		Then rc=X2C('E38293');
 		When Romaji='VU'	Then rc=X2C('E38294');
+/**/
 		When Romaji='KYA'	Then rc=X2C('E3818DE38283');
 		When Romaji='GYA'	Then rc=X2C('E3818EE38283');
 		When Romaji='KYU'	Then rc=X2C('E3818DE38285');
@@ -214,8 +207,10 @@ KanaCandidate: PROCEDURE	/* Encoded UTF8 Hiragana Sequences are output as rc */
 		When Romaji='RYA'	Then rc=X2C('E3828AE38283');
 		When Romaji='RYU'	Then rc=X2C('E3828AE38285');
 		When Romaji='RYO'	Then rc=X2C('E3828AE38287');
-		Otherwise rc=' @@ ';
+		Otherwise rc=' ';
 	End;
+
+	If Transform Then ;
 
 	Return rc;
 /*
