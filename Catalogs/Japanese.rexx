@@ -5,8 +5,9 @@ Options Results
 Parse Arg ArgVec
 /**/
 alpha='abcdefghijklmnopqrstuvwxyz'
+xmldata='Unihan_Readings.txt'
 /**/
-If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
+If Open(DBFH,xmldata,READ) Then Do While ~Eof(DBFH)
 	L=ReadLn(DBFH);
 	If SubStr(L,1,2)='U+' Then Do
 		Parse Var L With 'U+' CodePoint '09'x  dbEntryType '09'x Vector
@@ -56,7 +57,7 @@ WriteReadingEntry: PROCEDURE
 	Options Results
 	Parse Arg ARGV
 	Echo ARGV
-	return;
+	return rc;
 
 KanaConvert: PROCEDURE
 	Options Results
