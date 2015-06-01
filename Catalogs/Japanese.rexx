@@ -39,18 +39,24 @@ If Open(DBFH,'Unihan_Readings.txt',READ) Then Do While ~Eof(DBFH)
 		End;
 		Select
 			When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1
-				XS='U='||CodePoint||'['||Glyph||']=K:'||Translate(Word(Vector,i),alpha,Upper(alpha))||'['||KanaConvert(Upper(Word(Vector,i))||' Hiragana')||']';
-				Echo XS;
+				Reading='U='||CodePoint||'['||Glyph||']=K:'||Translate(Word(Vector,i),alpha,Upper(alpha))||'['||KanaConvert(Upper(Word(Vector,i))||' Hiragana')||']';
+				WriteReadingEntry(Reading);
 			End;
 			When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1
-				XS='U='||CodePoint||'['||Glyph||']=O:'||Translate(Word(Vector,i),alpha,Upper(alpha))||'['||KanaConvert(Upper(Word(Vector,i))||' Katakana')||']';
-				Echo XS;
+				Reading='U='||CodePoint||'['||Glyph||']=O:'||Translate(Word(Vector,i),alpha,Upper(alpha))||'['||KanaConvert(Upper(Word(Vector,i))||' Katakana')||']';
+				WriteReadingEntry(Reading);
 			End;
 			OtherWise NOP;
 		End;
 	End;
 End;
 Return;
+
+WriteReadingEntry: PROCEDURE
+	Options Results
+	Parse Arg ARGV
+	Echo ARGV
+	return;
 
 KanaConvert: PROCEDURE
 	Options Results
@@ -76,7 +82,7 @@ KanaConvert: PROCEDURE
 			Otherwise NOP;
 		End;
 	End;
-	Return rc
+	Return rc;
 
 KanaCandidate: PROCEDURE	/* Encoded UTF8 Hiragana Sequences are output as rc */
 	Options Results
@@ -209,9 +215,6 @@ KanaCandidate: PROCEDURE	/* Encoded UTF8 Hiragana Sequences are output as rc */
 		When Romaji='RYO'	Then rc=X2C('E3828AE38287');
 		Otherwise rc=' ';
 	End;
-
-	If Transform Then ;
-
 	Return rc;
 /*
 \\	Primary Activity is to generate the template datasets in the first pass
