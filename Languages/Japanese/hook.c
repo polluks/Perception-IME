@@ -357,10 +357,11 @@ ULONG TransformSyllableCodepoint(ULONG Kana, ULONG Base)
 {
 	ULONG rc=0L, h=0L, l=0L;
 
+
 	if(Kana & 0xFFFF0000)
 		h=(Kana & 0xFFFF0000) >> 16;
-	if(Kana & 0xFFFF0000)
-		l=(Kana & 0xFFFF0000);
+	if(Kana & 0x0000FFFF)
+		l=(Kana & 0x0000FFFF);
 	if(h)
 		h = (h & CODEPOINT_KANAMASK_KEY)|Base;
 	if(l)
