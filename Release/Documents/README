@@ -2,7 +2,7 @@ Short:        Perception InputMethodEnvironment
 Author:       Jeremy Sutherland (AKA Belxjander Serechai)
 Uploader:     Belxjander@gmail.com (AbH Belxjander Draconis Serechai // Jeremy sutherland)
 Type:         drivers/input
-Version:      1.0alpha
+Version:      1.5alpha
 Architecture: ppc-amigaos >= 4.1.0
 
 The original aim of this project was to provide a basis for extending the existing locale.library
@@ -27,7 +27,6 @@ The last thing to do is install the perception.library and then restart.
 It will automatically be running in the background once you see Workbench again.
 
 You can actively enable/disable the IME at any time through Commodities.
-
 
 This is a general framework for Asian and other "expanded" languages.
 	( It is perfectly valid to provide a "word to heiroglyph" language mode...)
