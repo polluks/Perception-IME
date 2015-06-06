@@ -70,9 +70,9 @@ void  InitLanguageContext(struct LanguageContext *lc)
 	}
 	for(x=0L;x<IME_VECTOR_SIZE;x++)
     {
-		lc->Vector[x].type	=0;
+		lc->Vector[x].type	=0x8000;
 		lc->Vector[x].qual	=0;
-		lc->Vector[x].glyph	=0;
+		lc->Vector[x].glyph	=x;
 	}
 
 	return;

@@ -40,11 +40,11 @@ If Open(DBFH,xmldata,READ) Then Do While ~Eof(DBFH)
 		End;
 		Select
 			When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1
-				Reading='U ['||Glyph||']'||CodePoint||' K '||'['||KanaConvert(Upper(Word(Vector,i))||' Hiragana')||']'||Translate(Word(Vector,i),alpha,Upper(alpha));
+				Reading='K ['||Glyph||']'||CodePoint||' '||'['||KanaConvert(Upper(Word(Vector,i))||' ')||']'||Translate(Word(Vector,i),alpha,Upper(alpha));
 				WriteReadingEntry(Reading);
 			End;
 			When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1
-				Reading='['||Glyph||']'||CodePoint||' '||'['||KanaConvert(Upper(Word(Vector,i))||' Katakana')||']'||Translate(Word(Vector,i),alpha,Upper(alpha));
+				Reading='O ['||Glyph||']'||CodePoint||' '||'['||KanaConvert(Upper(Word(Vector,i))||' ')||']'||Translate(Word(Vector,i),alpha,Upper(alpha));
 				WriteReadingEntry(Reading);
 			End;
 			OtherWise NOP;
@@ -55,7 +55,7 @@ Return;
 
 WriteReadingEntry: PROCEDURE
 	Options Results
-	Parse Arg Ideograph KanaReading ARGV
+	Parse Arg Yomi Ideograph KanaReading ARGV
 	Echo ARGV
 	Echo Ideograph KanaReading
 	return rc;
