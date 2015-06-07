@@ -11,7 +11,7 @@ xmldata='Unihan_Readings.txt'
 datadir='Japanese'
 /**/
 Address COMMAND 'C:Delete '||datadir||' ALL FORCE QUIET'
-Address COMMAND 'C:Makedir '||datadir
+Address COMMAND 'C:Makedir '||datadir||' '||datadir||'/K '||datadir||'/O '
 
 If Open(DBFH,xmldata,READ) Then Do While ~Eof(DBFH)
 	L=ReadLn(DBFH);
@@ -67,9 +67,8 @@ Exit();
 
 WriteReadingEntry: PROCEDURE EXPOSE datadir
 	Options Results
-	Parse Arg Yomi Ideograph CodePoint Kana Reading ARGV
-	fname=datadir||'/'||Yomi||'/'||C2X(Kana);
-	Echo fname
+	Parse Arg Variant Ideograph CodePoint Kana Reading ARGV
+	fname=datadir||'/'||C2X(Kana);
 	If Open(IDXFH,fname,APPEND) Then Do
         WriteLn(IDXFH,Ideograph||' '||CodePoint)
 		Close(IDXFH)
