@@ -7,15 +7,26 @@ UNICODE 	=	$(REXX) Unicode.rexx
 MKDIR		=	Makedir
 RM 			=	Delete >Nil:
 
-main:
-	@ Echo "Unpacking Unihan Datasets"
-	XadUnFile /Resources/Unicode/Unihan.zip /Catalogs/ OW >Nil:
+main: Chinese Japanese Korean
+	@ Echo ""
+
+Chinese:	UnicodeDataset
 	@ Echo "Generating [Language=Chinese] Dataset"
 #	$(REXX) Chinese.rexx
+
+Japanese:	UnicodeDataset
 	@ Echo "Generating [Language=Japanese] Dataset"
-	$(REXX) Japanese.rexx >Japanese-Readings.Dataset
+	@ $(RM) Japanese ALL FORCE
+	@ $(MKDIR) Japanese Japanese/K Japanese/O
+	$(REXX) Japanese.rexx
+
+Korean:		UnicodeDataset
 	@ Echo "Generating [Language=Korean] Dataset"
 #	$(REXX) Korean.rexx
+
+UnicodeDataset:
+	@ Echo "Unpacking Unihan Datasets"
+	XadUnFile /Resources/Unicode/Unihan.zip /Catalogs/ OW >Nil:
 
 clean:
 	@ Echo >dummy.txt " "

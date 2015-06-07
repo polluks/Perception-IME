@@ -51,8 +51,12 @@ If Open(DBFH,xmldata,READ) Then Do While ~Eof(DBFH)
 			End;
 			OtherWise NOP;
 		End;
+		Close(DBFH);
 	End;
 End;
+/*
+	Dataset is filtered to readings...now to rebuild into a central index
+*/
 Return;
 
 WriteReadingEntry: PROCEDURE EXPOSE datadir
