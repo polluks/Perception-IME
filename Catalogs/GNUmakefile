@@ -12,20 +12,14 @@ main:
 
 Chinese:	UnicodeDataset
 	@ Echo "Generating [Language=Chinese] Dataset"
-	@ $(RM) Chinese ALL FORCE
-	@ $(MKDIR) Chinese
 	$(REXX) Chinese.rexx
 
 Japanese:	UnicodeDataset
 	@ Echo "Generating [Language=Japanese] Dataset"
-	@ $(RM) Japanese ALL FORCE
-	@ $(MKDIR) Japanese Japanese/K Japanese/O
 	$(REXX) Japanese.rexx
 
 Korean:		UnicodeDataset
 	@ Echo "Generating [Language=Korean] Dataset"
-	@ $(RM) Korean ALL FORCE
-	@ $(MKDIR) Korean
 	$(REXX) Korean.rexx
 
 UnicodeDataset:
@@ -36,7 +30,7 @@ clean:
 	@ Echo >dummy.txt " "
 	@ Echo >dummy.cd " "
 	@ Echo >dummy.ct " "
-	@ $(RM) #?.txt #?.cd #?.ct
+	@ $(RM) #?.txt #?.cd #?.ct Chinese Japanese Korean
 
 #
 #	Everything below this point is commentative and non-essential

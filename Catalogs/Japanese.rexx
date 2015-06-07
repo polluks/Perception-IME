@@ -1,6 +1,7 @@
 /**
 \\	Japanese.rexx
 **/
+Option FailAt 100
 Options Results
 Parse Arg ArgVec
 /**/
@@ -9,6 +10,9 @@ xmldata='Unihan_Readings.txt'
 /**/
 datadir='Japanese'
 /**/
+Address COMMAND 'C:Delete '||datadir||' ALL FORCE QUIET'
+Address COMMAND 'C:Makedir '||datadir
+
 If Open(DBFH,xmldata,READ) Then Do While ~Eof(DBFH)
 	L=ReadLn(DBFH);
 	If SubStr(L,1,2)='U+' Then Do
@@ -42,20 +46,24 @@ If Open(DBFH,xmldata,READ) Then Do While ~Eof(DBFH)
 		End;
 		Select
 			When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1
-				WriteReadingEntry(Glyph||' '||CodePoint||' '||KanaConvert(Upper(Word(Vector,i))||' ')||' '||Translate(Word(Vector,i),alpha,Upper(alpha)));
+				Reading='K '||Glyph||' '||CodePoint||' '||KanaConvert(Upper(Word(Vector,i))||' ')||' '||Translate(Word(Vector,i),alpha,Upper(alpha))
+				WriteReadingEntry(Reading);
 			End;
 			When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1
-				WriteReadingEntry(Glyph||' '||CodePoint||' '||KanaConvert(Upper(Word(Vector,i))||' ')||' '||Translate(Word(Vector,i),alpha,Upper(alpha)));
+				Reading='O '||Glyph||' '||CodePoint||' '||KanaConvert(Upper(Word(Vector,i))||' ')||' '||Translate(Word(Vector,i),alpha,Upper(alpha))
+				WriteReadingEntry(Reading);
 			End;
 			OtherWise NOP;
 		End;
-		Close(DBFH);
 	End;
 End;
 /*
 	Dataset is filtered to readings...now to rebuild into a central index
+
+	Address COMMAND 'C:List SORT=N LFormat="%N" '||datadir||'/K'
+	Address COMMAND 'C:List SORT=N LFormat="%N" '||datadir||'/O'
 */
-Return;
+Exit();
 
 WriteReadingEntry: PROCEDURE EXPOSE datadir
 	Options Results
