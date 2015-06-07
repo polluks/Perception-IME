@@ -42,12 +42,10 @@ If Open(DBFH,xmldata,READ) Then Do While ~Eof(DBFH)
 		End;
 		Select
 			When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1
-				Reading='K '||Glyph||' '||CodePoint||' '||KanaConvert(Upper(Word(Vector,i))||' ')||' '||Translate(Word(Vector,i),alpha,Upper(alpha));
-				WriteReadingEntry(Reading);
+				WriteReadingEntry(Glyph||' '||CodePoint||' '||KanaConvert(Upper(Word(Vector,i))||' ')||' '||Translate(Word(Vector,i),alpha,Upper(alpha)));
 			End;
 			When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1
-				Reading='O '||Glyph||' '||CodePoint||' '||KanaConvert(Upper(Word(Vector,i))||' ')||' '||Translate(Word(Vector,i),alpha,Upper(alpha));
-				WriteReadingEntry(Reading);
+				WriteReadingEntry(Glyph||' '||CodePoint||' '||KanaConvert(Upper(Word(Vector,i))||' ')||' '||Translate(Word(Vector,i),alpha,Upper(alpha)));
 			End;
 			OtherWise NOP;
 		End;
