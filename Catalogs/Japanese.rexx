@@ -42,11 +42,11 @@ If Open(DBFH,xmldata,READ) Then Do While ~Eof(DBFH)
 		End;
 		Select
 			When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1
-				Reading='K ['||Glyph||']'||CodePoint||' '||'['||KanaConvert(Upper(Word(Vector,i))||' ')||']'||Translate(Word(Vector,i),alpha,Upper(alpha));
+				Reading='K '||Glyph||' '||CodePoint||' '||KanaConvert(Upper(Word(Vector,i))||' ')||' '||Translate(Word(Vector,i),alpha,Upper(alpha));
 				WriteReadingEntry(Reading);
 			End;
 			When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1
-				Reading='O ['||Glyph||']'||CodePoint||' '||'['||KanaConvert(Upper(Word(Vector,i))||' ')||']'||Translate(Word(Vector,i),alpha,Upper(alpha));
+				Reading='O '||Glyph||' '||CodePoint||' '||KanaConvert(Upper(Word(Vector,i))||' ')||' '||Translate(Word(Vector,i),alpha,Upper(alpha));
 				WriteReadingEntry(Reading);
 			End;
 			OtherWise NOP;
@@ -57,14 +57,12 @@ Return;
 
 WriteReadingEntry: PROCEDURE EXPOSE datadir
 	Options Results
-	Parse Arg Yomi Ideograph KanaReading ARGV
-	Kana=SubStr(KanaReading,Pos('[',KanaReading),Pos(']',KanaReading)-Pos('[',KanaReading));
-	KanaRoma=SubStr(KanaReading,1+Pos(']',KanaReading),Length(KanaReading));
+	Parse Arg Yomi Ideograph CodePoint Kana Reading ARGV
 	If Open(IDXFH,datadir||'/'||Yomi||'/'||C2X(Kana),APPEND) Then Do
-        WriteLn(IDXFH,Ideograph)
+        WriteLn(IDXFH,Ideograph||' '||CodePoint)
 		Close(IDXFH)
 	End;Else If Open(IDXFH,datadir||'/'||Yomi||'/'||C2X(Kana),WRITE) Then Do
-        WriteLn(IDXFH,Ideograph)
+        WriteLn(IDXFH,Ideograph||' '||CodePoint)
 		Close(IDXFH)
 	End;
 	return rc;
