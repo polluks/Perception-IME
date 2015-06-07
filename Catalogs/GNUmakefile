@@ -7,7 +7,7 @@ UNICODE 	=	$(REXX) Unicode.rexx
 MKDIR		=	Makedir
 RM 			=	Delete >Nil:
 
-main:
+main: clean
 	@ Echo ""
 
 Chinese:	UnicodeDataset
@@ -30,7 +30,7 @@ clean:
 	@ Echo >dummy.txt " "
 	@ Echo >dummy.cd " "
 	@ Echo >dummy.ct " "
-	@ $(RM) #?.txt #?.cd #?.ct Chinese Japanese Korean
+	@ $(RM) #?.txt #?.cd #?.ct
 
 #
 #	Everything below this point is commentative and non-essential
