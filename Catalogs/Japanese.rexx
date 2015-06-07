@@ -7,6 +7,8 @@ Parse Arg ArgVec
 alpha='abcdefghijklmnopqrstuvwxyz'
 xmldata='Unihan_Readings.txt'
 /**/
+datadir='Japanese'
+/**/
 If Open(DBFH,xmldata,READ) Then Do While ~Eof(DBFH)
 	L=ReadLn(DBFH);
 	If SubStr(L,1,2)='U+' Then Do
@@ -53,10 +55,18 @@ If Open(DBFH,xmldata,READ) Then Do While ~Eof(DBFH)
 End;
 Return;
 
-WriteReadingEntry: PROCEDURE
+WriteReadingEntry: PROCEDURE EXPOSE datadir
 	Options Results
 	Parse Arg Yomi Ideograph KanaReading ARGV
-	Echo Yomi Ideograph KanaReading ARGV
+	Kana=SubStr(KanaReading,Pos('[',KanaReading),Pos(']',KanaReading)-Pos('[',KanaReading));
+	KanaRoma=SubStr(KanaReading,1+Pos(']',KanaReading),Length(KanaReading));
+	If Open(IDXFH,datadir||'/'||Yomi||'/'||C2X(Kana),APPEND) Then Do
+        WriteLn(IDXFH,Ideograph)
+		Close(IDXFH)
+	End;Else If Open(IDXFH,datadir||'/'||Yomi||'/'||C2X(Kana),WRITE) Then Do
+        WriteLn(IDXFH,Ideograph)
+		Close(IDXFH)
+	End;
 	return rc;
 
 KanaConvert: PROCEDURE
