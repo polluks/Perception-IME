@@ -56,8 +56,7 @@ Return;
 WriteReadingEntry: PROCEDURE
 	Options Results
 	Parse Arg Yomi Ideograph KanaReading ARGV
-	Echo ARGV
-	Echo Ideograph KanaReading
+	Echo Yomi Ideograph KanaReading ARGV
 	return rc;
 
 KanaConvert: PROCEDURE
