@@ -58,10 +58,12 @@ Return;
 WriteReadingEntry: PROCEDURE EXPOSE datadir
 	Options Results
 	Parse Arg Yomi Ideograph CodePoint Kana Reading ARGV
-	If Open(IDXFH,datadir||'/'||Yomi||'/'||C2X(Kana),APPEND) Then Do
+	fname=datadir||'/'||Yomi||'/'||C2X(Kana);
+	Echo fname
+	If Open(IDXFH,fname,APPEND) Then Do
         WriteLn(IDXFH,Ideograph||' '||CodePoint)
 		Close(IDXFH)
-	End;Else If Open(IDXFH,datadir||'/'||Yomi||'/'||C2X(Kana),WRITE) Then Do
+	End;Else If Open(IDXFH,fname,WRITE) Then Do
         WriteLn(IDXFH,Ideograph||' '||CodePoint)
 		Close(IDXFH)
 	End;
