@@ -7,12 +7,14 @@ UNICODE 	=	$(REXX) Unicode.rexx
 MKDIR		=	Makedir
 RM 			=	Delete >Nil:
 
-main: Chinese Japanese Korean
+main:
 	@ Echo ""
 
 Chinese:	UnicodeDataset
 	@ Echo "Generating [Language=Chinese] Dataset"
-#	$(REXX) Chinese.rexx
+	@ $(RM) Chinese ALL FORCE
+	@ $(MKDIR) Chinese
+	$(REXX) Chinese.rexx
 
 Japanese:	UnicodeDataset
 	@ Echo "Generating [Language=Japanese] Dataset"
@@ -22,7 +24,9 @@ Japanese:	UnicodeDataset
 
 Korean:		UnicodeDataset
 	@ Echo "Generating [Language=Korean] Dataset"
-#	$(REXX) Korean.rexx
+	@ $(RM) Korean ALL FORCE
+	@ $(MKDIR) Korean
+	$(REXX) Korean.rexx
 
 UnicodeDataset:
 	@ Echo "Unpacking Unihan Datasets"
