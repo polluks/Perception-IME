@@ -69,6 +69,7 @@ WriteReadingEntry: PROCEDURE EXPOSE datadir
 	Options Results
 	Parse Arg Variant Ideograph CodePoint Kana Reading ARGV
 	fname=datadir||'/'||C2X(Kana);
+	Echo datadir||' '||Kana||' is a reading for '||Ideograph||' and is read as the romaji '||Reading
 	If Open(IDXFH,fname,APPEND) Then Do
         WriteLn(IDXFH,Ideograph||' '||CodePoint)
 		Close(IDXFH)
