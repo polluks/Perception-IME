@@ -17,7 +17,7 @@ LDLIBS	= -lc
 
 OBJECTS	= main.o apicalls.o hook.o
 
-$(LNAME): devkit $(OBJECTS)
+$(LNAME): devkit catalogs $(OBJECTS)
 	$(CC) $(LDFLAGS) $(OBJECTS) $(LDLIBS) -o $(LNAME).debug
 	$(STRIP) $(LNAME).debug -o $(LNAME)
 
@@ -26,6 +26,9 @@ clean:
 
 install: $(LNAME)
 	$(COPY)	$(LNAME).debug LOCALE:Languages/$(LNAME)
+
+catalogs:
+	$(MAKE) -C ../../Catalogs -f GNUmakefile Japanese
 
 devkit:
 	$(MAKE) -C ../../DevKit -f GNUmakefile
