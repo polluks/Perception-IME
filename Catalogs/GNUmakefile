@@ -12,15 +12,15 @@ main: clean
 
 Chinese:	UnicodeDataset
 	@ Echo "Generating [Language=Chinese] Dataset"
-#	$(REXX) Chinese.rexx
+#	$(REXX) Chinese.rexx >Chinese-UTF8.log
 
 Japanese:	UnicodeDataset
 	@ Echo "Generating [Language=Japanese] Dataset"
-	$(REXX) Japanese.rexx
+	$(REXX) Japanese.rexx >Japanese-UTF8.log
 
 Korean:		UnicodeDataset
 	@ Echo "Generating [Language=Korean] Dataset"
-#	$(REXX) Korean.rexx
+#	$(REXX) Korean.rexx  >Korean-UTF8.log
 
 UnicodeDataset:
 	@ Echo "Unpacking Unihan Datasets"
