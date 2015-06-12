@@ -9,13 +9,12 @@ STATIC CONST BYTE LanguageName[] = LIBRARY_NAME;
 
 #define CODEPOINT_HIRAGANA_KEY		0x3040
 #define CODEPOINT_KATAKANA_KEY		0x30A0
-#define CODEPOINT_KANATOGGLE_KEY	0x00E0
-#define	CODEPOINT_KANAMASK_KEY		0xFF1F
+#define CODEPOINT_KANADIFF_KEY		0x0060
 
 #define	LCSTATE_Syllable			(TAG_USER+0x00+LCSTATE_EXPANDED)
 
 ULONG FindSyllableCandidate(ULONG Key, struct UtilityIFace *IUtility);
-ULONG TransformSyllableCodepoint(ULONG Kana,ULONG Base);
+ULONG TransformSyllableCodepoint(ULONG Kana);
 ULONG QueueSyllableCandidate(ULONG codepoint,struct LanguageContext *LanguageContext);
 ULONG UpdateKanjiCandidates(ULONG codepoint,struct LanguageContext *LanguageContext);
 ULONG UpdateVocabCandidates(ULONG codepoint,struct LanguageContext *LanguageContext);
@@ -353,19 +352,23 @@ ULONG FindSyllableCandidate(ULONG Key, struct UtilityIFace *IUtility)
 }
 
 /**/
-ULONG TransformSyllableCodepoint(ULONG Kana, ULONG Base)
+ULONG TransformSyllableCodepoint(ULONG Kana)
 {
 	ULONG rc=0L, h=0L, l=0L;
-
 
 	if(Kana & 0xFFFF0000)
 		h=(Kana & 0xFFFF0000) >> 16;
 	if(Kana & 0x0000FFFF)
 		l=(Kana & 0x0000FFFF);
 	if(h)
-		h = (h & CODEPOINT_KANAMASK_KEY)|Base;
+		h = TransformSyllableCodepoint(h);	// Recursive Transform
 	if(l)
-		l = (l & CODEPOINT_KANAMASK_KEY)|Base;
+	{
+		if((l-CODEPOINT_HIRAGANA_KEY)<CODEPOINT_KANADIFF_KEY)
+			l+=CODEPOINT_KANADIFF_KEY
+		if((l-CODEPOINT_KATAKANA_KEY)<CODEPOINT_KANADIFF_KEY)
+			l-=CODEPOINT_KANADIFF_KEY
+	}
 	rc=(h << 16)|l;
 
 	return(rc);
