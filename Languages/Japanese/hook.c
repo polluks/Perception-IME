@@ -300,7 +300,7 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 					(LONG)LCSTATE_Syllable,
 					(LONG)Syllable);
 				if(Kana)
-					Kana=TransformSyllableCodepoint(Kana,CODEPOINT_KATAKANA_KEY);
+					Kana=TransformSyllableCodepoint(Kana);
 				KDEBUG("LOCALE:/Japanese.Language/:Katakana [ASCII=%lx,CodePoints=%lx:%lx]\n",
 					Syllable,(Kana >> 16),(Kana & 0xFFFF));
 				switch(Mode)
@@ -365,9 +365,9 @@ ULONG TransformSyllableCodepoint(ULONG Kana)
 	if(l)
 	{
 		if((l-CODEPOINT_HIRAGANA_KEY)<CODEPOINT_KANADIFF_KEY)
-			l+=CODEPOINT_KANADIFF_KEY
+			l+=CODEPOINT_KANADIFF_KEY;
 		if((l-CODEPOINT_KATAKANA_KEY)<CODEPOINT_KANADIFF_KEY)
-			l-=CODEPOINT_KANADIFF_KEY
+			l-=CODEPOINT_KANADIFF_KEY;
 	}
 	rc=(h << 16)|l;
 

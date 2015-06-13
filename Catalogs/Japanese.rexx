@@ -10,8 +10,10 @@ xmldata='Unihan_Readings.txt'
 /**/
 datadir='Japanese'
 /**/
-Address COMMAND 'C:Delete '||datadir||' ALL FORCE QUIET'
-Address COMMAND 'C:Makedir '||datadir||' '||datadir||'/K '||datadir||'/O '
+Address COMMAND
+'C:Delete '||datadir||' ALL FORCE QUIET'
+'C:Makedir '||datadir
+Address
 
 If Open(DBFH,xmldata,READ) Then Do While ~Eof(DBFH)
 	L=ReadLn(DBFH);
@@ -56,13 +58,19 @@ If Open(DBFH,xmldata,READ) Then Do While ~Eof(DBFH)
 			OtherWise NOP;
 		End;
 	End;
+	Close(DBFH);
 End;
 /*
 	Dataset is filtered to readings...now to rebuild into a central index
-
-	Address COMMAND 'C:List SORT=N LFormat="%N" '||datadir||'/K'
-	Address COMMAND 'C:List SORT=N LFormat="%N" '||datadir||'/O'
 */
+Address COMMAND
+'C:Makedir T:'||datadir
+'C:List '||datadir||' NOHEAD SORT=N LFormat="Echo %s >T:'||datadir||'/%s" >T:JpScript'
+'Execute T:JpScript'
+'C:Delete T:JpScript'
+'C:List T:'||datadir||' NOHEAD SORT=S LFormat="%s" >'||datadir||'.index'
+Address
+
 Exit();
 
 WriteReadingEntry: PROCEDURE EXPOSE datadir
