@@ -1,7 +1,6 @@
 /**
 \\	Japanese.rexx
 **/
-Option FailAt 100
 Options Results
 Parse Arg ArgVec
 /**/
@@ -11,10 +10,11 @@ xmldata='Unihan_Readings.txt'
 datadir='Japanese'
 /**/
 Address COMMAND
-'C:Delete '||datadir||' ALL FORCE QUIET'
-'C:Makedir '||datadir
+'C:Makedir dummy'
+'C:Delete dummy '||datadir||' ALL QUIET FORCE'
+'C:Makedir '||datadir||' '
 Address
-
+/**/
 If Open(DBFH,xmldata,READ) Then Do While ~Eof(DBFH)
 	L=ReadLn(DBFH);
 	If SubStr(L,1,2)='U+' Then Do
@@ -58,19 +58,10 @@ If Open(DBFH,xmldata,READ) Then Do While ~Eof(DBFH)
 			OtherWise NOP;
 		End;
 	End;
-	Close(DBFH);
 End;
 /*
 	Dataset is filtered to readings...now to rebuild into a central index
 */
-Address COMMAND
-'C:Makedir T:'||datadir
-'C:List '||datadir||' NOHEAD SORT=N LFormat="Echo %s >T:'||datadir||'/%s" >T:JpScript'
-'Execute T:JpScript'
-'C:Delete T:JpScript'
-'C:List T:'||datadir||' NOHEAD SORT=S LFormat="%s" >'||datadir||'.index'
-Address
-
 Exit();
 
 WriteReadingEntry: PROCEDURE EXPOSE datadir
