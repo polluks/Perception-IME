@@ -5,8 +5,7 @@ Options Results
 Parse Arg ArgVec
 /**/
 alpha='abcdefghijklmnopqrstuvwxyz'
-xmldata='Unihan_Readings.txt'
-/**/
+ucodedata='Unihan_Readings.txt'
 datadir='Japanese'
 /**/
 Address COMMAND
@@ -15,7 +14,9 @@ Address COMMAND
 'C:Makedir '||datadir||' '
 Address
 /**/
-/*If Open(DBFH,xmldata,READ) Then Do While ~Eof(DBFH)
+MRL=1;
+/**/
+If Open(DBFH,ucodedata,READ) Then Do While ~Eof(DBFH)
 	L=ReadLn(DBFH);
 	If SubStr(L,1,2)='U+' Then Do
 		Parse Var L With 'U+' CodePoint '09'x  dbEntryType '09'x Vector
@@ -48,30 +49,35 @@ Address
 		End;
 		Select
 			When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1
-				Reading='K '||Glyph||' '||CodePoint||' '||KanaConvert(Upper(Word(Vector,i))||' ')||' '||Translate(Word(Vector,i),alpha,Upper(alpha))
+				Kana=KanaConvert(Upper(Word(Vector,i)))
+				Reading='K '||Glyph||' '||CodePoint||' '||Kana||' '||Translate(Word(Vector,i),alpha,Upper(alpha))
+				If Length(Kana)>MRL Then MRL=Length(Kana);
 				WriteReadingEntry(Reading);
 			End;
 			When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1
-				Reading='O '||Glyph||' '||CodePoint||' '||KanaConvert(Upper(Word(Vector,i))||' ')||' '||Translate(Word(Vector,i),alpha,Upper(alpha))
+				Kana=KanaConvert(Upper(Word(Vector,i)))
+				Reading='O '||Glyph||' '||CodePoint||' '||Kana||' '||Translate(Word(Vector,i),alpha,Upper(alpha))
+				If Length(Kana)>MRL Then MRL=Length(Kana);
 				WriteReadingEntry(Reading);
 			End;
 			OtherWise NOP;
 		End;
 	End;
 End;
-*//*
+/*
 	Dataset is filtered to readings...now to rebuild into a central index
 */
-RecursiveIterateKana('15 3040 30A0 ');
+RDESCENT='X '||MRL||' 3040 30A0 '
+RecurseIterateKana(RDESCENT);
 
 Exit();
 
-RecursiveIterateKana: PROCEDURE EXPOSE datadir
+RecurseIterateKana: PROCEDURE EXPOSE datadir
 	Options Results
-	Parse Arg RD RB RH RP ArgVec; DPFN=datadir||'/'||C2X(RP);
+	Parse Arg X RD RB RH RP ArgVec; DPFN=datadir||'/'||C2X(RP);
 	Echo datadir||'/'||C2X(RP);
 	Do c=X2D(RB) While c<X2D(RH)
-		If Length(RP)<RD Then RecursiveIterateKana(RD||' '||RB||' '||RH||' '||RP||KanaCodepoint(c));
+		If Length(RP)<RD Then RecurseIterateKana(RD||' '||RB||' '||RH||' '||RP||KanaCodepoint(c));
 		If Open(datadir||'/'||C2X(RP),READ) Then Do
 			Echo datadir||'/'||C2X(RP);
 			Close(DFH);
