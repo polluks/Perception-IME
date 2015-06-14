@@ -15,7 +15,7 @@ Address COMMAND
 'C:Makedir '||datadir||' '
 Address
 /**/
-If Open(DBFH,xmldata,READ) Then Do While ~Eof(DBFH)
+/*If Open(DBFH,xmldata,READ) Then Do While ~Eof(DBFH)
 	L=ReadLn(DBFH);
 	If SubStr(L,1,2)='U+' Then Do
 		Parse Var L With 'U+' CodePoint '09'x  dbEntryType '09'x Vector
@@ -59,10 +59,42 @@ If Open(DBFH,xmldata,READ) Then Do While ~Eof(DBFH)
 		End;
 	End;
 End;
-/*
+*//*
 	Dataset is filtered to readings...now to rebuild into a central index
 */
+RecursiveIterateKana('15 3040 30A0 ');
+
 Exit();
+
+RecursiveIterateKana: PROCEDURE EXPOSE datadir
+	Options Results
+	Parse Arg RD RB RH RP ArgVec; DPFN=datadir||'/'||C2X(RP);
+	Echo datadir||'/'||C2X(RP);
+	Do c=X2D(RB) While c<X2D(RH)
+		If Length(RP)<RD Then RecursiveIterateKana(RD||' '||RB||' '||RH||' '||RP||KanaCodepoint(c));
+		If Open(datadir||'/'||C2X(RP),READ) Then Do
+			Echo datadir||'/'||C2X(RP);
+			Close(DFH);
+		End;
+	End;
+    Return 0;
+
+KanaCodepoint: PROCEDURE
+	Options Results
+	Parse Arg c
+	Select
+		When c<X2D('80') Then cx=D2C(c);
+		When c<X2D('100') Then cx=B2C('110000'||SubStr(C2B(D2C(c)),1,2))||B2C('10'||SubStr(C2B(D2C(c)),3,6));
+		When c<X2D('800') Then cx=B2C('110'||SubStr(C2B(SubStr(D2C(c),1,1)),6,3)||SubStr(C2B(SubStr(D2C(c),2,1)),1,2))||B2C('10'||SubStr(C2B(SubStr(D2C(c),2,1)),3,6))
+		When c<X2D('10000') Then cx=B2C('1110'||SubStr(C2B(SubStr(D2C(c),1,1)),1,4))||B2C('10'||SubStr(C2B(SubStr(D2C(c),1,1)),5,4)||SubStr(C2B(SubStr(D2C(c),2,1)),1,2))||B2C('10'||SubStr(C2B(SubStr(D2C(c),2,1)),3,6))
+		When c<X2D('200000') Then If Length(D2C(c))=4 Then Do
+				cx=B2C('11110'||SubStr(C2B(SubStr(D2C(c),1,1)),6,3)))||B2C('10'||SubStr(C2B(SubStr(D2C(c),2,1)),1,6))||B2C('10'||SubStr(C2B(SubStr(D2C(c),2,1)),7,2)||SubStr(C2B(SubStr(D2C(c),3,1)),1,4))||B2C('10'||SubStr(C2B(SubStr(D2C(c),3,1)),5,4)||SubStr(C2B(SubStr(D2C(c),4,1)),1,2))||B2C('10'||SubStr(C2B(SubStr(D2C(c),4,1)),3,6))
+			End;Else If Length(D2C(c))=3 Then Do
+				cx=B2C('11110'||SubStr(C2B(SubStr(D2C(c),1,1)),4,3))||B2C('10'||SubStr(C2B(SubStr(D2C(c),1,1)),7,2)||SubStr(C2B(SubStr(D2C(c),2,1)),1,4))||B2C('10'||SubStr(C2B(SubStr(D2C(c),2,1)),5,4)||SubStr(C2B(SubStr(D2C(c),3,1)),1,2))||B2C('10'||SubStr(C2B(SubStr(D2C(c),3,1)),3,6))
+			End;
+		Otherwise Return('##');
+	End;
+	Return cx;
 
 WriteReadingEntry: PROCEDURE EXPOSE datadir
 	Options Results
