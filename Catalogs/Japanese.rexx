@@ -26,13 +26,13 @@ If Open(DBFH,ucodedata,READ) Then Do While ~Eof(DBFH)
 			When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1
 				Kana=KanaConvert(Upper(Word(Vector,i)))
 				Reading='K '||CodePoint||' '||Glyph||' '||Kana||' '||Translate(Word(Vector,i),alpha,Upper(alpha))
-/*				If Length(Kana)>MRL Then MRL=Length(Kana);*/
+				If Length(Kana)>MRL Then MRL=Length(Kana);
 				WriteReadingEntry(Reading);
 			End;
 			When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1
 				Kana=KanaConvert(Upper(Word(Vector,i)))
 				Reading='O '||CodePoint||' '||Glyph||' '||Kana||' '||Translate(Word(Vector,i),alpha,Upper(alpha))
-/*				If Length(Kana)>MRL Then MRL=Length(Kana);*/
+				If Length(Kana)>MRL Then MRL=Length(Kana);
 				WriteReadingEntry(Reading);
 			End;
 			OtherWise NOP;
@@ -41,19 +41,6 @@ If Open(DBFH,ucodedata,READ) Then Do While ~Eof(DBFH)
 End;
 
 Exit();
-
-RecurseIterateKana: PROCEDURE EXPOSE datadir
-	Options Results
-	Parse Arg X RD RB RH RP ArgVec; DPFN=datadir||'/'||C2X(RP);
-	Echo datadir||'/'||C2X(RP);
-	Do c=X2D(RB) While c<X2D(RH)
-		If Length(RP)<RD Then RecurseIterateKana(RD||' '||RB||' '||RH||' '||RP||KanaCodepoint(c));
-		If Open(datadir||'/'||C2X(RP),READ) Then Do
-			Echo datadir||'/'||C2X(RP);
-			Close(DFH);
-		End;
-	End;
-    Return 0;
 
 KanaCodepoint: PROCEDURE
 	Options Results
@@ -82,13 +69,10 @@ WriteReadingEntry: PROCEDURE EXPOSE datadir
 	If Open(IDXFH,fpname,APPEND) Then Do
    	    WriteLn(IDXFH,fentry)
 		Close(IDXFH)
-		Echo Logging
 	End;Else If Open(IDXFH,fpname,WRITE) Then Do
    	    WriteLn(IDXFH,Header)
    	    WriteLn(IDXFH,fentry)
 		Close(IDXFH)
-		Echo Header
-		Echo Logging
 	End;
 	return rc;
 
