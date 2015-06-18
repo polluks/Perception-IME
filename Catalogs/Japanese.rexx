@@ -10,7 +10,7 @@ datadir='Japanese'
 /**/
 Address COMMAND
 'C:Makedir dummy'
-'C:Delete dummy '||datadir||' '||datadir||'#?.log ALL QUIET FORCE'
+'C:Delete dummy '||datadir||' ALL QUIET FORCE'
 'C:Makedir '||datadir||' '
 Address
 /*
