@@ -10,18 +10,18 @@ datadir='Japanese'
 /**/
 Address COMMAND
 'C:Makedir dummy'
-'C:Delete dummy '||datadir||' ALL QUIET FORCE'
+'C:Delete dummy '||datadir||' '||datadir||'#?.log ALL QUIET FORCE'
 'C:Makedir '||datadir||' '
 Address
-/**/
+/*
 MRL=1;
-/**/
+*/
 If Open(DBFH,ucodedata,READ) Then Do While ~Eof(DBFH)
 	L=ReadLn(DBFH);
 	If SubStr(L,1,2)='U+' Then Do
 		Parse Var L With 'U+' CodePoint '09'x  dbEntryType '09'x Vector
 		Vector=Translate(Vector,'20'x,'09'x);
-		B=C2B(X2C(CodePoint));Glyph=KanaCodepoint(C2D(X2C(CodePoint)));
+		Glyph=KanaCodepoint(C2D(X2C(CodePoint)));B=C2B(X2C(CodePoint));
 		Select
 			When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1
 				Kana=KanaConvert(Upper(Word(Vector,i)))
@@ -39,17 +39,6 @@ If Open(DBFH,ucodedata,READ) Then Do While ~Eof(DBFH)
 		End;
 	End;
 End;
-/*
-	Dataset is filtered to readings...now to rebuild into a central index
-*/
-/*
-	Replace the First number after the X with the MRL value to properly handle dynamic depth
-	As Kana in Unicode all encode to 3-octet strings, it will be a multiple of 3.
- */
-/*
-RDESCENT='X 36 3040 30A0 '
-RecurseIterateKana(RDESCENT);
-*/
 
 Exit();
 
@@ -85,24 +74,22 @@ KanaCodepoint: PROCEDURE
 
 WriteReadingEntry: PROCEDURE EXPOSE datadir
 	Options Results
-	Parse Arg Variant Ideograph CodePoint Kana Reading ARGV
-	pname=datadir||'/'||Kana;fname=pname||'_'||CodePoint;
-	Echo fname||' ['||Ideograph||']'
-	If BuildTreePath(pname) Then Do
-		If Open(IDXFH,fname,APPEND) Then Do
-    	    WriteLn(IDXFH,Ideograph||' '||CodePoint)
-			Close(IDXFH)
-		End;Else If Open(IDXFH,fname,WRITE) Then Do
-    	    WriteLn(IDXFH,Ideograph||' '||CodePoint)
-			Close(IDXFH)
-		End;
+	Parse Arg Variant Ideograph Codepoint Kana Reading ARGV
+	Logging=CodePoint||' '||Ideograph||' '||Variant||' '||Kana
+	fpname=datadir||'/'||Reading||','||Variant
+    fentry=Codepoint||' '||Ideograph
+	Header=Reading||' '||Kana
+	If Open(IDXFH,fpname,APPEND) Then Do
+   	    WriteLn(IDXFH,fentry)
+		Close(IDXFH)
+		Echo Logging
+	End;Else If Open(IDXFH,fpname,WRITE) Then Do
+   	    WriteLn(IDXFH,Header)
+   	    WriteLn(IDXFH,fentry)
+		Close(IDXFH)
+		Echo Header
+		Echo Logging
 	End;
-	return rc;
-
-BuildTreePath: PROCEDURE EXPOSE datadir
-	Options Results
-	Parse Arg Vector
-	rc=0;
 	return rc;
 
 KanaConvert: PROCEDURE

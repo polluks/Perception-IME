@@ -10,21 +10,24 @@ RM 			=	Delete >Nil:
 main: clean
 	@ Echo ""
 
-Chinese:	UnicodeDataset
+Chinese:	UnicodeData
 	@ Echo "Generating [Language=Chinese] Dataset"
-#	$(REXX) Chinese.rexx >Chinese-UTF8.log
+#	$(REXX) Chinese.rexx >Chinese.utf8
 
-Japanese:	UnicodeDataset
+Japanese:	UnicodeData
 	@ Echo "Generating [Language=Japanese] Dataset"
-	$(REXX) Japanese.rexx >Japanese-UTF8.log
+	$(REXX) Japanese.rexx >Japanese.utf8
 
-Korean:		UnicodeDataset
+Korean:		UnicodeData
 	@ Echo "Generating [Language=Korean] Dataset"
-#	$(REXX) Korean.rexx  >Korean-UTF8.log
+#	$(REXX) Korean.rexx  >Korean.utf8
 
-UnicodeDataset:
+UnicodeData:
 	@ Echo "Unpacking Unihan Datasets"
 	XadUnFile /Resources/Unicode/Unihan.zip /Catalogs/ OW >Nil:
+
+Dictionaries:
+	@ Echo >Dictionaries " "
 
 clean:
 	@ Echo >dummy.txt " "
