@@ -7,16 +7,15 @@ Parse Arg ArgVec
 alpha='abcdefghijklmnopqrstuvwxyz'
 ucodedata='Unihan_Readings.txt'
 datadir='Japanese'
+KReadLog='T:'||datadir||'-ReadingList'
 /**/
 Address COMMAND
-'C:Makedir dummy'
-'C:Delete dummy '||datadir||' ALL QUIET FORCE'
-'C:Makedir '||datadir||' '
+'C:Makedir dummy';'C:Delete dummy '||datadir||' ALL QUIET FORCE';'C:Makedir '||datadir||' '
 Address
 /*
 MRL=1;
 */
-If Open(DBFH,ucodedata,READ) Then Do While ~Eof(DBFH)
+If Open(DBFH,ucodedata,READ) Then Do
 	L=ReadLn(DBFH);
 	If SubStr(L,1,2)='U+' Then Do
 		Parse Var L With 'U+' CodePoint '09'x  dbEntryType '09'x Vector
@@ -38,8 +37,21 @@ If Open(DBFH,ucodedata,READ) Then Do While ~Eof(DBFH)
 			OtherWise NOP;
 		End;
 	End;
+	If ~Eof(DBFH) Then Iterate;
+	Close(DBFH);
 End;
+/**/
+Address COMMAND
+'C:List SORT=N '||datadir||' NOHEAD LFormat="%s" >'||KReadLog
+Address
+/**/
+If Open(DBFH,KReadLog,READ) Then Do
+    L=ReadLn(DBFH);
 
+	If ~Eof(DBFH) Then Iterate;
+	Close(DBFH);
+End;
+/**/
 Exit();
 
 KanaCodepoint: PROCEDURE
