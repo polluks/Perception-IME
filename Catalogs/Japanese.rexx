@@ -55,7 +55,7 @@ If Open(DBFH,KReadLog,READ) Then Do
 	    L=ReadLn(DBFH);KRLPATH=datadir||'/'||L;
 		BUFFER='';
         If Open(KRLFH,KRLPATH,READ) Then Do
-			R=ReadLn(KRLFH);Echo KRLPATH R;
+			R=ReadLn(KRLFH);Echo R;
 			Do While ~Eof(KRLFH)
 				K=ReadLn(KRLFH);
 				BUFFER=BUFFER||' '||K;
