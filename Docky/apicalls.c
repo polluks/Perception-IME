@@ -30,7 +30,7 @@ CONST APTR LibInterfaceTable[] =
 /**/
   (APTR)&LCALL_DockyGet,
   (APTR)&LCALL_DockySet,
-  (APTR)&LCALL_DockyExec,
+  (APTR)&LCALL_DockExec,
 /**/
   (APTR)-1
 };
