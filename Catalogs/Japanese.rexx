@@ -50,14 +50,14 @@ If Open(DBFH,ucodedata,READ) Then Do While ~Eof(DBFH)
 		Select
 			When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1
 				Kana=KanaConvert(Upper(Word(Vector,i)))
-				Reading='K '||Glyph||' '||CodePoint||' '||Kana||' '||Translate(Word(Vector,i),alpha,Upper(alpha))
-				If Length(Kana)>MRL Then MRL=Length(Kana);
+				Reading='K '||CodePoint||' '||Glyph||' '||Kana||' '||Translate(Word(Vector,i),alpha,Upper(alpha))
+/*				If Length(Kana)>MRL Then MRL=Length(Kana);*/
 				WriteReadingEntry(Reading);
 			End;
 			When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1
 				Kana=KanaConvert(Upper(Word(Vector,i)))
-				Reading='O '||Glyph||' '||CodePoint||' '||Kana||' '||Translate(Word(Vector,i),alpha,Upper(alpha))
-				If Length(Kana)>MRL Then MRL=Length(Kana);
+				Reading='O '||CodePoint||' '||Glyph||' '||Kana||' '||Translate(Word(Vector,i),alpha,Upper(alpha))
+/*				If Length(Kana)>MRL Then MRL=Length(Kana);*/
 				WriteReadingEntry(Reading);
 			End;
 			OtherWise NOP;
@@ -67,7 +67,11 @@ End;
 /*
 	Dataset is filtered to readings...now to rebuild into a central index
 */
-RDESCENT='X '||MRL||' 3040 30A0 '
+/*
+	Replace the First number after the X with the MRL value to properly handle dynamic depth
+	As Kana in Unicode all encode to 3-octet strings, it will be a multiple of 3.
+ */
+RDESCENT='X 36 3040 30A0 '
 RecurseIterateKana(RDESCENT);
 
 Exit();
