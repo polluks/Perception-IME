@@ -18,7 +18,7 @@ archive:
 
 clean:
 	@ ${MKDIR}	Dummy
-	@ ${RM}		Libs Devs Locale Dummy
-	@ ${MKDIR}	Libs Devs Locale
-	@ ${MKDIR}	Devs/Keymaps Locale/Charsets Locale/Languages
-	@ ${MKDIR}	Release/Utilities Release/Utilities/Commodities Release/Utilities/Commodities/Dockies/
+	@ ${RM}		Libs Devs Locale Utilities Dummy
+	@ ${MKDIR}	Libs Devs Locale Utilities
+	@ ${MKDIR}	Devs/Keymaps Locale/Charsets Locale/Languages Utilities/Commodities
+	@ ${MKDIR}	Utilities/Commodities/Dockies/
