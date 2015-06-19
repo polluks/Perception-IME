@@ -71,8 +71,10 @@ End;
 	Replace the First number after the X with the MRL value to properly handle dynamic depth
 	As Kana in Unicode all encode to 3-octet strings, it will be a multiple of 3.
  */
+/*
 RDESCENT='X 36 3040 30A0 '
 RecurseIterateKana(RDESCENT);
+*/
 
 Exit();
 
@@ -109,7 +111,7 @@ KanaCodepoint: PROCEDURE
 WriteReadingEntry: PROCEDURE EXPOSE datadir
 	Options Results
 	Parse Arg Variant Ideograph CodePoint Kana Reading ARGV
-	fname=datadir||'/'||C2X(Kana);
+	fname=datadir||'/'||C2X(Kana)||'.'||Reading
 	Echo datadir||'/'||Kana||' = '||Ideograph||' [ '||Reading||' ]'
 	If Open(IDXFH,fname,APPEND) Then Do
         WriteLn(IDXFH,Ideograph||' '||CodePoint)
