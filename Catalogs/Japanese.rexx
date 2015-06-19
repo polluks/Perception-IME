@@ -52,7 +52,14 @@ Address
 /**/
 If Open(DBFH,KReadLog,READ) Then Do
 	Do While ~Eof(DBFH)
-	    L=ReadLn(DBFH);
+	    L=ReadLn(DBFH);KRLPATH=datadir||'/'||L;
+        If Open(KRLFH,KRLPATH,READ) Then Do
+			R=ReadLn(KRLFH);Echo KRLPATH R;
+			Do While ~Eof(KRLFH)
+				K=ReadLn(KRLFH);
+			End;
+			Close(KRLFH);
+		End;
 	End;
 	Close(DBFH);
 End;
