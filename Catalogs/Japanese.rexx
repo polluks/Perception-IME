@@ -53,12 +53,15 @@ Address
 If Open(DBFH,KReadLog,READ) Then Do
 	Do While ~Eof(DBFH)
 	    L=ReadLn(DBFH);KRLPATH=datadir||'/'||L;
+		BUFFER='';
         If Open(KRLFH,KRLPATH,READ) Then Do
 			R=ReadLn(KRLFH);Echo KRLPATH R;
 			Do While ~Eof(KRLFH)
 				K=ReadLn(KRLFH);
+				BUFFER=BUFFER||' '||K;
 			End;
 			Close(KRLFH);
+			Echo BUFFER;
 		End;
 	End;
 	Close(DBFH);
