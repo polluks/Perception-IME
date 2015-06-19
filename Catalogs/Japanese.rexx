@@ -23,7 +23,7 @@ If Open(DBFH,ucodedata,READ) Then Do
 		If SubStr(L,1,2)='U+' Then Do
 			Parse Var L With 'U+' CodePoint '09'x  dbEntryType '09'x Vector
 			Vector=Translate(Vector,'20'x,'09'x);
-			Glyph=KanaCodepoint(C2D(X2C(CodePoint)));B=C2B(X2C(CodePoint));
+			Glyph=EnCodepoint(C2D(X2C(CodePoint)));B=C2B(X2C(CodePoint));
 			Select
 				When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1
 					Kana=KanaConvert(Upper(Word(Vector,i)))
@@ -56,15 +56,16 @@ If Open(DBFH,KReadLog,READ) Then Do
 	End;
 	Close(DBFH);
 End;
+/*
 Address COMMAND
 'C:Delete '||KReadLog||' FORCE QUIET'
 Address
-/**/
+*/
 'Echo' 'Processing ... Phase 2 = Completed'
 /**/
 Exit();
 
-KanaCodepoint: PROCEDURE
+EnCodepoint: PROCEDURE
 	Options Results
 	Parse Arg c
 	Select
