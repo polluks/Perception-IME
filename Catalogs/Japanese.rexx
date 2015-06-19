@@ -12,9 +12,11 @@ KReadLog='T:'||datadir||'-ReadingList'
 Address COMMAND
 'C:Makedir dummy';'C:Delete dummy '||datadir||' ALL QUIET FORCE';'C:Makedir '||datadir||' '
 Address
-/*
+/**/
+'Echo' 'Processing ... Phase 1'
+/**
 MRL=1;
-*/
+**/
 If Open(DBFH,ucodedata,READ) Then Do
 	Do While ~Eof(DBFH)
 		L=ReadLn(DBFH);
@@ -42,6 +44,8 @@ If Open(DBFH,ucodedata,READ) Then Do
 	Close(DBFH);
 End;
 /**/
+'Echo' 'Processing ... Phase 2'
+/**/
 Address COMMAND
 'C:List SORT=N '||datadir||' NOHEAD LFormat="%s" >'||KReadLog
 Address
@@ -55,6 +59,8 @@ End;
 Address COMMAND
 'C:Delete '||KReadLog||' FORCE QUIET'
 Address
+/**/
+'Echo' 'Processing ... Phase 2 = Completed'
 /**/
 Exit();
 
