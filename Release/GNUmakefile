@@ -21,4 +21,4 @@ clean:
 	@ ${RM}		Libs Devs Locale Dummy
 	@ ${MKDIR}	Libs Devs Locale
 	@ ${MKDIR}	Devs/Keymaps Locale/Charsets Locale/Languages
-	@ ${MKDIR}	Release/Utilities/Commodities/Dockies/
+	@ ${MKDIR}	Release/Utilities Release/Utilities/Commodities Release/Utilities/Commodities/Dockies/
