@@ -21,32 +21,7 @@ If Open(DBFH,ucodedata,READ) Then Do While ~Eof(DBFH)
 	If SubStr(L,1,2)='U+' Then Do
 		Parse Var L With 'U+' CodePoint '09'x  dbEntryType '09'x Vector
 		Vector=Translate(Vector,'20'x,'09'x);
-		B=C2B(X2C(CodePoint))
-		Select
-			When X2D(CodePoint) < X2D('80') Then Glyph=X2C(B)
-			When X2D(CodePoint) < X2D('100') Then Glyph=B2C('110000'||SubStr(B,1,2))||B2C('10'||SubStr(B,3,6));
-			When X2D(CodePoint) < X2D('800') Then Glyph=B2C('110'||SubStr(B,1,1)||'10'||SubStr(B,2,1)||'10'||SubStr(B,3,1));
-			When X2D(CodePoint) < X2D('10000') Then	Glyph=B2C('1110'||SubStr(B,1,4)||'10'||SubStr(B,5,6)||'10'||SubStr(B,11,6));
-/*
-	The Following two conditions of Unicode need better encoding support from the input Hex length.
-
-    Run the script as it exists to see the issue at the end of the current ouput.
-
-			When X2D(CodePoint) < X2D('200000') Then Glyph=B2C(
-'11110'||SubStr(4,3)||
-'10'||SubStr(B,7,6)||
-'10'||SubStr(B,13,6)||
-'10'||SubStr(B,19,6));
-
-			When X2D(CodePoint) < X2D('1000000') Then Glyph=C2B(
-'111110'||SubStr(B,,2)||
-'10'||SubStr(B,,6)||
-'10'||SubStr(B,,6)||
-'10'||SubStr(B,,6)||
-'10'||SubStr(B,,6));
-*/
-			Otherwise Glyph='#'||C2B(X2C(CodePoint))||'#';
-		End;
+		B=C2B(X2C(CodePoint));Glyph=KanaCodepoint(C2D(X2C(CodePoint)));
 		Select
 			When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1
 				Kana=KanaConvert(Upper(Word(Vector,i)))
@@ -150,11 +125,7 @@ KanaConvert: PROCEDURE
 
 KanaCandidate: PROCEDURE	/* Encoded UTF8 Hiragana Sequences are output as rc */
 	Options Results
-	Parse Arg Romaji Key
-/*
-	If Key='Hiragana' Then Transform=0;
-	If Key='Katakana' Then Transform=1;
-*/
+	Parse Arg Romaji ArgV
 	Select
 		When Romaji='A'		Then rc=X2C('E38182');
 		When Romaji='I'		Then rc=X2C('E38184');
