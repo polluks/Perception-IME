@@ -86,15 +86,23 @@ KanaCodepoint: PROCEDURE
 WriteReadingEntry: PROCEDURE EXPOSE datadir
 	Options Results
 	Parse Arg Variant Ideograph CodePoint Kana Reading ARGV
-	fname=datadir||'/'||C2X(Kana)||'.'||Reading
-	Echo datadir||'/'||Kana||' = '||Ideograph||' [ '||Reading||' ]'
-	If Open(IDXFH,fname,APPEND) Then Do
-        WriteLn(IDXFH,Ideograph||' '||CodePoint)
-		Close(IDXFH)
-	End;Else If Open(IDXFH,fname,WRITE) Then Do
-        WriteLn(IDXFH,Ideograph||' '||CodePoint)
-		Close(IDXFH)
+	pname=datadir||'/'||Kana;fname=pname||'_'||CodePoint;
+	Echo fname||' ['||Ideograph||']'
+	If BuildTreePath(pname) Then Do
+		If Open(IDXFH,fname,APPEND) Then Do
+    	    WriteLn(IDXFH,Ideograph||' '||CodePoint)
+			Close(IDXFH)
+		End;Else If Open(IDXFH,fname,WRITE) Then Do
+    	    WriteLn(IDXFH,Ideograph||' '||CodePoint)
+			Close(IDXFH)
+		End;
 	End;
+	return rc;
+
+BuildTreePath: PROCEDURE EXPOSE datadir
+	Options Results
+	Parse Arg Vector
+	rc=0;
 	return rc;
 
 KanaConvert: PROCEDURE
