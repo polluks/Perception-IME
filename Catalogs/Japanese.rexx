@@ -16,28 +16,29 @@ Address
 MRL=1;
 */
 If Open(DBFH,ucodedata,READ) Then Do
-	L=ReadLn(DBFH);
-	If SubStr(L,1,2)='U+' Then Do
-		Parse Var L With 'U+' CodePoint '09'x  dbEntryType '09'x Vector
-		Vector=Translate(Vector,'20'x,'09'x);
-		Glyph=KanaCodepoint(C2D(X2C(CodePoint)));B=C2B(X2C(CodePoint));
-		Select
-			When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1
-				Kana=KanaConvert(Upper(Word(Vector,i)))
-				Reading='K '||CodePoint||' '||Glyph||' '||Kana||' '||Translate(Word(Vector,i),alpha,Upper(alpha))
-				If Length(Kana)>MRL Then MRL=Length(Kana);
-				WriteReadingEntry(Reading);
+	Do While ~Eof(DBFH)
+		L=ReadLn(DBFH);
+		If SubStr(L,1,2)='U+' Then Do
+			Parse Var L With 'U+' CodePoint '09'x  dbEntryType '09'x Vector
+			Vector=Translate(Vector,'20'x,'09'x);
+			Glyph=KanaCodepoint(C2D(X2C(CodePoint)));B=C2B(X2C(CodePoint));
+			Select
+				When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1
+					Kana=KanaConvert(Upper(Word(Vector,i)))
+					Reading='K '||CodePoint||' '||Glyph||' '||Translate(Word(Vector,i),alpha,Upper(alpha))||' '||Kana
+					If Length(Kana)>MRL Then MRL=Length(Kana);
+					WriteReadingEntry(Reading);
+				End;
+				When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1
+					Kana=KanaConvert(Upper(Word(Vector,i)))
+					Reading='O '||CodePoint||' '||Glyph||' '||Translate(Word(Vector,i),alpha,Upper(alpha))||' '||Kana
+					If Length(Kana)>MRL Then MRL=Length(Kana);
+					WriteReadingEntry(Reading);
+				End;
+				OtherWise NOP;
 			End;
-			When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1
-				Kana=KanaConvert(Upper(Word(Vector,i)))
-				Reading='O '||CodePoint||' '||Glyph||' '||Kana||' '||Translate(Word(Vector,i),alpha,Upper(alpha))
-				If Length(Kana)>MRL Then MRL=Length(Kana);
-				WriteReadingEntry(Reading);
-			End;
-			OtherWise NOP;
 		End;
 	End;
-	If ~Eof(DBFH) Then Iterate;
 	Close(DBFH);
 End;
 /**/
@@ -46,11 +47,14 @@ Address COMMAND
 Address
 /**/
 If Open(DBFH,KReadLog,READ) Then Do
-    L=ReadLn(DBFH);
-
-	If ~Eof(DBFH) Then Iterate;
+	Do While ~Eof(DBFH)
+	    L=ReadLn(DBFH);
+	End;
 	Close(DBFH);
 End;
+Address COMMAND
+'C:Delete '||KReadLog||' FORCE QUIET'
+Address
 /**/
 Exit();
 
@@ -73,10 +77,10 @@ KanaCodepoint: PROCEDURE
 
 WriteReadingEntry: PROCEDURE EXPOSE datadir
 	Options Results
-	Parse Arg Variant Ideograph Codepoint Kana Reading ARGV
+	Parse Arg Variant Codepoint Ideograph Reading Kana
 	Logging=CodePoint||' '||Ideograph||' '||Variant||' '||Kana
-	fpname=datadir||'/'||Reading||','||Variant
-    fentry=Codepoint||' '||Ideograph
+	fpname=datadir||'/'||Reading
+    fentry=Variant||' '||Codepoint||' '||Ideograph
 	Header=Reading||' '||Kana
 	If Open(IDXFH,fpname,APPEND) Then Do
    	    WriteLn(IDXFH,fentry)
