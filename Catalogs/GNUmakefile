@@ -30,7 +30,7 @@ clean:
 	@ Echo >dummy.txt " "
 	@ Echo >dummy.cd " "
 	@ Echo >dummy.ct " "
-	@ $(RM) #?.txt #?.cd #?.ct
+	@ $(RM) #?.txt #?.cd #?.ct ALL FORCE QUIET
 
 #
 #	Everything below this point is commentative and non-essential
