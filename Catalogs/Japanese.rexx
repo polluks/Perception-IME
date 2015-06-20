@@ -86,9 +86,8 @@ WriteReadingEntry: PROCEDURE EXPOSE datadir
    	    WriteLn(IDXFH,fentry)
 		Close(IDXFH)
 	End;Else If Open(IDXFH,fpname,WRITE) Then Do
-   	    WriteLn(IDXFH,Header)
-   	    WriteLn(IDXFH,fentry)
-		Close(IDXFH)
+   	    WriteLn(IDXFH,Header||X2C('13'x)||fentry);
+		Close(IDXFH);
 	End;
 	return rc;
 
