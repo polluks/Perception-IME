@@ -53,15 +53,13 @@ Address
 If Open(DBFH,KReadLog,READ) Then Do
 	Do While ~Eof(DBFH)
 	    L=ReadLn(DBFH);KRLPATH=datadir||'/'||L;
-		BUFFER='';
         If Open(KRLFH,KRLPATH,READ) Then Do
 			R=ReadLn(KRLFH);Echo R;
 			Do While ~Eof(KRLFH)
-				K=ReadLn(KRLFH);
-				BUFFER=BUFFER||' '||K;
+				BUFFER=L||' '||ReadLn(KRLFH);
+				WriteIndexedEntry(BUFFER);
 			End;
 			Close(KRLFH);
-			Echo BUFFER;
 		End;
 	End;
 	Close(DBFH);
@@ -107,6 +105,12 @@ WriteReadingEntry: PROCEDURE EXPOSE datadir
 		Close(IDXFH);
 	End;
 	return rc;
+
+WriteIndexedEntry: PROCEDURE EXPOSE datadir
+	Options Results
+	Parse Arg ArgV;
+	Echo ArgV;
+	Return 1;
 
 KanaConvert: PROCEDURE
 	Options Results
