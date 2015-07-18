@@ -74,7 +74,7 @@ Address
 */
 'Echo' 'Processing ... Phase 2 = Completed'
 /**/
-Exit();
+Exit(0);
 
 EnCodepoint: PROCEDURE
 	Options Results
