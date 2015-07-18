@@ -14,9 +14,9 @@ Address COMMAND
 Address
 /**/
 'Echo' 'Processing ... Phase 1'
-/**
-MRL=1;
-**/
+/**/
+MRL=1;MF=1;
+/**/
 If Open(DBFH,ucodedata,READ) Then Do
 	Do While ~Eof(DBFH)
 		L=ReadLn(DBFH);
@@ -40,6 +40,9 @@ If Open(DBFH,ucodedata,READ) Then Do
 				OtherWise NOP;
 			End;
 		End;
+        If MF=20 Then Do
+			MF=1;Address COMMAND 'C:Avail >Nil: FLUSH'
+		End;Else MF=1+MF;
 	End;
 	Close(DBFH);
 End;
@@ -54,10 +57,10 @@ If Open(DBFH,KReadLog,READ) Then Do
 	Do While ~Eof(DBFH)
 	    L=ReadLn(DBFH);KRLPATH=datadir||'/'||L;
         If Open(KRLFH,KRLPATH,READ) Then Do
-			R=ReadLn(KRLFH);Echo R;
+			H=ReadLn(KRLFH);Echo H;
 			Do While ~Eof(KRLFH)
 				BUFFER=L||' '||ReadLn(KRLFH);
-				WriteIndexedEntry(BUFFER);
+				WriteReadingEntryIndexed(BUFFER);
 			End;
 			Close(KRLFH);
 		End;
@@ -106,10 +109,9 @@ WriteReadingEntry: PROCEDURE EXPOSE datadir
 	End;
 	return rc;
 
-WriteIndexedEntry: PROCEDURE EXPOSE datadir
+WriteReadingEntryIndexed: PROCEDURE EXPOSE datadir
 	Options Results
 	Parse Arg ArgV;
-	Echo ArgV;
 	Return 1;
 
 KanaConvert: PROCEDURE
