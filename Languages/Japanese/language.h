@@ -40,8 +40,8 @@
 
 /*
 \\	KDEBUG() macro
-
-	Usage = KDEBUG("At line [%lld] address [%lld]\n", __LINE__, address)
+//
+\\	Usage = KDEBUG("At line [%lld] address [%lld]\n", __LINE__, address)
 */
 #ifndef KDEBUG
 #define KDEBUG(format, argv...) \
@@ -71,6 +71,8 @@ struct LIBRARY_CLASS
 	struct SignalSemaphore Lock;
 
 	APTR HPerception;
+
+    struct TagItem *RPerception;
 };
 
 STATIC CONST struct Resident RomTag;

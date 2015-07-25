@@ -179,7 +179,7 @@ STATIC CONST struct TagItem DictionaryOrderKey[] =
 */
 void InitPerceptionHook(struct LIBRARY_CLASS *Self)
 {
-    APTR Context=NULL;
+    APTR Context=NULL, Resource=NULL;
 
 	if(!(Self->HPerception))
 	{
@@ -187,6 +187,8 @@ void InitPerceptionHook(struct LIBRARY_CLASS *Self)
 			Context=Self->IPerception->ObtainLanguageContext((APTR)LanguageName,(APTR)&ExecLanguageHook);
 		if(Context)
 			Self->HPerception=Context;
+//		if(Self->HPerception)
+//			Resource=Self->IExec->
 	};
 
 	return;
@@ -196,8 +198,12 @@ void InitPerceptionHook(struct LIBRARY_CLASS *Self)
 void ExitPerceptionHook(struct LIBRARY_CLASS *Self)
 {
 	if(!(Self->Library.lib_OpenCnt))
+	{
+//		if(Self->RPerception)
+//			Self->IExec->
 		if(Self->HPerception)
 			Self->IPerception->ReleaseLanguageContext(Self->HPerception);
+	}
 	return;
 }
 
