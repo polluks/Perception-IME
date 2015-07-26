@@ -11,7 +11,7 @@ KReadLog='T:'||datadir||'-ReadingList'
 /**/
 Address COMMAND
 'C:Makedir dummy';'C:Delete dummy '||datadir||' ALL QUIET FORCE';
-'C:Makedir '||datadir||' '||datadir||'/Kanji '||datadir||'/Romaji '||datadir||'/Reading '
+'C:Makedir '||datadir||' '||datadir||'/Kanji '||datadir||'/Romaji '||datadir||'/Reading '||datadir||'/Vocabulary '
 Address
 /**/
 'Echo' 'Processing ...'
