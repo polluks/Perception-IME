@@ -83,9 +83,9 @@ APTR LCALL_ScriptExec(struct LIBIFACE_CLASS *iface)
 *****************************************************************************
 *
 */
-APTR LCALL_OptionTagList(struct LIBIFACE_CLASS *iface, struct TagItem *options)
+uint32 LCALL_OptionTagList(struct LIBIFACE_CLASS *iface, struct TagItem *options)
 {
-	APTR rc=NULL;
+	uint32 rc=NULL;
 	struct LIBRARY_CLASS *Self = (APTR) iface->Data.LibBase;
 
 	if(options)

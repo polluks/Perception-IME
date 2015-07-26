@@ -137,29 +137,29 @@ extern struct library *LCALL_Init(struct LIBRARY_CLASS *SelfBase,
 				 BPTR SegmentList,
 				 struct Interface *Executive);
 extern struct Library *LCALL_Open(struct LIBIFACE_CLASS *Iface, ULONG version);
-extern APTR  LCALL_Close(struct LIBIFACE_CLASS *Iface);
-extern APTR  LCALL_Expunge(struct LIBIFACE_CLASS *Iface);
-extern APTR  LCALL_Reserved(void);
+extern APTR LCALL_Close(struct LIBIFACE_CLASS *Iface);
+extern APTR LCALL_Expunge(struct LIBIFACE_CLASS *Iface);
+extern APTR LCALL_Reserved(void);
 extern ULONG MCALL_Obtain(struct Interface *Iface);
 extern ULONG MCALL_Release(struct Interface *Iface);
 /*apicalls.c*/
-extern APTR  LCALL_ScriptExec(struct LIBIFACE_CLASS *Self);
-extern APTR  LCALL_OptionTagList(struct LIBIFACE_CLASS *Self, struct TagItem *options);
-extern APTR  LCALL_ObtainLanguageContext(struct LIBIFACE_CLASS *Self, APTR name, APTR hook);
-extern APTR  LCALL_ReleaseLanguageContext(struct LIBIFACE_CLASS *Self, APTR name);
+extern APTR LCALL_ScriptExec(struct LIBIFACE_CLASS *Self);
+extern uint32 LCALL_OptionTagList(struct LIBIFACE_CLASS *Self, struct TagItem *options);
+extern APTR LCALL_ObtainLanguageContext(struct LIBIFACE_CLASS *Self, APTR name, APTR hook);
+extern APTR LCALL_ReleaseLanguageContext(struct LIBIFACE_CLASS *Self, APTR name);
 extern ULONG LCALL_GetLanguageContextAttr(struct LIBIFACE_CLASS *Self, APTR lc, ULONG x);
-extern void  LCALL_SetLanguageContextAttr(struct LIBIFACE_CLASS *Self, APTR lc, ULONG a, ULONG b);
+extern void LCALL_SetLanguageContextAttr(struct LIBIFACE_CLASS *Self, APTR lc, ULONG a, ULONG b);
 /*daemon.c*/
-extern void  InitPerceptionDaemon(struct LIBRARY_CLASS *Self);
-extern void  ExitPerceptionDaemon(struct LIBRARY_CLASS *Self);
+extern void InitPerceptionDaemon(struct LIBRARY_CLASS *Self);
+extern void ExitPerceptionDaemon(struct LIBRARY_CLASS *Self);
 extern int32 ExecPerceptionDaemon(STRPTR argv, ULONG argc);
 /*objects.c*/
-extern APTR  GetInputContext(APTR name,struct PerceptionIFace *IPerception);
-extern void  SetInputContext(APTR ctxt,struct PerceptionIFace *IPerception);
-extern void  InitLanguageContext(struct LanguageContext *lc);
-extern void  ExitLanguageContext(struct LanguageContext *lc);
-extern void  TranslateCP32UTF8(ULONG *codepoint);
-/*extern void  TranslateUTF8CP32(struct TagItem *item);*/
+extern APTR GetInputContext(APTR name,struct PerceptionIFace *IPerception);
+extern void SetInputContext(APTR ctxt,struct PerceptionIFace *IPerception);
+extern void InitLanguageContext(struct LanguageContext *lc);
+extern void ExitLanguageContext(struct LanguageContext *lc);
+extern void TranslateCP32UTF8(ULONG *codepoint);
+/*extern voidTranslateUTF8CP32(struct TagItem *item);*/
 /**/
 
 #endif                 

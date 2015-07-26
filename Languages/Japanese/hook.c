@@ -7,179 +7,28 @@
 
 STATIC CONST BYTE LanguageName[] = LIBRARY_NAME;
 
+extern CONST struct TagItem SyllableCandidates[];
+extern CONST struct TagItem DictionaryOrderKey[];
+extern CONST struct TagItem RadicalOrderKey[];
+
 #define CODEPOINT_HIRAGANA_KEY		0x3040
 #define CODEPOINT_KATAKANA_KEY		0x30A0
 #define CODEPOINT_KANADIFF_KEY		0x0060
 
 #define	LCSTATE_Syllable			(TAG_USER+0x00+LCSTATE_EXPANDED)
 
-ULONG FindSyllableCandidate(ULONG Key, struct UtilityIFace *IUtility);
-ULONG TransformSyllableCodepoint(ULONG Kana);
-ULONG QueueSyllableCandidate(ULONG codepoint,struct LanguageContext *LanguageContext);
-ULONG UpdateKanjiCandidates(ULONG codepoint,struct LanguageContext *LanguageContext);
-ULONG UpdateVocabCandidates(ULONG codepoint,struct LanguageContext *LanguageContext);
-
-/*	The SyllableCandidate Table has TagItems mapping Romaji to Hiragana
-*/
-STATIC CONST struct TagItem SyllableCandidates[] =
-{
-	{0X80000000,0x00000000},{0X8000003D,0x000030A0},		    				//	NULL, EQUALS
-	{0X80000061,0x00003042},                            						//	A
-	{0X80000069,0x00003044},                            						//	I
-	{0X80000075,0x00003046},                            						//	U
-	{0X80000065,0x00003048},                            						//	E
-	{0X8000006F,0x0000304A},                            						//	O
-	{0X80006B61,0x0000304B},{0X80006761,0x0000304C},    						//	KA/GA
-	{0X80006B69,0x0000304D},{0X80006769,0x0000304E},    						//	KI/GI
-	{0X80006B75,0x0000304F},{0X80006775,0x00003050},    						//	KU/GU
-	{0X80006B65,0x00003051},{0X80006765,0x00003052},    						//	KE/GE
-	{0X80006B6F,0x00003053},{0X8000676F,0x00003054},    						//	KO/GO
-    {0X80007361,0x00003055},{0X80007A61,0x00003056},							//	SA/ZA
-	{0X80736869,0x00003057},{0X80006A69,0x00003058},							//	SHI/JI
-	{0X80007369,0x00003057},{0X80007A69,0x00003058},							//	SI/ZI
-	{0X80007375,0x00003059},{0X80007A75,0x0000305A},							//	SU/ZU
-	{0X80007365,0x0000305B},{0X80007A65,0x0000305C},            				//	SE/ZE
-	{0X8000736F,0x0000305D},{0X80007A6F,0x0000305E},							//	SO/ZO
-	{0X80007461,0x0000305F},{0X80006461,0x00003060},							//	TA/DA
-	{0X80636869,0x00003061},{0X80006469,0x00003062},							//	CHI/DI
-	{0X80006369,0x00003061},{0X80007469,0x00003061},							//	CI/TI
-	{0X80747375,0x00003064},{0X80647A75,0x00003065},							//	TSU/DZU
-	{0X80007475,0x00003064},{0X80006475,0x00003065},							//	TU/DU
-	{0X80007465,0x00003066},{0X80006465,0x00003067},							//	TE/DE
-	{0X8000746F,0x00003068},{0X8000646F,0x00003069},							//	TO/DO
-	{0X80006E61,0x0000306A},													//	NA
-	{0X80006E69,0x0000306B},													//	NI
-	{0X80006E75,0x0000306C},													//	NU
-	{0X80006E65,0x0000306D},													//	NE
-	{0X80006E6F,0x0000306E},													//	NO
-	{0X80006861,0x0000306F},{0X80006261,0x00003070},{0X80007061,0x00003071},	//	HA/BA/PA
-	{0X80006869,0x00003072},{0X80006269,0x00003073},{0X80007069,0x00003074},	//	HI/BI/PI
-	{0X80006675,0x00003075},													//	FU
-	{0X80006875,0x00003075},{0X80006275,0x00003076},{0X80007075,0x00003077},	//	HU/BU/PU
-	{0X80006865,0x00003078},{0X80006265,0x00003079},{0X80007065,0x0000307A},	//	HE/BE/PE
-	{0X8000686F,0x0000307B},{0X8000626F,0x0000307C},{0X8000706F,0x0000307D},	//	HO/BO/PO
-	{0X80006D61,0x0000307E},													//	MA
-	{0X80006D69,0x0000307F},													//	MI
-	{0X80006D75,0x00003080},													//	MU
-	{0X80006D65,0x00003081},													//	ME
-	{0X80006D6F,0x00003082},													//	MO
-	{0X80007961,0x00003084},													//	YA
-	{0X80007975,0x00003086},													//	YU
-	{0X8000796F,0x00003088},													//	YO
-	{0X80007261,0x00003089},													//	RA
-	{0X80007269,0x0000308A},													//	RI
-	{0X80007275,0x0000308B},													//	RU
-	{0X80007265,0x0000308C},													//	RE
-	{0X8000726F,0x0000308D},													//	RO
-	{0X80007761,0x0000308F},													//	WA
-	{0X80007769,0x00003090},													//	WI
-	{0X80007765,0x00003091},													//	WE
-	{0X8000776F,0x00003092},													//	WO
-	{0X80006E6E,0x00003093},													//	N
-	{0X80007675,0x00003094},													//	VU
-	{0X80007661,0x000030F7},													//	VA
-	{0X80007669,0x000030F8},													//	VI
-	{0X80007665,0x000030F9},													//	VE
-	{0X8000766F,0x000030FA},													//	VO
-/*
-		Syllable Chords follow
-*/
-	{0x806B7961,0x304D3083},{0x80677961,0x304E3083},							//	KYA/GYA
-	{0x806B7975,0x304D3085},{0x80677975,0x304E3085},							//	KYU/GYU
-	{0x806B796F,0x304D3087},{0x8067796F,0x304E3087},							//	KYO/GYO
-	{0X80736861,0x30573083},{0X80006A61,0x30583083},{0X80647961,0x30583083},	//	SHA/JA/DYA
-	{0X80737961,0x30573083},{0X806A7961,0x30583083},							//	SYA/JYA
-	{0X80736875,0x30573085},{0X80006A75,0x30583085},{0X80647975,0x30583085},	//	SHU/JU/DYU
-	{0X80737975,0x30573085},{0X806A7975,0x30583085},							//	SYU/JYU
-	{0X80006A65,0x30583047},													//	JE
-	{0X8073686F,0x30573087},{0X80006A6F,0x30583087},{0X8064796F,0x30583087},	//	SHO/JO/DYO
-    {0X0073796F,0x30573087},{0X806A796F,0x30583087},							//	SYO/JYO
-	{0X80636861,0x30613083},{0X80637961,0x30613083},							//	CHA/CYA
-	{0X80636875,0x30613085},{0X80637975,0x30613085},							//	CHU/CYU
-	{0X8063686F,0x30613087},{0X8063796F,0x30613087},							//	CHO/CYO
-	{0X806E7961,0x306B3083},													//	NYA
-	{0X806E7975,0x306B3085},													//	NYU
-	{0X806E796F,0x306B3087},													//	NYO
-	{0X80687961,0x30723083},{0X80627961,0x30733083},{0X80707961,0x30743083},	//	HYA/BYA/PYA
-	{0X80687975,0x30723085},{0X80627975,0x30733085},{0X80707975,0x30743085},	//	HYU/BYU/PYU
-	{0X8068796F,0x30723087},{0X8062796F,0x30733087},{0X8070796F,0x30743087},	//	HYO/BYO/PYO
-	{0X806D7961,0x307F3083},													//	MYA
-	{0X806D7975,0x307F3085},													//	MYU
-	{0X806D796F,0x307F3087},													//	MYO
-	{0X80727961,0x308A3083},													//	RYA
-	{0X80727975,0x308A3085},													//	RYU
-	{0X8072796F,0x308A3087},													//	RYO
-	{TAG_END,	TAG_END}
-};
-
-STATIC CONST struct TagItem DictionaryOrderKey[] =
-{
-//	PLEASE NOTE THAT THE UNICODE ORDER AND THE SINGLE-SYLLABLE ORDER ARE 100% IDENTICAL
-//		DOUBLED-SYLLABLES FOLLOW THE SINGLE-SYLLABLE THEY EXTEND!
-//
-	{0x00003042,0x00000000},													//	A
-	{0x00003044,0x00000000},													//	I
-	{0x00003046,0x00000000},													//	U
-	{0x00003048,0x00000000},													//	E
-	{0x0000304A,0x00000000},													//	O
-	{0x0000304B,0x00000000},{0x0000304C,0x00000000},							//	KA/GA
-	{0x0000304D,0x00000000},{0x0000304E,0x00000000},							//	KI/GI
-	{0x304D3083,0x00000000},{0x304E3083,0x00000000},							//	KYA/GYA
-	{0x304D3085,0x00000000},{0x304E3085,0x00000000},							//	KYU/GYU
-	{0x304D3087,0x00000000},{0x304E3087,0x00000000},							//	KYO/GYO
-	{0x0000304F,0x00000000},{0x00003050,0x00000000},							//	KU/GU
-	{0x00003051,0x00000000},{0x00003052,0x00000000},							//	KE/GE
-	{0x00003053,0x00000000},{0x00003054,0x00000000},							//	KO/GO
-    {0x00003055,0x00000000},{0x00003056,0x00000000},							//	SA/ZA
-	{0x00003057,0x00000000},{0x00003058,0x00000000},							//	SHI/JI
-	{0x00003057,0x00000000},{0x00003058,0x00000000},							//	SI/ZI
-	{0x00003059,0x00000000},{0x0000305A,0x00000000},							//	SU/ZU
-	{0x0000305B,0x00000000},{0x0000305C,0x00000000},							//	SE/ZE
-	{0x0000305D,0x00000000},{0x0000305E,0x00000000},							//	SO/ZO
-	{0x0000305F,0x00000000},{0x00003060,0x00000000},							//	TA/DA
-	{0x00003061,0x00000000},{0x00003062,0x00000000},							//	CHI/DI
-	{0x00003061,0x00000000},{0x00003061,0x00000000},							//	CI/TI
-	{0x00003064,0x00000000},{0x00003065,0x00000000},							//	TSU/DZU
-	{0x00003064,0x00000000},{0x00003065,0x00000000},							//	TU/DU
-	{0x00003066,0x00000000},{0x00003067,0x00000000},							//	TE/DE
-	{0x00003068,0x00000000},{0x00003069,0x00000000},							//	TO/DO
-	{0x0000306A,0x00000000},													//	NA
-	{0x0000306B,0x00000000},													//	NI
-	{0x0000306C,0x00000000},													//	NU
-	{0x0000306D,0x00000000},													//	NE
-	{0x0000306E,0x00000000},													//	NO
-	{0x0000306F,0x00000000},{0x00003070,0x00000000},{0x00003071,0x00000000},	//	HA/BA/PA
-	{0x00003072,0x00000000},{0x00003073,0x00000000},{0x00003074,0x00000000},	//	HI/BI/PI
-	{0x00003075,0x00000000},													//	FU
-	{0x00003075,0x00000000},{0x00003076,0x00000000},{0x00003077,0x00000000},	//	HU/BU/PU
-	{0x00003078,0x00000000},{0x00003079,0x00000000},{0x0000307A,0x00000000},	//	HE/BE/PE
-	{0x0000307B,0x00000000},{0x0000307C,0x00000000},{0x0000307D,0x00000000},	//	HO/BO/PO
-	{0x0000307E,0x00000000},													//	MA
-	{0x0000307F,0x00000000},													//	MI
-	{0x00003080,0x00000000},													//	MU
-	{0x00003081,0x00000000},													//	ME
-	{0x00003082,0x00000000},													//	MO
-	{0x00003084,0x00000000},													//	YA
-	{0x00003086,0x00000000},													//	YU
-	{0x00003088,0x00000000},													//	YO
-	{0x00003089,0x00000000},													//	RA
-	{0x0000308A,0x00000000},													//	RI
-	{0x0000308B,0x00000000},													//	RU
-	{0x0000308C,0x00000000},													//	RE
-	{0x0000308D,0x00000000},													//	RO
-	{0x0000308F,0x00000000},													//	WA
-	{0x00003090,0x00000000},													//	WI
-	{0x00003091,0x00000000},													//	WE
-	{0x00003092,0x00000000},													//	WO
-	{0x00003093,0x00000000},													//	N
-	{TAG_END,	TAG_END}
-};
+int32 IsValidVanilla(uint32 vanilla);
+int32 FindSyllableCandidate(uint32 Key, struct UtilityIFace *IUtility);
+int32 TransformSyllableCodepoint(uint32 Kana);
+int32 QueueSyllableCandidate(uint32 codepoint,struct LanguageContext *LanguageContext);
+int32 UpdateKanjiCandidates(uint32 codepoint,struct LanguageContext *LanguageContext);
+int32 UpdateVocabCandidates(uint32 codepoint,struct LanguageContext *LanguageContext);
 
 /* Once-or-more Init & Exit calls will occur...
 */
 void InitPerceptionHook(struct LIBRARY_CLASS *Self)
 {
-    APTR Context=NULL, Resource=NULL;
+    APTR Context=NULL;//, Resource=NULL;
 
 	if(!(Self->HPerception))
 	{
@@ -207,6 +56,8 @@ void ExitPerceptionHook(struct LIBRARY_CLASS *Self)
 	return;
 }
 
+/*
+*/
 /**/
 ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,ULONG *Message)
 {
@@ -214,17 +65,16 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 	struct TagItem *Vector=NULL;
 
 	if(LanguageContext)
-		Vector=(APTR)LanguageContext->IPerception->GetLanguageContextAttr((APTR)LanguageContext,(LONG)LCSTATE_VECTOR);
+		Vector=(APTR)LanguageContext->IPerception->GetLanguageContextAttr((APTR)LanguageContext,LCSTATE_VECTOR);
 	if(Message)
 	{
-		Mode=LanguageContext->IPerception->GetLanguageContextAttr(
-			(APTR)LanguageContext,
-			(LONG)LCSTATE_LMODE);
+		Mode=LanguageContext->IPerception->GetLanguageContextAttr((APTR)LanguageContext,(ULONG)LCSTATE_LMODE);
+		Syllable=LanguageContext->IPerception->GetLanguageContextAttr((APTR)LanguageContext,(ULONG)LCSTATE_Syllable);
 		switch(Message[0])
 		{
-            case TRANSLATE_AMIGA: // Unmapped "Raw" Keyboard Input
-				switch(Message[1]);
-				{
+            case TRANSLATE_AMIGA: // Unmapped Raw Keyboard Input
+				switch(Message[1])
+                {
 					case 0x00000000:		// Zenkaku~Hankaku
 					case 0x40000000:		// Space
 					case 0x43000000:		// Enter
@@ -235,178 +85,155 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 					case 0x01020000:		// MuHenkan
 					default:
 						break;
-				}
+				};
 				KDEBUG("LOCALE:/Japanese.Language::LanguageHook() [AMIGA:%lx:%lx]\n",Message[1],Message[2]);
 				break;
             case TRANSLATE_ANSI:  // Mapped "Vanilla" Keyboard Input
-				Syllable=LanguageContext->IPerception->GetLanguageContextAttr(
-					(APTR)LanguageContext,
-					(LONG)LCSTATE_Syllable);
-				switch((Message[1] >> 24) & 0x7F)
+                xc=IsValidVanilla((Message[1] >> 24) & 0x7F);
+				if(((Message[1] >> 24) & 0x7F)==0x08)
 				{
-					case 0x7A: // z
-					case 0x79: // y
-					case 0x78: // x
-					case 0x77: // w
-					case 0x76: // v
-					case 0x75: // u
-					case 0x74: // t
-					case 0x73: // s
-					case 0x72: // r
-					case 0x71: // q
-					case 0x70: // p
-					case 0x6F: // o
-					case 0x6E: // n
-					case 0x6D: // m
-					case 0x6C: // l
-					case 0x6B: // k
-					case 0x6A: // j
-					case 0x69: // i
-					case 0x68: // h
-					case 0x67: // g
-					case 0x66: // f
-					case 0x65: // e
-					case 0x64: // d
-					case 0x63: // c
-					case 0x62: // b
-					case 0x61: // a
-						xc=(Message[1] >> 24) & 0x7F;
-						break;
-					case 0x5A: // Z
-					case 0x59: // Y
-					case 0x58: // X
-					case 0x57: // W
-					case 0x56: // V
-					case 0x55: // U
-					case 0x54: // T
-					case 0x53: // S
-					case 0x52: // R
-					case 0x51: // Q
-					case 0x50: // P
-					case 0x4F: // O
-					case 0x4E: // N
-					case 0x4D: // M
-					case 0x4C: // L
-					case 0x4B: // K
-					case 0x4A: // J
-					case 0x49: // I
-					case 0x48: // H
-					case 0x47: // G
-					case 0x46: // F
-					case 0x45: // E
-					case 0x44: // D
-					case 0x43: // C
-					case 0x42: // B
-					case 0x41: // A
-						xc=((Message[1] >> 24) & 0x7F)+0x20;
-						break;
-                    case 0x08:
-						Syllable = Syllable >> 8;
-					default:
-						xc=0L;
-						break;
-				}
-				switch(Syllable)
-				{
-					case 0x00:
-                        switch(xc)
-						{
-							case 0x61: // A
-							case 0x69: // I
-							case 0x75: // U
-							case 0x65: // E
-							case 0x6F: // O
-								Kana=FindSyllableCandidate(xc,LanguageContext->IUtility);
-								break;
-							default:
-								Syllable=(Syllable << 8)+(xc & 0x7F);
-								break;
-						}
-						break;
-					case 0x6E:
-                        switch(xc)
-						{
-							case 0x61: // A
-							case 0x69: // I
-							case 0x75: // U
-							case 0x65: // E
-							case 0x6F: // O
-								Kana=FindSyllableCandidate((Syllable << 8)+(xc & 0x7F),LanguageContext->IUtility);
-								break;
-							case 0x79: // Y
-								Syllable=(Syllable << 8)+(xc & 0x7F);
-								break;
-							default:
-								Kana = 0x00003093;
-								Syllable=(xc & 0x7F);
-								break;
-						}
-						break;
-					default:
-						if(Syllable==xc)
-						{
-							Kana = 0x00003063;
-						}else{
-                            if(xc)
+					Syllable=Syllable >> 8;
+				}else{
+					switch(Syllable)
+					{
+						case 0x00:
+                            switch(xc)
 							{
-								Syllable=(Syllable << 8)+(xc & 0x7F);
-								Kana=FindSyllableCandidate(Syllable,LanguageContext->IUtility);
-							}else{
-								Syllable=0L;
+								case 0x61: // A
+								case 0x69: // I
+								case 0x75: // U
+								case 0x65: // E
+								case 0x6F: // O
+									Kana=FindSyllableCandidate(xc,LanguageContext->IUtility);
+									break;
+								default:
+									Syllable=(Syllable << 8)+(xc & 0x7F);
+									break;
 							};
-						};
-						break;
-				}
-				KDEBUG("LOCALE:/Japanese.Language/:Hiragana [ASCII=%lx,CodePoints=%lx:%lx]\n",
-					Syllable,(Kana >> 16),(Kana & 0xFFFF));
+							break;
+						case 0x6E:
+                            switch(xc)
+							{
+								case 0x61: // A
+								case 0x69: // I
+								case 0x75: // U
+								case 0x65: // E
+								case 0x6F: // O
+									Kana=FindSyllableCandidate((Syllable << 8)+(xc & 0x7F),LanguageContext->IUtility);
+									break;
+								case 0x79: // Y
+									Syllable=(Syllable << 8)+(xc & 0x7F);
+									break;
+								default:
+									Kana = 0x00003093;
+									Syllable=(xc & 0x7F);
+									break;
+							};
+							break;
+						default:
+							if(Syllable==xc)
+							{
+								Kana = 0x00003063;
+							}else{
+                                if(xc)
+								{
+									Syllable=(Syllable << 8)+(xc & 0x7F);
+									Kana=FindSyllableCandidate(Syllable,LanguageContext->IUtility);
+								}else{
+									Syllable=0L;
+								};
+							};
+							break;
+					};
+				};
 				if(Kana)
 					Syllable=0L;
-				LanguageContext->IPerception->SetLanguageContextAttr(
-					(APTR)LanguageContext,
-					(LONG)LCSTATE_Syllable,
-					(LONG)Syllable);
-				if(Kana)
-					Kana=TransformSyllableCodepoint(Kana);
-				KDEBUG("LOCALE:/Japanese.Language/:Katakana [ASCII=%lx,CodePoints=%lx:%lx]\n",
+				Kana=TransformSyllableCodepoint(Kana);
+				LanguageContext->IPerception->SetLanguageContextAttr((APTR)LanguageContext,(int32)LCSTATE_Syllable,(int32)Syllable);
+				KDEBUG("LOCALE:/Japanese.Language/:Hiragana [ASCII=%lx,CodePoints=%lx:%lx]\n",
 					Syllable,(Kana >> 16),(Kana & 0xFFFF));
-				switch(Mode)
-				{
-					case 0x0F:	// Mode 15=
-					case 0x0E:	// Mode 14=
-					case 0x0D:	// Mode 13=
-					case 0x0C:	// Mode 12=
-					case 0x0B:	// Mode 11=
-					case 0x0A:	// Mode 10=
-					case 0x09:	// Mode 09=
-					case 0x08:	// Mode 08=
-					case 0x07:	// Mode 07=
-					case 0x06:	// Mode 06=
-					case 0x05:	// Mode 05=
-					case 0x04:	// Mode 04=
-					case 0x03:	// Mode 03=
-					case 0x02:	// Mode 02=
-					case 0x01:	// Mode 01=
-					default:	// Mode 00= Pass-Through
-						break;
-				}
 				break;
 			default:
 				break;
-		}
-		LanguageContext->IPerception->SetLanguageContextAttr(
-			(APTR)LanguageContext,
-			(LONG)LCSTATE_LMODE,
-			(LONG)Mode);
-	};
-
-
+		};
+		LanguageContext->IPerception->SetLanguageContextAttr((APTR)LanguageContext,(int32)LCSTATE_LMODE,(int32)Mode);
+    };
 	return(rc);
 }
 
 /**/
-ULONG FindSyllableCandidate(ULONG Key, struct UtilityIFace *IUtility)
+int32 IsValidVanilla(uint32 vanilla)
 {
-	ULONG rc=0L;
+	int32 rc=0L;
+
+	switch(vanilla)
+	{
+		case 0x7A: // z
+		case 0x79: // y
+		case 0x78: // x
+		case 0x77: // w
+		case 0x76: // v
+		case 0x75: // u
+		case 0x74: // t
+		case 0x73: // s
+		case 0x72: // r
+		case 0x71: // q
+		case 0x70: // p
+		case 0x6F: // o
+		case 0x6E: // n
+		case 0x6D: // m
+		case 0x6C: // l
+		case 0x6B: // k
+		case 0x6A: // j
+		case 0x69: // i
+		case 0x68: // h
+		case 0x67: // g
+		case 0x66: // f
+		case 0x65: // e
+		case 0x64: // d
+		case 0x63: // c
+		case 0x62: // b
+		case 0x61: // a
+			rc=vanilla;
+			break;
+		case 0x5A: // Z
+		case 0x59: // Y
+		case 0x58: // X
+		case 0x57: // W
+		case 0x56: // V
+		case 0x55: // U
+		case 0x54: // T
+		case 0x53: // S
+		case 0x52: // R
+		case 0x51: // Q
+		case 0x50: // P
+		case 0x4F: // O
+		case 0x4E: // N
+		case 0x4D: // M
+		case 0x4C: // L
+		case 0x4B: // K
+		case 0x4A: // J
+		case 0x49: // I
+		case 0x48: // H
+		case 0x47: // G
+		case 0x46: // F
+		case 0x45: // E
+		case 0x44: // D
+		case 0x43: // C
+		case 0x42: // B
+		case 0x41: // A
+			rc=vanilla+0x20;
+			break;
+		default:
+			rc=0L;
+			break;
+	};
+	return(rc);
+}
+/**/
+int32 FindSyllableCandidate(uint32 Key, struct UtilityIFace *IUtility)
+{
+	int32 rc=0L;
 	struct TagItem *item=NULL;
 
 	if(IUtility)
@@ -418,9 +245,9 @@ ULONG FindSyllableCandidate(ULONG Key, struct UtilityIFace *IUtility)
 }
 
 /**/
-ULONG TransformSyllableCodepoint(ULONG Kana)
+int32 TransformSyllableCodepoint(uint32 Kana)
 {
-	ULONG rc=0L, h=0L, l=0L;
+	int32 rc=0L, h=0L, l=0L;
 
 	if(Kana & 0xFFFF0000)
 		h=(Kana & 0xFFFF0000) >> 16;
@@ -441,23 +268,23 @@ ULONG TransformSyllableCodepoint(ULONG Kana)
 };
 
 /**/
-ULONG QueueSyllableCandidate(ULONG codepoint,struct LanguageContext *LanguageContext)
+int32 QueueSyllableCandidate(uint32 codepoint,struct LanguageContext *LanguageContext)
 {
-	ULONG rc=0L;
+	int32 rc=0L;
 	return(rc);
 };
 
 /**/
-ULONG UpdateKanjiCandidates(ULONG codepoint,struct LanguageContext *LanguageContext)
+int32 UpdateKanjiCandidates(uint32 codepoint,struct LanguageContext *LanguageContext)
 {
-	ULONG rc=0L;
+	int32 rc=0L;
 	return(rc);
 };
 
 /**/
-ULONG UpdateVocabCandidates(ULONG codepoint,struct LanguageContext *LanguageContext)
+int32 UpdateVocabCandidates(uint32 codepoint,struct LanguageContext *LanguageContext)
 {
-	ULONG rc=0L;
+	int32 rc=0L;
 	return(rc);
 };
 

@@ -15,7 +15,7 @@ CFLAGS	= -O2 $(CWFLAGS) -gstabs $(INCLUDE) -fno-builtin -fPIC -shared
 LDFLAGS	= -nostartfiles -nostdlib -mcrt=newlib
 LDLIBS	= -lc
 
-OBJECTS	= main.o apicalls.o hook.o
+OBJECTS	= main.o apicalls.o tables.o hook.o
 
 $(LNAME): devkit $(OBJECTS)
 	$(CC) $(LDFLAGS) $(OBJECTS) $(LDLIBS) -o $(LNAME).debug

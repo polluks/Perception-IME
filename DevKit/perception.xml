@@ -17,7 +17,7 @@
 			<arg name="rmsg" type="struct RexxMsg *"/>
 			<arg name="result" type="STRPTR *"/>
 		</method>
-		<method name="OptionTagList" result="ULONG">
+		<method name="OptionTagList" result="uint32">
 			<arg name="options" type="struct TagItem *"/>
 		</method>
 		<method name="ObtainLanguageContext" result="APTR">
@@ -27,14 +27,14 @@
 		<method name="ReleaseLanguageContext" result="int32">
 			<arg name="object" type="APTR"/>
 		</method>
-		<method name="GetLanguageContextAttr" result="int32">
+		<method name="GetLanguageContextAttr" result="uint32">
 			<arg name="object" type="APTR"/>
-			<arg name="attribute" type="int32"/>
+			<arg name="attribute" type="uint32"/>
 		</method>
 		<method name="SetLanguageContextAttr" result="void">
 			<arg name="object" type="APTR"/>
-			<arg name="attribute" type="int32"/>
-			<arg name="value" type="int32"/>
+			<arg name="attribute" type="uint32"/>
+			<arg name="value" type="uint32"/>
 		</method>
 	</interface>
 </library>
