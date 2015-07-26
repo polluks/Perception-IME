@@ -85,7 +85,7 @@ WriteOutputEntries: PROCEDURE EXPOSE datadir
 	End;
 	Pragma(D,CWD);
 	/**/
-	Echo Codepoint Reading Codepath
+	Echo Codepoint Ideograph Variant Reading Kana Codepath
 	/**/
 	return rc;
 
@@ -287,6 +287,7 @@ KanaCandidate: PROCEDURE	/* Encoded UTF8 Hiragana Sequences are output as rc */
 		When Romaji='FI'	Then rc=X2C('E381B2E381832F');
 		When Romaji='FE'	Then rc=X2C('E381B2E381872F');
 		When Romaji='FO'	Then rc=X2C('E381B2E381892F');
+		When Romaji='HYU'	Then rc=X2C('E381B2E382852F');
 		When Romaji='BYU'	Then rc=X2C('E381B3E382852F');
 		When Romaji='PYU'	Then rc=X2C('E381B4E382852F');
 		When Romaji='HYO'	Then rc=X2C('E381B2E382872F');
@@ -416,6 +417,7 @@ CodePointCandidate: PROCEDURE	/* Raw Hiragana Codepoint Sequences are output as 
 		When Romaji='FI'	Then rc='3075,3043/';
 		When Romaji='FE'	Then rc='3075,3047/';
 		When Romaji='FO'	Then rc='3075,3049/';
+		When Romaji='HYU'	Then rc='3072,3085/';
 		When Romaji='BYU'	Then rc='3073,3085/';
 		When Romaji='PYU'	Then rc='3074,3085/';
 		When Romaji='HYO'	Then rc='3072,3087/';
@@ -427,7 +429,7 @@ CodePointCandidate: PROCEDURE	/* Raw Hiragana Codepoint Sequences are output as 
 		When Romaji='RYA'	Then rc='308A,3083/';
 		When Romaji='RYU'	Then rc='308A,3085/';
 		When Romaji='RYO'	Then rc='308A,3087/';
-		Otherwise rc='^';
+		Otherwise rc='^'||Romaji||'^';
 	End;
 	Return rc;
 /*
