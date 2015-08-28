@@ -32,6 +32,7 @@ If Open(DBFH,ucodedata,READ) Then Do
 					Reading='K '||CodePoint||' '||Glyph||' '||Translate(Word(Vector,i),alpha,Upper(alpha))||' '||KanaPath||' '||CodePath
 					If Length(Kana)>MRL Then MRL=Length(Kana);
                     WriteOutputEntries(Reading);
+					If MF=10 Then 'Echo' '@ '||CodePoint||'['||Glyph||']'
 				End;
 				When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1
 					KanaPath=KanaConvert(Upper(Word(Vector,i)));
@@ -39,16 +40,23 @@ If Open(DBFH,ucodedata,READ) Then Do
 					Reading='O '||CodePoint||' '||Glyph||' '||Translate(Word(Vector,i),alpha,Upper(alpha))||' '||KanaPath||' '||CodePath
 					If Length(Kana)>MRL Then MRL=Length(Kana);
                     WriteOutputEntries(Reading);
+					If MF=10 Then 'Echo' '@ '||CodePoint||'['||Glyph||']'
 				End;
 				OtherWise NOP;
 			End;
 		End;
-        If MF=20 Then Do
-			MF=1;Address COMMAND 'C:Avail >Nil: FLUSH'
+        If MF=11 Then Do;
+			MF=1;Address COMMAND;
+			'C:Avail >Nil: FLUSH';
+			'C:Avail >Nil: FLUSH';
+			'C:Avail >Nil: FLUSH';
+			Address
 		End;Else MF=1+MF;
 	End;
 	Close(DBFH);
 End;
+/**/
+'Echo' 'Processing Completed,  DataBase Generated,  Now compiling Kanji Index...'
 /**/
 Exit(0);
 
@@ -429,7 +437,7 @@ CodePointCandidate: PROCEDURE	/* Raw Hiragana Codepoint Sequences are output as 
 		When Romaji='RYA'	Then rc='308A,3083/';
 		When Romaji='RYU'	Then rc='308A,3085/';
 		When Romaji='RYO'	Then rc='308A,3087/';
-		Otherwise rc='^'||Romaji||'^';
+		Otherwise rc=Romaji||'/';
 	End;
 	Return rc;
 /*
