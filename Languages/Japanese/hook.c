@@ -148,6 +148,7 @@ ULONG ExecLanguageHook(struct Hook *h,struct LanguageContext *LanguageContext,UL
 				};
 				if(Kana)
 					Syllable=0L;
+
 				Kana=TransformSyllableCodepoint(Kana);
 				LanguageContext->IPerception->SetLanguageContextAttr((APTR)LanguageContext,(int32)LCSTATE_Syllable,(int32)Syllable);
 				KDEBUG("LOCALE:/Japanese.Language/:Hiragana [ASCII=%lx,CodePoints=%lx:%lx]\n",
