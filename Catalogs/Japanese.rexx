@@ -28,8 +28,7 @@ If Open(DBFH,ucodedata,READ) Then Do
 			Select
 				When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1
 					KanaPath=KanaConvert(Upper(Word(Vector,i)));
-                    CodePath=CodePointConvert(Upper(Word(Vector,i)));
-					Reading='K '||CodePoint||' '||Glyph||' '||Translate(Word(Vector,i),alpha,Upper(alpha))||' '||KanaPath||' '||CodePath
+					Reading='K '||CodePoint||' '||Glyph||' '||Translate(Word(Vector,i),alpha,Upper(alpha))||' '||KanaPath||' '
 					If Length(Kana)>MRL Then MRL=Length(Kana);
                     WriteOutputEntries(Reading);
 					If MF=10 Then 'Echo' '@ '||CodePoint||'['||Glyph||']'
