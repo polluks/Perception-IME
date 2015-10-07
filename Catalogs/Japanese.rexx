@@ -11,7 +11,7 @@ KReadLog='T:'||datadir||'-ReadingList'
 /**/
 Address COMMAND
 'C:Makedir dummy';'C:Delete dummy '||datadir||' ALL QUIET FORCE';
-'C:Makedir '||datadir||' '||datadir||'/Kanji '||datadir||'/Romaji '||datadir||'/Reading '||datadir||'/Vocabulary '
+'C:Makedir '||datadir||' '||datadir||'/Kanji '||datadir||'/Romaji '||datadir||'/Vocabulary '
 Address
 /**/
 'Echo' 'Processing ...'
@@ -36,8 +36,7 @@ If Open(DBFH,ucodedata,READ) Then Do
 				End;
 				When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1
 					KanaPath=KanaConvert(Upper(Word(Vector,i)));
-                    CodePath=CodePointConvert(Upper(Word(Vector,i)));
-					Reading='O '||CodePoint||' '||Glyph||' '||Translate(Word(Vector,i),alpha,Upper(alpha))||' '||KanaPath||' '||CodePath
+					Reading='O '||CodePoint||' '||Glyph||' '||Translate(Word(Vector,i),alpha,Upper(alpha))||' '||KanaPath||' '
 					If Length(Kana)>MRL Then MRL=Length(Kana);
                     WriteOutputEntries(Reading);
 					If MF=10 Then 'Echo' '@ '||CodePoint||'['||Glyph||']'
@@ -62,8 +61,8 @@ Exit(0);
 
 WriteOutputEntries: PROCEDURE EXPOSE datadir
 	Options Results
-	Parse Arg Variant Codepoint Ideograph Reading Kana Codepath
-	/**/
+	Parse Arg Variant Codepoint Ideograph Reading Kana
+/**/
 	CWD=Pragma(D,datadir||'/Kanji');
 	If Open(KANJIFH,CodePoint,APPEND) Then Do
 		WriteLn(KANJIFH,Kana||'='||Reading||'='||Codepath);
@@ -82,52 +81,10 @@ WriteOutputEntries: PROCEDURE EXPOSE datadir
 		Close(IDXFH);
 	End;
 	Pragma(D,CWD);
-	CWD=Pragma(D,datadir||'/Reading');
-	fname=MakePath(Codepath)||Codepoint;
-	If Open(IDXFH,fname,APPEND) Then Do
-		WriteLn(IDXFH,Ideograph);
-		Close(IDXFH);
-	End;Else If Open(IDXFH,fname,WRITE) Then Do
-		WriteLn(IDXFH,Ideograph);
-		Close(IDXFH);
-	End;
-	Pragma(D,CWD);
-	/**/
+/*
 	Echo Codepoint Ideograph Variant Reading Kana Codepath
-	/**/
+*/
 	return rc;
-
-MakePath: PROCEDURE EXPOSE datadir  /* Relative Only...need to add disk support*/
-	Options Results;
-	Parse Arg ' ' path
-	root=Pos(':',path)
-	If root=0 Then rpath=path; Else Parse Var path With disk ':' rpath;
-	wpath=Translate(rpath,' ','/');
-	CWD=Pragma(D)
-	mpath='';Do i=1 To Words(wpath)
-		mpath=mpath||Word(wpath,i);
-		If ~Exists(mpath) Then Address COMMAND 'C:MakeDir' mpath
-		mpath=mpath||'/';
-	End;
-	Pragma('D',CWD)
-	Return mpath;
-
-EnCodepoint: PROCEDURE
-	Options Results
-	Parse Arg c
-	Select
-		When c<X2D('80') Then cx=D2C(c);
-		When c<X2D('100') Then cx=B2C('110000'||SubStr(C2B(D2C(c)),1,2))||B2C('10'||SubStr(C2B(D2C(c)),3,6));
-		When c<X2D('800') Then cx=B2C('110'||SubStr(C2B(SubStr(D2C(c),1,1)),6,3)||SubStr(C2B(SubStr(D2C(c),2,1)),1,2))||B2C('10'||SubStr(C2B(SubStr(D2C(c),2,1)),3,6))
-		When c<X2D('10000') Then cx=B2C('1110'||SubStr(C2B(SubStr(D2C(c),1,1)),1,4))||B2C('10'||SubStr(C2B(SubStr(D2C(c),1,1)),5,4)||SubStr(C2B(SubStr(D2C(c),2,1)),1,2))||B2C('10'||SubStr(C2B(SubStr(D2C(c),2,1)),3,6))
-		When c<X2D('200000') Then If Length(D2C(c))=4 Then Do
-				cx=B2C('11110'||SubStr(C2B(SubStr(D2C(c),1,1)),6,3)))||B2C('10'||SubStr(C2B(SubStr(D2C(c),2,1)),1,6))||B2C('10'||SubStr(C2B(SubStr(D2C(c),2,1)),7,2)||SubStr(C2B(SubStr(D2C(c),3,1)),1,4))||B2C('10'||SubStr(C2B(SubStr(D2C(c),3,1)),5,4)||SubStr(C2B(SubStr(D2C(c),4,1)),1,2))||B2C('10'||SubStr(C2B(SubStr(D2C(c),4,1)),3,6))
-			End;Else If Length(D2C(c))=3 Then Do
-				cx=B2C('11110'||SubStr(C2B(SubStr(D2C(c),1,1)),4,3))||B2C('10'||SubStr(C2B(SubStr(D2C(c),1,1)),7,2)||SubStr(C2B(SubStr(D2C(c),2,1)),1,4))||B2C('10'||SubStr(C2B(SubStr(D2C(c),2,1)),5,4)||SubStr(C2B(SubStr(D2C(c),3,1)),1,2))||B2C('10'||SubStr(C2B(SubStr(D2C(c),3,1)),3,6))
-			End;
-		Otherwise Return('##');
-	End;
-	Return cx;
 
 KanaConvert: PROCEDURE
 	Options Results
@@ -149,32 +106,6 @@ KanaConvert: PROCEDURE
 				When cx='E' Then NOP;
 				When cx='O' Then NOP;
 				Otherwise rc=rc||KanaCandidate(Syllable||' '||Type); Syllable='';
-			End;
-			Otherwise NOP;
-		End;
-	End;
-	Return rc;
-
-CodePointConvert: PROCEDURE
-	Options Results
-	Parse Arg Reading Type ArgV
-	rc='';Syllable='';
-	Do i=1 To Length(Reading) By 1;
-        c=SubStr(Reading,i,1);cx=SubStr(Reading,i+1,1);
-		If Syllable=c Then rc=rc||CodePointCandidate('tsu'||' '||Type);Else Syllable=Syllable||c;
-		Select
-			When c='A' Then Do; rc=rc||CodePointCandidate(Syllable||' '||Type); Syllable=''; End;
-			When c='I' Then Do; rc=rc||CodePointCandidate(Syllable||' '||Type); Syllable=''; End;
-			When c='U' Then Do; rc=rc||CodePointCandidate(Syllable||' '||Type); Syllable=''; End;
-			When c='E' Then Do; rc=rc||CodePointCandidate(Syllable||' '||Type); Syllable=''; End;
-			When c='O' Then Do; rc=rc||CodePointCandidate(Syllable||' '||Type); Syllable=''; End;
-			When c='N' Then Select;
-				When cx='A' Then NOP;
-				When cx='I' Then NOP;
-				When cx='U' Then NOP;
-				When cx='E' Then NOP;
-				When cx='O' Then NOP;
-				Otherwise rc=rc||CodePointCandidate(Syllable||' '||Type); Syllable='';
 			End;
 			Otherwise NOP;
 		End;
@@ -311,135 +242,6 @@ KanaCandidate: PROCEDURE	/* Encoded UTF8 Hiragana Sequences are output as rc */
 	End;
 	Return rc;
 
-CodePointCandidate: PROCEDURE	/* Raw Hiragana Codepoint Sequences are output as rc */
-	Options Results
-	Parse Arg Romaji ArgV
-	Select
-		When Romaji='A'		Then rc='3042/';
-		When Romaji='I'		Then rc='3044/';
-		When Romaji='U'		Then rc='3046/';
-		When Romaji='E'		Then rc='3048/';
-		When Romaji='O'		Then rc='304A/';
-		When Romaji='KA'	Then rc='304B/';
-		When Romaji='GA'	Then rc='304C/';
-		When Romaji='KI'	Then rc='304D/';
-		When Romaji='GI'	Then rc='304E/';
-		When Romaji='KU'	Then rc='304F/';
-		When Romaji='GU'	Then rc='3050/';
-		When Romaji='KE'	Then rc='3051/';
-		When Romaji='GE'	Then rc='3052/';
-		When Romaji='KO'	Then rc='3053/';
-		When Romaji='GO'	Then rc='3054/';
-		When Romaji='SA'	Then rc='3055/';
-		When Romaji='ZA'	Then rc='3056/';
-		When Romaji='SHI'	Then rc='3057/';
-		When Romaji='SI'	Then rc='3057/';
-		When Romaji='JI'	Then rc='3058/';
-		When Romaji='SU'	Then rc='3059/';
-		When Romaji='ZU'	Then rc='305A/';
-		When Romaji='SE'	Then rc='305B/';
-		When Romaji='ZE'	Then rc='305C/';
-		When Romaji='SO'	Then rc='305D/';
-		When Romaji='ZO'	Then rc='305E/';
-		When Romaji='TA'	Then rc='305F/';
-		When Romaji='DA'	Then rc='3060/';
-		When Romaji='CHI'	Then rc='3061/';
-		When Romaji='DI'	Then rc='3062/';
-		When Romaji='tsu'	Then rc='3063/';
-		When Romaji='TSU'	Then rc='3064/';
-		When Romaji='DZU'	Then rc='3065/';
-		When Romaji='TE'	Then rc='3066/';
-		When Romaji='DE'	Then rc='3067/';
-		When Romaji='TO'	Then rc='3068/';
-		When Romaji='DO'	Then rc='3069/';
-		When Romaji='NA'	Then rc='306A/';
-		When Romaji='NI'	Then rc='306B/';
-		When Romaji='NU'	Then rc='306C/';
-		When Romaji='NE'	Then rc='306D/';
-		When Romaji='NO'	Then rc='306E/';
-		When Romaji='HA'	Then rc='306F/';
-		When Romaji='BA'	Then rc='3070/';
-		When Romaji='PA'	Then rc='3071/';
-		When Romaji='HI'	Then rc='3072/';
-		When Romaji='BI'	Then rc='3073/';
-		When Romaji='PI'	Then rc='3074/';
-		When Romaji='HU'	Then rc='3075/';
-		When Romaji='FU'	Then rc='3075/';
-		When Romaji='BU'	Then rc='3076/';
-		When Romaji='PU'	Then rc='3077/';
-		When Romaji='HE'	Then rc='3078/';
-		When Romaji='BE'	Then rc='3079/';
-		When Romaji='PE'	Then rc='307A/';
-		When Romaji='HO'	Then rc='307B/';
-		When Romaji='BO'	Then rc='307C/';
-		When Romaji='PO'	Then rc='307D/';
-		When Romaji='MA'	Then rc='307E/';
-		When Romaji='MI'	Then rc='307F/';
-		When Romaji='MU'	Then rc='3080/';
-		When Romaji='ME'	Then rc='3081/';
-		When Romaji='MO'	Then rc='3082/';
-		When Romaji='YA'	Then rc='3084/';
-		When Romaji='YU'	Then rc='3086/';
-		When Romaji='YO'	Then rc='3088/';
-		When Romaji='RA'	Then rc='3089/';
-		When Romaji='RI'	Then rc='308A/';
-		When Romaji='RU'	Then rc='308B/';
-		When Romaji='RE'	Then rc='308C/';
-		When Romaji='RO'	Then rc='308D/';
-		When Romaji='WA'	Then rc='308F/';
-		When Romaji='WI'	Then rc='3090/';
-		When Romaji='WE'	Then rc='3091/';
-		When Romaji='WO'	Then rc='3092/';
-		When Romaji='N'		Then rc='3093/';
-		When Romaji='VU'	Then rc='3094/';
-/**/
-		When Romaji='KYA'	Then rc='304D,3083/';
-		When Romaji='GYA'	Then rc='304E,3083/';
-		When Romaji='KYU'	Then rc='304D,3085/';
-		When Romaji='GYU'	Then rc='304E,3085/';
-		When Romaji='KYO'	Then rc='304D,3087/';
-		When Romaji='GYO'	Then rc='304E,3087/';
-		When Romaji='SHYA'	Then rc='3057,3083/';
-		When Romaji='SHA'	Then rc='3057,3083/';
-		When Romaji='JA'	Then rc='3058,3083/';
-		When Romaji='SHYU'	Then rc='3057,3085/';
-		When Romaji='SHU'	Then rc='3057,3085/';
-		When Romaji='JU'	Then rc='3058,3085/';
-		When Romaji='JE'	Then rc='3058,3047/';
-		When Romaji='SHYO'	Then rc='3057,3087/';
-		When Romaji='SHO'	Then rc='3057,3087/';
-		When Romaji='JO'	Then rc='3058,3087/';
-		When Romaji='CHYA'	Then rc='3061,3083/';
-		When Romaji='CHA'	Then rc='3061,3083/';
-		When Romaji='CHYU'	Then rc='3061,3085/';
-		When Romaji='CHU'	Then rc='3061,3085/';
-		When Romaji='CHYO'	Then rc='3061,3087/';
-		When Romaji='CHO'	Then rc='3061,3087/';
-		When Romaji='NYA'	Then rc='306B,3083/';
-		When Romaji='NYU'	Then rc='306B,3085/';
-		When Romaji='NYO'	Then rc='306B,3087/';
-		When Romaji='HYA'	Then rc='3072,3083/';
-		When Romaji='BYA'	Then rc='3073,3083/';
-		When Romaji='PYA'	Then rc='3074,3083/';
-		When Romaji='FA'	Then rc='3075,3041/';
-		When Romaji='FI'	Then rc='3075,3043/';
-		When Romaji='FE'	Then rc='3075,3047/';
-		When Romaji='FO'	Then rc='3075,3049/';
-		When Romaji='HYU'	Then rc='3072,3085/';
-		When Romaji='BYU'	Then rc='3073,3085/';
-		When Romaji='PYU'	Then rc='3074,3085/';
-		When Romaji='HYO'	Then rc='3072,3087/';
-		When Romaji='BYO'	Then rc='3073,3087/';
-		When Romaji='PYO'	Then rc='3074,3087/';
-		When Romaji='MYA'	Then rc='307F,3083/';
-		When Romaji='MYU'	Then rc='307F,3085/';
-		When Romaji='MYO'	Then rc='307F,3087/';
-		When Romaji='RYA'	Then rc='308A,3083/';
-		When Romaji='RYU'	Then rc='308A,3085/';
-		When Romaji='RYO'	Then rc='308A,3087/';
-		Otherwise rc=Romaji||'/';
-	End;
-	Return rc;
 /*
 \\	Primary Activity is to generate the template datasets in the first pass
 //		This is a CodePoint listing with Emitted character contained in []s following
