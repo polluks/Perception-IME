@@ -39,7 +39,6 @@ If Open(DBFH,ucodedata,READ) Then Do
 					If Length(Kana)>MRL Then MRL=Length(Kana);
 					CNT=1+CNT;WriteOutputEntries(Reading);
 					If MF=10 Then 'Echo' '@ '||CodePoint||'['||Glyph||']'
-
 				End;
 				OtherWise NOP;
 			End;
@@ -52,7 +51,7 @@ If Open(DBFH,ucodedata,READ) Then Do
 			Address
 		End;Else MF=1+MF;
 		If CNT=1001 Then Do;
-			Echo CNT '@' CodePoint
+			CNT=1;Echo CNT '@' CodePoint
 		End;
 	End;
 	Close(DBFH);
