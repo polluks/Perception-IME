@@ -16,7 +16,7 @@ Address
 /**/
 'Echo' 'Processing ...'
 /**/
-MRL=1;MF=1;
+MRL=1;MF=1;CNT=1;
 /**/
 If Open(DBFH,ucodedata,READ) Then Do
 	Do While ~Eof(DBFH)
@@ -30,15 +30,16 @@ If Open(DBFH,ucodedata,READ) Then Do
 					KanaPath=KanaConvert(Upper(Word(Vector,i)));
 					Reading='K '||CodePoint||' '||Glyph||' '||Translate(Word(Vector,i),alpha,Upper(alpha))||' '||KanaPath||' '
 					If Length(Kana)>MRL Then MRL=Length(Kana);
-                    WriteOutputEntries(Reading);
+					CNT=1+CNT;WriteOutputEntries(Reading);
 					If MF=10 Then 'Echo' '@ '||CodePoint||'['||Glyph||']'
 				End;
 				When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1
 					KanaPath=KanaConvert(Upper(Word(Vector,i)));
 					Reading='O '||CodePoint||' '||Glyph||' '||Translate(Word(Vector,i),alpha,Upper(alpha))||' '||KanaPath||' '
 					If Length(Kana)>MRL Then MRL=Length(Kana);
-                    WriteOutputEntries(Reading);
+					CNT=1+CNT;WriteOutputEntries(Reading);
 					If MF=10 Then 'Echo' '@ '||CodePoint||'['||Glyph||']'
+
 				End;
 				OtherWise NOP;
 			End;
@@ -50,6 +51,9 @@ If Open(DBFH,ucodedata,READ) Then Do
 			'C:Avail >Nil: FLUSH';
 			Address
 		End;Else MF=1+MF;
+		If CNT=1001 Then Do;
+			Echo CNT '@' CodePoint
+		End;
 	End;
 	Close(DBFH);
 End;
@@ -64,10 +68,10 @@ WriteOutputEntries: PROCEDURE EXPOSE datadir
 /**/
 	CWD=Pragma(D,datadir||'/Kanji');
 	If Open(KANJIFH,CodePoint,APPEND) Then Do
-		WriteLn(KANJIFH,Kana||'='||Reading||'='||Codepath);
+		WriteLn(KANJIFH,Kana||'='||Reading);
 		Close(KANJIFH);
 	End;Else If Open(KANJIFH,CodePoint,WRITE) Then Do
-		WriteLn(KANJIFH,Ideograph||'0A'x||Kana||'='||Reading||'='||Codepath);
+		WriteLn(KANJIFH,Ideograph||'0A'x||Kana||'='||Reading);
 		Close(KANJIFH);
 	End;
 	Pragma(D,CWD);
@@ -81,7 +85,7 @@ WriteOutputEntries: PROCEDURE EXPOSE datadir
 	End;
 	Pragma(D,CWD);
 /*
-	Echo Codepoint Ideograph Variant Reading Kana Codepath
+	Echo Codepoint Ideograph Variant Reading Kana
 */
 	return rc;
 
