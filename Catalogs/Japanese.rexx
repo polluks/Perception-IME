@@ -7,33 +7,38 @@ Parse Arg ArgVec
 alpha='abcdefghijklmnopqrstuvwxyz'
 ucodedata='Unihan_Readings.txt'
 datadir='Japanese'
-KReadLog='T:'||datadir||'-ReadingList'
-/**/
+/*
+	Clear the FileSystem storage location
+	and build the required "tree" arrangement
+
+*/
 Address COMMAND
 'C:Makedir dummy';'C:Delete dummy '||datadir||' ALL QUIET FORCE';
 'C:Makedir '||datadir||' '||datadir||'/Kanji '||datadir||'/Romaji '||datadir||'/Vocabulary '
 Address
 /**/
 'Echo' 'Processing ...'
-/**/
+/*
+	Some Initial Variables,  these are for a memory leak workaround and later printing of the MaximumReadingLength used
+*/
 MRL=1;MF=1;
 /**/
 If Open(DBFH,ucodedata,READ) Then Do
 	Do While ~Eof(DBFH)
-		L=ReadLn(DBFH);
-		If SubStr(L,1,2)='U+' Then Do
-			Parse Var L With 'U+' CodePoint '09'x  dbEntryType '09'x Vector
-			Vector=Translate(Vector,'20'x,'09'x);
-			Glyph=EnCodepoint(C2D(X2C(CodePoint)));B=C2B(X2C(CodePoint));
+		L=ReadLn(DBFH);																	/* Read a line */
+		If SubStr(L,1,2)='U+' Then Do 													/* Verify it is a valid entry beginning with a Codepoint Hex value */
+			Parse Var L With 'U+' CodePoint '09'x  dbEntryType '09'x Vector             /* Split the valid line into sections of interest */
+			Vector=Translate(Vector,'20'x,'09'x);										/* force all spaces to tabs */
+			Glyph=EnCodepoint(C2D(X2C(CodePoint)));B=C2B(X2C(CodePoint));				/* Convert the Hexidecimal Codepoint into a valid UTF8 of the same CodePoint numbered Glyph */
 			Select
-				When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1
-					KanaPath=KanaConvert(Upper(Word(Vector,i)));
-					Reading='K '||CodePoint||' '||Glyph||' '||Translate(Word(Vector,i),alpha,Upper(alpha))||' '||KanaPath||' '
-					If Length(Kana)>MRL Then MRL=Length(Kana);
-					WriteOutputEntries(Reading);
+				When dbEntryType='kJapaneseKun' Then Do i=1 To Words(Vector) BY 1		/* Iterate the Japanese Readings (Kun readings are originally Japanese and not chinese orignated ) */
+					KanaPath=KanaConvert(Upper(Word(Vector,i)));						/* Convert the Reading from "romaji" ascii text to proper Japanese UTF8 as defined within this script */
+					Reading='K '||CodePoint||' '||Glyph||' '||Translate(Word(Vector,i),alpha,Upper(alpha))||' '||KanaPath||' ' /* formatted arguments for the output processing function */
+					If Length(Kana)>MRL Then MRL=Length(Kana);							/* update the MRL Reading Length to the current length if it is longer */
+					WriteOutputEntries(Reading);										/* Call the Output Function */
 					If MF=10 Then 'Echo' '@ '||CodePoint||'['||Glyph||']'
 				End;
-				When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1
+				When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1		/* This is a repeat of the "kJapaneseKun" for "kJapaneseOn" readings (sound readings from chinese origin) */
 					KanaPath=KanaConvert(Upper(Word(Vector,i)));
 					Reading='O '||CodePoint||' '||Glyph||' '||Translate(Word(Vector,i),alpha,Upper(alpha))||' '||KanaPath||' '
 					If Length(Kana)>MRL Then MRL=Length(Kana);
@@ -60,24 +65,15 @@ Exit(0);
 
 WriteOutputEntries: PROCEDURE EXPOSE datadir
 	Options Results
-	Parse Arg Variant Codepoint Ideograph Reading Kana
+	Parse Arg Variant Codepoint Ideograph Reading Kana				/* Split the Argument string */
 /**/
-	CWD=Pragma(D,datadir||'/Kanji');
-	If Open(KANJIFH,CodePoint,APPEND) Then Do
+	CWD=Pragma(D,datadir||'/Kanji');								/* Go to the Kanji Storage Directory */
+	If Open(KANJIFH,CodePoint,APPEND) Then Do						/* If the Kanji File Exists, add a new line */
 		WriteLn(KANJIFH,Kana||'='||Reading);
 		Close(KANJIFH);
-	End;Else If Open(KANJIFH,CodePoint,WRITE) Then Do
+	End;Else If Open(KANJIFH,CodePoint,WRITE) Then Do				/* If the Kanji File Didn't exist...create it, first line is the Kanji, and add the current reading as the first entry line */
 		WriteLn(KANJIFH,Ideograph||'0A'x||Kana||'='||Reading);
 		Close(KANJIFH);
-	End;
-	Pragma(D,CWD);
-	CWD=Pragma(D,datadir||'/Romaji');
-	If Open(IDXFH,Reading,APPEND) Then Do
-   	    WriteLn(IDXFH,Variant||' '||Codepoint||' '||Ideograph)
-		Close(IDXFH)
-	End;Else If Open(IDXFH,Reading,WRITE) Then Do
-   	    WriteLn(IDXFH,Reading||' '||Kana||'0A'x||Variant||' '||Codepoint||' '||Ideograph);
-		Close(IDXFH);
 	End;
 	Pragma(D,CWD);
 /*
@@ -85,9 +81,16 @@ WriteOutputEntries: PROCEDURE EXPOSE datadir
 */
 	return rc;
 
-EnCodepoint: PROCEDURE
+EnCodepoint: PROCEDURE	/* Conversion of the Input Character text assuming UTF8 output encoding */
 	Options Results
-	Parse Arg c
+	Parse Arg c			/* the Input Character as a Decimal String of the CodePoint */
+/*
+	The following "Select" works like "switch()" in C language
+
+	ARexx has extensive text processing functionality but is also showing bitrot on newer systems.
+		that is why the use of X2D() B2C() C2B() functions where B is Binary, D is Decimal and X is Hex
+		SubStr() is to retrieve part of a larger string returning the given parts of the string
+*/
 	Select
 		When c<X2D('80') Then cx=D2C(c);
 		When c<X2D('100') Then cx=B2C('110000'||SubStr(C2B(D2C(c)),1,2))||B2C('10'||SubStr(C2B(D2C(c)),3,6));
@@ -100,9 +103,11 @@ EnCodepoint: PROCEDURE
 			End;
 		Otherwise Return('##');
 	End;
+/*	the cx returned here is a properly encoded UTF8 Character Sequence
+*/
 	Return cx;
 
-KanaConvert: PROCEDURE
+KanaConvert: PROCEDURE /* given a proper Japanese syllable in Romaji, returns the correct UTF8 sequence of that syllable */
 	Options Results
 	Parse Arg Reading Type ArgV
 	rc='';Syllable='';
@@ -130,7 +135,10 @@ KanaConvert: PROCEDURE
 
 KanaCandidate: PROCEDURE	/* Encoded UTF8 Hiragana Sequences are output as rc */
 	Options Results
-	Parse Arg Romaji ArgV
+	Parse Arg Romaji ArgV	/* Input romaji is "A" "KA" or "RYU" style text sequences
+/*
+    The Following are all single syllable sequences
+*/
 	Select
 		When Romaji='A'		Then rc=X2C('E381822F');
 		When Romaji='I'		Then rc=X2C('E381842F');
@@ -209,7 +217,9 @@ KanaCandidate: PROCEDURE	/* Encoded UTF8 Hiragana Sequences are output as rc */
 		When Romaji='WO'	Then rc=X2C('E382922F');
 		When Romaji='N'		Then rc=X2C('E382932F');
 		When Romaji='VU'	Then rc=X2C('E382942F');
-/**/
+/*
+	The Following are all single-syllables with two output sequences concatenated.
+*/
 		When Romaji='KYA'	Then rc=X2C('E3818DE382832F');
 		When Romaji='GYA'	Then rc=X2C('E3818EE382832F');
 		When Romaji='KYU'	Then rc=X2C('E3818DE382852F');
