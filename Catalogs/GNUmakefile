@@ -9,14 +9,14 @@ RM 			=	Delete >Nil:
 
 main:	DictionaryDB UnicodeData
 	@ Echo "Generating [Language=Chinese] Dataset"
-#	$(REXX) Chinese.rexx
+	$(REXX) Chinese.rexx
 	@ Echo "Generating [Language=Japanese] Dataset"
 	$(REXX) Japanese.rexx
 	@ Echo "Generating [Language=Korean] Dataset"
-#	$(REXX) Korean.rexx
+	$(REXX) Korean.rexx
 
 DictionaryDB:
-	@ Echo "Confirming the EDICT UTF8 database"
+	@ Echo "Need to download the EDICT UTF8 database"
 
 UnicodeData:
 	@ Echo "Unpacking Unihan Datasets"

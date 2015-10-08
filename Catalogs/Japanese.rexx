@@ -16,7 +16,7 @@ Address
 /**/
 'Echo' 'Processing ...'
 /**/
-MRL=1;MF=1;CNT=1;
+MRL=1;MF=1;
 /**/
 If Open(DBFH,ucodedata,READ) Then Do
 	Do While ~Eof(DBFH)
@@ -30,14 +30,14 @@ If Open(DBFH,ucodedata,READ) Then Do
 					KanaPath=KanaConvert(Upper(Word(Vector,i)));
 					Reading='K '||CodePoint||' '||Glyph||' '||Translate(Word(Vector,i),alpha,Upper(alpha))||' '||KanaPath||' '
 					If Length(Kana)>MRL Then MRL=Length(Kana);
-					CNT=1+CNT;WriteOutputEntries(Reading);
+					WriteOutputEntries(Reading);
 					If MF=10 Then 'Echo' '@ '||CodePoint||'['||Glyph||']'
 				End;
 				When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1
 					KanaPath=KanaConvert(Upper(Word(Vector,i)));
 					Reading='O '||CodePoint||' '||Glyph||' '||Translate(Word(Vector,i),alpha,Upper(alpha))||' '||KanaPath||' '
 					If Length(Kana)>MRL Then MRL=Length(Kana);
-					CNT=1+CNT;WriteOutputEntries(Reading);
+					WriteOutputEntries(Reading);
 					If MF=10 Then 'Echo' '@ '||CodePoint||'['||Glyph||']'
 				End;
 				OtherWise NOP;
@@ -50,9 +50,6 @@ If Open(DBFH,ucodedata,READ) Then Do
 			'C:Avail >Nil: FLUSH';
 			Address
 		End;Else MF=1+MF;
-		If CNT=1001 Then Do;
-			CNT=1;Echo CNT '@' CodePoint
-		End;
 	End;
 	Close(DBFH);
 End;
@@ -261,30 +258,4 @@ KanaCandidate: PROCEDURE	/* Encoded UTF8 Hiragana Sequences are output as rc */
 	End;
 	Return rc;
 
-/*
-\\	Primary Activity is to generate the template datasets in the first pass
-//		This is a CodePoint listing with Emitted character contained in []s following
-\\		These datasets will be useful for expansion into a "reading" dataset
-**
-'Unicode' "Hiragana" 3040 30A0
-'Unicode' "Katakana" 30A0 3100
-'Unicode' "Katakana-Phonetic-Extensions" 31F0 3200
-'Unicode' "Vertical-Forms" FE10 FE1A
-'Unicode' "Combining-Half-Marks" FE20 FE2E
-'Unicode' "Halfwidth-and-Fullwidth-Forms" FF01 FFEF
-'Unicode' "Kana-Suppliment" 1B000 1B100
-**
-'Unicode' "CJK-Radicals-Suppliment" 2E80 2EF4
-'Unicode' "CJK-Punctuation" 3000 3040
-'Unicode' "CJK-Strokes" 31C0 31E4
-'Unicode' "CJK-Enclosed-Letters-and-Months" 3200 32FF
-'Unicode' "CJK-Compatability" 3300 3400
-'Unicode' "CJK-Unified-Ideographs-Extension-A" 3400 4DB6
-'Unicode' "CJK-Unified-Ideographs.0" 4E00 7700
-'Unicode' "CJK-Unified-Ideographs.1" 7700 A000
-'Unicode' "CJK-Compatability-Ideographs" F900 FADA
-'Unicode' "CJK-Compatability-Forms" FE30 FE50
-'Unicode' "Enclosed-Ideographic-Suppliment" 1F200 1F252
-'Unicode' "Miscellaneous-Symbols-and-Pictographs" 1F300 1F600
-'Unicode' "CJK-Unified-Ideographs-Extension-B" 20000 2FA1E
-**/
+/**/
