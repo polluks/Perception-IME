@@ -16,21 +16,13 @@ def encode(hex,keyword):
     return codePoint
 
 """base parsing line, to be decorated """
+
 def parseLine(tokens,lines,keyword):
     hex = tokens[0][2:]
     codePoint = encode(hex,keyword)
     readings = tokens[2]
     readings = readings.decode("utf-8")
-
-    out = codePoint +": "+readings
-    """
-    print "hex: ",hex
-    print "decimal: ",decimal
-    print "codePoint: ",codePoint
-    print out
-    print
-    """
-    return out
+    return codePoint +": "+readings
 
 def japaneseDecoration(parseLine):
     def innerWrapper(tokens,lines,keyword):
