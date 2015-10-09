@@ -7,22 +7,40 @@ import os,time
 pathToTopLevelDir = os.path.dirname(os.getcwd())
 CodePointsZipFile = pathToTopLevelDir+"/Resources/Unicode/Unihan.zip"
 
-allLines = iter(open("Unihan_Readings.txt",'r').read().split('\n'))  #with is a context manager, automatically closes file handles etc no matter what happens
+allLines = iter(open("Unihan_Readings.txt",'r').read().split('\n')) #iterators are great 
+verbose = True
 
-
-def parseJapaneseLine(tokens,lines,dialect):
-    hex =tokens[0][2:]
+def encode(hex,keyword):
     decimal =int(hex,16)
-
     codePoint = unichr(decimal)
+    return codePoint
+
+"""base parsing line, to be decorated """
+def parseLine(tokens,lines,keyword):
+    hex = tokens[0][2:]
+    codePoint = encode(hex,keyword)
     readings = tokens[2]
+    readings = readings.decode("utf-8")
+
     out = codePoint +": "+readings
+    """
     print "hex: ",hex
     print "decimal: ",decimal
     print "codePoint: ",codePoint
     print out
     print
+    """
     return out
+
+def japaneseDecoration(parseLine):
+    def innerWrapper(tokens,lines,keyword):
+        print "Decorated."
+        return parseLine(tokens,lines,keyword)
+    return innerWrapper
+
+parseJapaneseLine = japaneseDecoration(parseLine) #move into dict
+
+parsers = {"JapaneseKun" : parseJapaneseLine,"Definition" : parseLine,"Korean" : parseLine,"Tang" : parseLine}
 
 def writeOut(readingsetc,path):
     output = open(path,"w")
@@ -39,14 +57,27 @@ def parseJapanese(lines):
     while "EOF" not in line:
         line = lines.next()
         if not line.startswith("U"):
-          continue
+            continue
         tokens = line.split("\t")
+        keyword = tokens[1]
+        keyword = keyword[1:]
+       
+        if verbose:
+            #print "processing: ",keyword
+            #print tokens
+            pass
 
-        if "kJapaneseKun" == tokens[1]:
-            kJapaneseKun.append(parseJapaneseLine(tokens,lines,"kun"))
+        if keyword not in parsers:
+            continue
+        out = parsers[keyword](tokens,lines,keyword)
+        if verbose:
+            print out
+            #time.sleep(4)
+            #kJapaneseKun.append(parseJapaneseLine(tokens,lines,"kun"))
         
-        if "kJapaneseOn" == tokens[1]:
-            kJapaneseOn.append(parseJapaneseLine(tokens,lines,"On"))
+        #if "kMandarin" ==tokens[1]:
+        #make dispatcher instead of ifs.keyword is key, lines,tokens,keyword minus k values.
+ 
 
     kJapaneseOn.sort(key=len,reverse=True)
     writeOut(kJapaneseOn,"kJapaneseOn.output")
