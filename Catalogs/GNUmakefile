@@ -4,9 +4,12 @@
 MAKE		=	make
 PYTHON		=	Python:Python
 MKDIR		=	Makedir
-RM 			=	Delete >Nil:
+RM 			=	Delete ALL QUIET
 
 main:
+	XadUnFile /Resources/Unicode/Unihan.zip /Catalogs/ OW
+	$(RM) Data
+	$(MKDIR) Data
 	$(PYTHON) CodePointParser.py
 
 clean:
