@@ -1,4 +1,4 @@
-import os
+import os,time
 
 #open file, create language files etc, iterate line by line
 #identify language and encode code point to correct unicode
@@ -11,10 +11,17 @@ allLines = iter(open("Unihan_Readings.txt",'r').read().split('\n'))  #with is a 
 
 
 def parseJapaneseLine(tokens,lines,dialect):
-    codePoint = tokens[0]
-    #glyph = blah
+    hex =tokens[0][2:]
+    decimal =int(hex,16)
+
+    codePoint = unichr(decimal)
     readings = tokens[2]
-    out = codePoint +" "+readings
+    out = codePoint +": "+readings
+    print "hex: ",hex
+    print "decimal: ",decimal
+    print "codePoint: ",codePoint
+    print out
+    print
     return out
 
 def writeOut(readingsetc,path):
