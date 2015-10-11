@@ -6,11 +6,11 @@ def encode(hex):
 	glyph = unichr(int(hex,16))
 	return glyph
 
-def parseDefault(tokens,lines,keyword):
+def parseDefault(tokens,lines):
 	readings = tokens[2]
 	return readings
 
-def parseJapanese(tokens,lines,keyword):
+def parseJapanese(tokens,lines):
 	readings = tokens[2]
 	return readings
 
