@@ -1,7 +1,3 @@
-import sys,os,time
-
-allLines = iter(open("Unihan_Readings.txt",'r').read().split('\n')) #iterators are great
-
 def encode(hex):
 	glyph = unichr(int(hex,16))
 	return glyph
@@ -11,8 +7,12 @@ def parseDefault(tokens,lines):
 	return readings
 
 def parseJapanese(tokens,lines):
-	readings = tokens[2]
-	return readings
+	vector = tokens[2]
+	readings = vector.split(' ')
+
+
+
+	return "Japanese"
 
 parsers = {
 	"Chinese" : parseDefault,
@@ -36,10 +36,6 @@ def parseEverything(lines):
 			continue
 		glyph = encode(tokens[0][2:])
 		out = parsers[keyword](tokens,lines)
-		print out
-
-	print "\t"+str(len(kJapaneseOn)+len(kJapaneseKun))+" characters processed."
-
-parseEverything(allLines)
 
 
+parseEverything(iter(open("Unihan_Readings.txt",'r').read().split('\n')))
