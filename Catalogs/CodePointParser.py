@@ -1,18 +1,41 @@
-def encode(hex):
+##
+##  Thank you to JohnWKerr for the initial code for this script,
+##    I did try to explain what was essential and what was irrelevant...*sigh*
+##
+
+
+def encode(hex):					# Generate the actual UTF8 Sequence for the CodePoint value
 	glyph = unichr(int(hex,16))
 	return glyph
 
-def parseDefault(tokens,lines):
-	readings = tokens[2]
-	return readings
-
-def parseJapanese(tokens,lines):
+def parseDefault(tokens,lines,glyph):
 	vector = tokens[2]
-	readings = vector.split(' ')
+	return vector
+
+#
+#	Japanese Syllables all count as 1,2 or 3 English letter combinations.
+#		The Input Strings are currently English Letter romaji (this needs Hiragana conversion)
+#		NONE of the Input Strings contain UTF8 outside the ASCII range for processing Japanese
+#
+#	Each "Syllable" in the reading (multiple syllables is common) requires to be
+#		a branch of each level into the tree,  leaf nodes are Kanji strings (use the glyphs!)
+#
+#
+#	Example:	"DA/SU/" for the tree and adds a Kanji Entry to that locations string
+#				"KO/U/"  is the most popular branch and will have many many Kanji listed
+#				"SHI"    is a single syllable and has the Kanji for "city" along with at at least 20 more meanings
+#				"HI/TO/" is include the Kanji for "person" amongst others
+#				"KA/N/"  is another popular reading with many Kanji
+#
+#				tree[KA][N]+=<Kanji>  based on each reading.
+#
+#   One Kanji to One Reading IS NOT NORMAL... Many Kanji HAVE Many Readings BY DEFAULT
+#
 
 
-
-	return "Japanese"
+def parseJapanese(tokens,lines,glyph):
+	vector = tokens[2]
+	return vector
 
 parsers = {
 	"Chinese" : parseDefault,
@@ -35,7 +58,7 @@ def parseEverything(lines):
 		if keyword not in parsers:
 			continue
 		glyph = encode(tokens[0][2:])
-		out = parsers[keyword](tokens,lines)
+		out = parsers[keyword](tokens,lines,glyph)
 
 
 parseEverything(iter(open("Unihan_Readings.txt",'r').read().split('\n')))
