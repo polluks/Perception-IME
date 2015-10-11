@@ -20,7 +20,7 @@ parsers = {
 	"JapaneseKun" : parseJapanese,
 	"JapaneseOn" : parseJapanese,
 	"Korean" : parseDefault,
-	"Tang" : parseLine
+	"Tang" : parseDefault
 }
 
 def parseEverything(lines):
