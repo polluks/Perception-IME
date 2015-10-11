@@ -2,10 +2,8 @@ import sys,os,time
 
 allLines = iter(open("Unihan_Readings.txt",'r').read().split('\n')) #iterators are great
 
-def encode(hex,keyword):
-    decimal =int(hex,16)
-    codePoint = unichr(decimal)
-    return codePoint
+def encode(hex):
+    return unichr(int(hex,16))
 
 def parseDefault(tokens,lines,keyword):
     readings = tokens[2]
@@ -36,8 +34,8 @@ def parseEverything(lines):
 
 		if keyword not in parsers:
 			continue
-		glyph = encode(tokens[0][2:],keyword)
-		out = parsers[keyword](tokens,lines,keyword)
+		glyph = encode(tokens[0][2:])
+		out = parsers[keyword](tokens,lines)
 		print out
 
     print "\t"+str(len(kJapaneseOn)+len(kJapaneseKun))+" characters processed."
