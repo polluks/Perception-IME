@@ -66,7 +66,9 @@ Exit(0);
 WriteOutputEntries: PROCEDURE EXPOSE datadir
 	Options Results
 	Parse Arg Variant Codepoint Ideograph Reading Kana				/* Split the Argument string */
-/**/
+
+	Echo " "||Ideograph||" = "||Kana
+/*
 	CWD=Pragma(D,datadir||'/Kanji');								/* Go to the Kanji Storage Directory */
 	If Open(KANJIFH,CodePoint,APPEND) Then Do						/* If the Kanji File Exists, add a new line */
 		WriteLn(KANJIFH,Kana||'='||Reading);
@@ -76,6 +78,7 @@ WriteOutputEntries: PROCEDURE EXPOSE datadir
 		Close(KANJIFH);
 	End;
 	Pragma(D,CWD);
+*/
 /*
 	Echo Codepoint Ideograph Variant Reading Kana
 */
@@ -135,7 +138,7 @@ KanaConvert: PROCEDURE /* given a proper Japanese syllable in Romaji, returns th
 
 KanaCandidate: PROCEDURE	/* Encoded UTF8 Hiragana Sequences are output as rc */
 	Options Results
-	Parse Arg Romaji ArgV	/* Input romaji is "A" "KA" or "RYU" style text sequences
+	Parse Arg Romaji ArgV	/* Input romaji is "A" "KA" or "RYU" style text sequences */
 /*
     The Following are all single syllable sequences
 */
