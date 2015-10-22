@@ -13,8 +13,9 @@ datadir='Japanese'
 
 */
 Address COMMAND
-'C:Makedir dummy';'C:Delete dummy '||datadir||' ALL QUIET FORCE';
-'C:Makedir '||datadir||' '||datadir||'/Kanji '||datadir||'/Romaji '||datadir||'/Vocabulary '
+'C:Makedir dummy'
+'C:Delete dummy '||datadir||' ALL QUIET FORCE'
+'C:Makedir '||datadir||' '||datadir||'/Kanji '||datadir||'/Readings '
 Address
 /**/
 'Echo' 'Processing ...'
@@ -68,17 +69,26 @@ WriteOutputEntries: PROCEDURE EXPOSE datadir
 	Parse Arg Variant Codepoint Ideograph Reading Kana				/* Split the Argument string */
 
 	Echo " "||Ideograph||" = "||Kana
-/*
+
 	CWD=Pragma(D,datadir||'/Kanji');								/* Go to the Kanji Storage Directory */
-	If Open(KANJIFH,CodePoint,APPEND) Then Do						/* If the Kanji File Exists, add a new line */
-		WriteLn(KANJIFH,Kana||'='||Reading);
+	If Open(KANJIFH,CodePoint,APPEND) Then Do						/* If the File Exists, add a new line */
+		WriteLn(KANJIFH,Reading||'='||Kana);
 		Close(KANJIFH);
-	End;Else If Open(KANJIFH,CodePoint,WRITE) Then Do				/* If the Kanji File Didn't exist...create it, first line is the Kanji, and add the current reading as the first entry line */
-		WriteLn(KANJIFH,Ideograph||'0A'x||Kana||'='||Reading);
+	End;Else If Open(KANJIFH,CodePoint,WRITE) Then Do				/* If the File Didn't exist...create it, and add the first entry */
+		WriteLn(KANJIFH,Ideograph||'0A'x||Reading||'='||Kana);
 		Close(KANJIFH);
 	End;
 	Pragma(D,CWD);
-*/
+
+	CWD=Pragma(D,datadir||'/Readings');								/* Go to the Readings Storage Directory */
+	If Open(ROMAJIFH,Reading,APPEND) Then Do						/* If the File Exists, add a new line */
+		WriteLn(ROMAJIFH,Ideograph);
+		Close(ROMAJIFH);
+	End;Else If Open(ROMAJIFH,CodePoint,WRITE) Then Do				/* If the File Didn't exist...create it, and add the first entry */
+		WriteLn(ROMAJIFH,Reading||'='||Kana||'0A'x||Ideograph);
+		Close(ROMAJIFH);
+	End;
+	Pragma(D,CWD);
 /*
 	Echo Codepoint Ideograph Variant Reading Kana
 */
@@ -143,130 +153,130 @@ KanaCandidate: PROCEDURE	/* Encoded UTF8 Hiragana Sequences are output as rc */
     The Following are all single syllable sequences
 */
 	Select
-		When Romaji='A'		Then rc=X2C('E381822F');
-		When Romaji='I'		Then rc=X2C('E381842F');
-		When Romaji='U'		Then rc=X2C('E381862F');
-		When Romaji='E'		Then rc=X2C('E381882F');
-		When Romaji='O'		Then rc=X2C('E3818A2F');
-		When Romaji='KA'	Then rc=X2C('E3818B2F');
-		When Romaji='GA'	Then rc=X2C('E3818C2F');
-		When Romaji='KI'	Then rc=X2C('E3818D2F');
-		When Romaji='GI'	Then rc=X2C('E3818E2F');
-		When Romaji='KU'	Then rc=X2C('E3818F2F');
-		When Romaji='GU'	Then rc=X2C('E381902F');
-		When Romaji='KE'	Then rc=X2C('E381912F');
-		When Romaji='GE'	Then rc=X2C('E381922F');
-		When Romaji='KO'	Then rc=X2C('E381932F');
-		When Romaji='GO'	Then rc=X2C('E381942F');
-		When Romaji='SA'	Then rc=X2C('E381952F');
-		When Romaji='ZA'	Then rc=X2C('E381962F');
-		When Romaji='SHI'	Then rc=X2C('E381972F');
-		When Romaji='SI'	Then rc=X2C('E381972F');
-		When Romaji='JI'	Then rc=X2C('E381982F');
-		When Romaji='SU'	Then rc=X2C('E381992F');
-		When Romaji='ZU'	Then rc=X2C('E3819A2F');
-		When Romaji='SE'	Then rc=X2C('E3819B2F');
-		When Romaji='ZE'	Then rc=X2C('E3819C2F');
-		When Romaji='SO'	Then rc=X2C('E3819D2F');
-		When Romaji='ZO'	Then rc=X2C('E3819E2F');
-		When Romaji='TA'	Then rc=X2C('E3819F2F');
-		When Romaji='DA'	Then rc=X2C('E381A02F');
-		When Romaji='CHI'	Then rc=X2C('E381A12F');
-		When Romaji='DI'	Then rc=X2C('E381A22F');
-		When Romaji='tsu'	Then rc=X2C('E381A32F');
-		When Romaji='TSU'	Then rc=X2C('E381A42F');
-		When Romaji='DZU'	Then rc=X2C('E381A52F');
-		When Romaji='TE'	Then rc=X2C('E381A62F');
-		When Romaji='DE'	Then rc=X2C('E381A72F');
-		When Romaji='TO'	Then rc=X2C('E381A82F');
-		When Romaji='DO'	Then rc=X2C('E381A92F');
-		When Romaji='NA'	Then rc=X2C('E381AA2F');
-		When Romaji='NI'	Then rc=X2C('E381AB2F');
-		When Romaji='NU'	Then rc=X2C('E381AC2F');
-		When Romaji='NE'	Then rc=X2C('E381AD2F');
-		When Romaji='NO'	Then rc=X2C('E381AE2F');
-		When Romaji='HA'	Then rc=X2C('E381AF2F');
-		When Romaji='BA'	Then rc=X2C('E381B02F');
-		When Romaji='PA'	Then rc=X2C('E381B12F');
-		When Romaji='HI'	Then rc=X2C('E381B22F');
-		When Romaji='BI'	Then rc=X2C('E381B32F');
-		When Romaji='PI'	Then rc=X2C('E381B42F');
-		When Romaji='HU'	Then rc=X2C('E381B52F');
-		When Romaji='FU'	Then rc=X2C('E381B52F');
-		When Romaji='BU'	Then rc=X2C('E381B62F');
-		When Romaji='PU'	Then rc=X2C('E381B72F');
-		When Romaji='HE'	Then rc=X2C('E381B82F');
-		When Romaji='BE'	Then rc=X2C('E381B92F');
-		When Romaji='PE'	Then rc=X2C('E381BA2F');
-		When Romaji='HO'	Then rc=X2C('E381BB2F');
-		When Romaji='BO'	Then rc=X2C('E381BC2F');
-		When Romaji='PO'	Then rc=X2C('E381BD2F');
-		When Romaji='MA'	Then rc=X2C('E381BE2F');
-		When Romaji='MI'	Then rc=X2C('E381BF2F');
-		When Romaji='MU'	Then rc=X2C('E382802F');
-		When Romaji='ME'	Then rc=X2C('E382812F');
-		When Romaji='MO'	Then rc=X2C('E382822F');
-		When Romaji='YA'	Then rc=X2C('E382842F');
-		When Romaji='YU'	Then rc=X2C('E382862F');
-		When Romaji='YO'	Then rc=X2C('E382882F');
-		When Romaji='RA'	Then rc=X2C('E382892F');
-		When Romaji='RI'	Then rc=X2C('E3828A2F');
-		When Romaji='RU'	Then rc=X2C('E3828B2F');
-		When Romaji='RE'	Then rc=X2C('E3828C2F');
-		When Romaji='RO'	Then rc=X2C('E3828D2F');
-		When Romaji='WA'	Then rc=X2C('E3828F2F');
-		When Romaji='WI'	Then rc=X2C('E382902F');
-		When Romaji='WE'	Then rc=X2C('E382912F');
-		When Romaji='WO'	Then rc=X2C('E382922F');
-		When Romaji='N'		Then rc=X2C('E382932F');
-		When Romaji='VU'	Then rc=X2C('E382942F');
+		When Romaji='A'		Then rc=X2C('E381822E');
+		When Romaji='I'		Then rc=X2C('E381842E');
+		When Romaji='U'		Then rc=X2C('E381862E');
+		When Romaji='E'		Then rc=X2C('E381882E');
+		When Romaji='O'		Then rc=X2C('E3818A2E');
+		When Romaji='KA'	Then rc=X2C('E3818B2E');
+		When Romaji='GA'	Then rc=X2C('E3818C2E');
+		When Romaji='KI'	Then rc=X2C('E3818D2E');
+		When Romaji='GI'	Then rc=X2C('E3818E2E');
+		When Romaji='KU'	Then rc=X2C('E3818F2E');
+		When Romaji='GU'	Then rc=X2C('E381902E');
+		When Romaji='KE'	Then rc=X2C('E381912E');
+		When Romaji='GE'	Then rc=X2C('E381922E');
+		When Romaji='KO'	Then rc=X2C('E381932E');
+		When Romaji='GO'	Then rc=X2C('E381942E');
+		When Romaji='SA'	Then rc=X2C('E381952E');
+		When Romaji='ZA'	Then rc=X2C('E381962E');
+		When Romaji='SHI'	Then rc=X2C('E381972E');
+		When Romaji='SI'	Then rc=X2C('E381972E');
+		When Romaji='JI'	Then rc=X2C('E381982E');
+		When Romaji='SU'	Then rc=X2C('E381992E');
+		When Romaji='ZU'	Then rc=X2C('E3819A2E');
+		When Romaji='SE'	Then rc=X2C('E3819B2E');
+		When Romaji='ZE'	Then rc=X2C('E3819C2E');
+		When Romaji='SO'	Then rc=X2C('E3819D2E');
+		When Romaji='ZO'	Then rc=X2C('E3819E2E');
+		When Romaji='TA'	Then rc=X2C('E3819F2E');
+		When Romaji='DA'	Then rc=X2C('E381A02E');
+		When Romaji='CHI'	Then rc=X2C('E381A12E');
+		When Romaji='DI'	Then rc=X2C('E381A22E');
+		When Romaji='tsu'	Then rc=X2C('E381A32E');
+		When Romaji='TSU'	Then rc=X2C('E381A42E');
+		When Romaji='DZU'	Then rc=X2C('E381A52E');
+		When Romaji='TE'	Then rc=X2C('E381A62E');
+		When Romaji='DE'	Then rc=X2C('E381A72E');
+		When Romaji='TO'	Then rc=X2C('E381A82E');
+		When Romaji='DO'	Then rc=X2C('E381A92E');
+		When Romaji='NA'	Then rc=X2C('E381AA2E');
+		When Romaji='NI'	Then rc=X2C('E381AB2E');
+		When Romaji='NU'	Then rc=X2C('E381AC2E');
+		When Romaji='NE'	Then rc=X2C('E381AD2E');
+		When Romaji='NO'	Then rc=X2C('E381AE2E');
+		When Romaji='HA'	Then rc=X2C('E381AF2E');
+		When Romaji='BA'	Then rc=X2C('E381B02E');
+		When Romaji='PA'	Then rc=X2C('E381B12E');
+		When Romaji='HI'	Then rc=X2C('E381B22E');
+		When Romaji='BI'	Then rc=X2C('E381B32E');
+		When Romaji='PI'	Then rc=X2C('E381B42E');
+		When Romaji='HU'	Then rc=X2C('E381B52E');
+		When Romaji='FU'	Then rc=X2C('E381B52E');
+		When Romaji='BU'	Then rc=X2C('E381B62E');
+		When Romaji='PU'	Then rc=X2C('E381B72E');
+		When Romaji='HE'	Then rc=X2C('E381B82E');
+		When Romaji='BE'	Then rc=X2C('E381B92E');
+		When Romaji='PE'	Then rc=X2C('E381BA2E');
+		When Romaji='HO'	Then rc=X2C('E381BB2E');
+		When Romaji='BO'	Then rc=X2C('E381BC2E');
+		When Romaji='PO'	Then rc=X2C('E381BD2E');
+		When Romaji='MA'	Then rc=X2C('E381BE2E');
+		When Romaji='MI'	Then rc=X2C('E381BF2E');
+		When Romaji='MU'	Then rc=X2C('E382802E');
+		When Romaji='ME'	Then rc=X2C('E382812E');
+		When Romaji='MO'	Then rc=X2C('E382822E');
+		When Romaji='YA'	Then rc=X2C('E382842E');
+		When Romaji='YU'	Then rc=X2C('E382862E');
+		When Romaji='YO'	Then rc=X2C('E382882E');
+		When Romaji='RA'	Then rc=X2C('E382892E');
+		When Romaji='RI'	Then rc=X2C('E3828A2E');
+		When Romaji='RU'	Then rc=X2C('E3828B2E');
+		When Romaji='RE'	Then rc=X2C('E3828C2E');
+		When Romaji='RO'	Then rc=X2C('E3828D2E');
+		When Romaji='WA'	Then rc=X2C('E3828F2E');
+		When Romaji='WI'	Then rc=X2C('E382902E');
+		When Romaji='WE'	Then rc=X2C('E382912E');
+		When Romaji='WO'	Then rc=X2C('E382922E');
+		When Romaji='N'		Then rc=X2C('E382932E');
+		When Romaji='VU'	Then rc=X2C('E382942E');
 /*
 	The Following are all single-syllables with two output sequences concatenated.
 */
-		When Romaji='KYA'	Then rc=X2C('E3818DE382832F');
-		When Romaji='GYA'	Then rc=X2C('E3818EE382832F');
-		When Romaji='KYU'	Then rc=X2C('E3818DE382852F');
-		When Romaji='GYU'	Then rc=X2C('E3818EE382852F');
-		When Romaji='KYO'	Then rc=X2C('E3818DE382872F');
-		When Romaji='GYO'	Then rc=X2C('E3818EE382872F');
-		When Romaji='SHYA'	Then rc=X2C('E38197E382832F');
-		When Romaji='SHA'	Then rc=X2C('E38197E382832F');
-		When Romaji='JA'	Then rc=X2C('E38198E382832F');
-		When Romaji='SHYU'	Then rc=X2C('E38197E382852F');
-		When Romaji='SHU'	Then rc=X2C('E38197E382852F');
-		When Romaji='JU'	Then rc=X2C('E38198E382852F');
-		When Romaji='JE'	Then rc=X2C('E38198E381872F');
-		When Romaji='SHYO'	Then rc=X2C('E38197E382872F');
-		When Romaji='SHO'	Then rc=X2C('E38197E382872F');
-		When Romaji='JO'	Then rc=X2C('E38198E382872F');
-		When Romaji='CHYA'	Then rc=X2C('E381A1E382832F');
-		When Romaji='CHA'	Then rc=X2C('E381A1E382832F');
-		When Romaji='CHYU'	Then rc=X2C('E381A1E382852F');
-		When Romaji='CHU'	Then rc=X2C('E381A1E382852F');
-		When Romaji='CHYO'	Then rc=X2C('E381A1E382872F');
-		When Romaji='CHO'	Then rc=X2C('E381A1E382872F');
-		When Romaji='NYA'	Then rc=X2C('E381ABE382832F');
-		When Romaji='NYU'	Then rc=X2C('E381ABE382852F');
-		When Romaji='NYO'	Then rc=X2C('E381ABE382872F');
-		When Romaji='HYA'	Then rc=X2C('E381B2E382832F');
-		When Romaji='BYA'	Then rc=X2C('E381B3E382832F');
-		When Romaji='PYA'	Then rc=X2C('E381B4E382832F');
-		When Romaji='FA'	Then rc=X2C('E381B2E381812F');
-		When Romaji='FI'	Then rc=X2C('E381B2E381832F');
-		When Romaji='FE'	Then rc=X2C('E381B2E381872F');
-		When Romaji='FO'	Then rc=X2C('E381B2E381892F');
-		When Romaji='HYU'	Then rc=X2C('E381B2E382852F');
-		When Romaji='BYU'	Then rc=X2C('E381B3E382852F');
-		When Romaji='PYU'	Then rc=X2C('E381B4E382852F');
-		When Romaji='HYO'	Then rc=X2C('E381B2E382872F');
-		When Romaji='BYO'	Then rc=X2C('E381B3E382872F');
-		When Romaji='PYO'	Then rc=X2C('E381B4E382872F');
-		When Romaji='MYA'	Then rc=X2C('E382BFE382832F');
-		When Romaji='MYU'	Then rc=X2C('E382BFE382852F');
-		When Romaji='MYO'	Then rc=X2C('E382BFE382872F');
-		When Romaji='RYA'	Then rc=X2C('E3828AE382832F');
-		When Romaji='RYU'	Then rc=X2C('E3828AE382852F');
-		When Romaji='RYO'	Then rc=X2C('E3828AE382872F');
+		When Romaji='KYA'	Then rc=X2C('E3818D2EE382832E');
+		When Romaji='GYA'	Then rc=X2C('E3818E2EE382832E');
+		When Romaji='KYU'	Then rc=X2C('E3818D2EE382852E');
+		When Romaji='GYU'	Then rc=X2C('E3818E2EE382852E');
+		When Romaji='KYO'	Then rc=X2C('E3818D2EE382872E');
+		When Romaji='GYO'	Then rc=X2C('E3818E2EE382872E');
+		When Romaji='SHYA'	Then rc=X2C('E381972EE382832E');
+		When Romaji='SHA'	Then rc=X2C('E381972EE382832E');
+		When Romaji='JA'	Then rc=X2C('E381982EE382832E');
+		When Romaji='SHYU'	Then rc=X2C('E381972EE382852E');
+		When Romaji='SHU'	Then rc=X2C('E381972EE382852E');
+		When Romaji='JU'	Then rc=X2C('E381982EE382852E');
+		When Romaji='JE'	Then rc=X2C('E381982EE381872E');
+		When Romaji='SHYO'	Then rc=X2C('E381972EE382872E');
+		When Romaji='SHO'	Then rc=X2C('E381972EE382872E');
+		When Romaji='JO'	Then rc=X2C('E381982EE382872E');
+		When Romaji='CHYA'	Then rc=X2C('E381A12EE382832E');
+		When Romaji='CHA'	Then rc=X2C('E381A12EE382832E');
+		When Romaji='CHYU'	Then rc=X2C('E381A12EE382852E');
+		When Romaji='CHU'	Then rc=X2C('E381A12EE382852E');
+		When Romaji='CHYO'	Then rc=X2C('E381A12EE382872E');
+		When Romaji='CHO'	Then rc=X2C('E381A12EE382872E');
+		When Romaji='NYA'	Then rc=X2C('E381AB2EE382832E');
+		When Romaji='NYU'	Then rc=X2C('E381AB2EE382852E');
+		When Romaji='NYO'	Then rc=X2C('E381AB2EE382872E');
+		When Romaji='HYA'	Then rc=X2C('E381B22EE382832E');
+		When Romaji='BYA'	Then rc=X2C('E381B32EE382832E');
+		When Romaji='PYA'	Then rc=X2C('E381B42EE382832E');
+		When Romaji='FA'	Then rc=X2C('E381B22EE381812E');
+		When Romaji='FI'	Then rc=X2C('E381B22EE381832E');
+		When Romaji='FE'	Then rc=X2C('E381B22EE381872E');
+		When Romaji='FO'	Then rc=X2C('E381B22EE381892E');
+		When Romaji='HYU'	Then rc=X2C('E381B22EE382852E');
+		When Romaji='BYU'	Then rc=X2C('E381B32EE382852E');
+		When Romaji='PYU'	Then rc=X2C('E381B42EE382852E');
+		When Romaji='HYO'	Then rc=X2C('E381B22EE382872E');
+		When Romaji='BYO'	Then rc=X2C('E381B32EE382872E');
+		When Romaji='PYO'	Then rc=X2C('E381B42EE382872E');
+		When Romaji='MYA'	Then rc=X2C('E382BF2EE382832E');
+		When Romaji='MYU'	Then rc=X2C('E382BF2EE382852E');
+		When Romaji='MYO'	Then rc=X2C('E382BF2EE382872E');
+		When Romaji='RYA'	Then rc=X2C('E3828A2EE382832E');
+		When Romaji='RYU'	Then rc=X2C('E3828A2EE382852E');
+		When Romaji='RYO'	Then rc=X2C('E3828A2EE382872E');
 		Otherwise rc=' ';
 	End;
 	Return rc;
