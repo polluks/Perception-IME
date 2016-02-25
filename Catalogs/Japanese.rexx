@@ -37,24 +37,18 @@ If Open(DBFH,ucodedata,READ) Then Do
 					Reading='K '||CodePoint||' '||Glyph||' '||Translate(Word(Vector,i),alpha,Upper(alpha))||' '||KanaPath||' ' /* formatted arguments for the output processing function */
 					If Length(Kana)>MRL Then MRL=Length(Kana);							/* update the MRL Reading Length to the current length if it is longer */
 					WriteOutputEntries(Reading);										/* Call the Output Function */
-					If MF=10 Then 'Echo' '@ '||CodePoint||'['||Glyph||']'
 				End;
 				When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1		/* This is a repeat of the "kJapaneseKun" for "kJapaneseOn" readings (sound readings from chinese origin) */
 					KanaPath=KanaConvert(Upper(Word(Vector,i)));
 					Reading='O '||CodePoint||' '||Glyph||' '||Translate(Word(Vector,i),alpha,Upper(alpha))||' '||KanaPath||' '
 					If Length(Kana)>MRL Then MRL=Length(Kana);
 					WriteOutputEntries(Reading);
-					If MF=10 Then 'Echo' '@ '||CodePoint||'['||Glyph||']'
 				End;
 				OtherWise NOP;
 			End;
 		End;
-        If MF=11 Then Do;
-			MF=1;Address COMMAND;
-			'C:Avail >Nil: FLUSH';
-			'C:Avail >Nil: FLUSH';
-			'C:Avail >Nil: FLUSH';
-			Address
+        If MF=15 Then Do; MF=1;
+			Address COMMAND 'C:Avail >Nil: FLUSH';
 		End;Else MF=1+MF;
 	End;
 	Close(DBFH);
@@ -66,9 +60,9 @@ Exit(0);
 
 WriteOutputEntries: PROCEDURE EXPOSE datadir
 	Options Results
-	Parse Arg Variant Codepoint Ideograph Reading Kana				/* Split the Argument string */
+	Parse Arg Variant Codepoint Ideograph Romaji Kana				/* Split the Argument string */
 
-	Echo " "||Ideograph||" = "||Kana
+	Echo '['||CodePoint||'] '||Romaji
 
 	CWD=Pragma(D,datadir||'/Kanji');								/* Go to the Kanji Storage Directory */
 	If Open(KANJIFH,CodePoint,APPEND) Then Do						/* If the File Exists, add a new line */
@@ -81,17 +75,15 @@ WriteOutputEntries: PROCEDURE EXPOSE datadir
 	Pragma(D,CWD);
 
 	CWD=Pragma(D,datadir||'/Readings');								/* Go to the Readings Storage Directory */
-	If Open(ROMAJIFH,Reading,APPEND) Then Do						/* If the File Exists, add a new line */
+	If Open(ROMAJIFH,Romaji,APPEND) Then Do						/* If the File Exists, add a new line */
 		WriteLn(ROMAJIFH,Ideograph);
 		Close(ROMAJIFH);
-	End;Else If Open(ROMAJIFH,CodePoint,WRITE) Then Do				/* If the File Didn't exist...create it, and add the first entry */
-		WriteLn(ROMAJIFH,Reading||'='||Kana||'0A'x||Ideograph);
+	End;Else If Open(ROMAJIFH,Romaji,WRITE) Then Do				/* If the File Didn't exist...create it, and add the first entry */
+		WriteLn(ROMAJIFH,Romaji||'='||Kana||'0A'x||Ideograph);
 		Close(ROMAJIFH);
 	End;
 	Pragma(D,CWD);
-/*
-	Echo Codepoint Ideograph Variant Reading Kana
-*/
+
 	return rc;
 
 EnCodepoint: PROCEDURE	/* Conversion of the Input Character text assuming UTF8 output encoding */
