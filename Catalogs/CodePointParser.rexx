@@ -6,7 +6,7 @@ Parse Arg ArgVec
 /**/
 alpha='abcdefghijklmnopqrstuvwxyz'
 ucodedata='Unihan_Readings.txt'
-datadir='Japanese'
+datadir=Pragma(D)||'Data'
 /*
 	Clear the FileSystem storage location
 	and build the required "tree" arrangement
@@ -15,7 +15,7 @@ datadir='Japanese'
 Address COMMAND
 'C:Makedir dummy'
 'C:Delete dummy '||datadir||' ALL QUIET FORCE'
-'C:Makedir '||datadir||' '||datadir||'/Kanji '||datadir||'/Readings '
+'C:Makedir '||datadir||'/Kana '||datadir||'/Kanji '||datadir||'/Hanzi '||datadir||'/Hangul '
 Address
 /**/
 'Echo' 'Processing ...'
@@ -36,14 +36,17 @@ If Open(DBFH,ucodedata,READ) Then Do
 					KanaPath=KanaConvert(Upper(Word(Vector,i)));						/* Convert the Reading from "romaji" ascii text to proper Japanese UTF8 as defined within this script */
 					Reading='K '||CodePoint||' '||Glyph||' '||Translate(Word(Vector,i),alpha,Upper(alpha))||' '||KanaPath||' ' /* formatted arguments for the output processing function */
 					If Length(Kana)>MRL Then MRL=Length(Kana);							/* update the MRL Reading Length to the current length if it is longer */
-					WriteOutputEntries(Reading);										/* Call the Output Function */
+					WriteJapaneseData(Reading);										/* Call the Output Function */
 				End;
 				When dbEntryType='kJapaneseOn' Then Do i=1 TO Words(Vector) BY 1		/* This is a repeat of the "kJapaneseKun" for "kJapaneseOn" readings (sound readings from chinese origin) */
 					KanaPath=KanaConvert(Upper(Word(Vector,i)));
 					Reading='O '||CodePoint||' '||Glyph||' '||Translate(Word(Vector,i),alpha,Upper(alpha))||' '||KanaPath||' '
 					If Length(Kana)>MRL Then MRL=Length(Kana);
-					WriteOutputEntries(Reading);
+					WriteJapaneseData(Reading);
 				End;
+				When dbEntryType='kMandarin' Then WriteChineseData('M '||Vector);
+				When dbEntryType='kCantonese' Then WriteChineseData('C '||Vector);
+				When dbEntryType='kHangul' Then WriteKoreanData('H '||Vector);
 				OtherWise NOP;
 			End;
 		End;
@@ -58,7 +61,7 @@ End;
 /**/
 Exit(0);
 
-WriteOutputEntries: PROCEDURE EXPOSE datadir
+WriteJapaneseData: PROCEDURE EXPOSE datadir
 	Options Results
 	Parse Arg Variant Codepoint Ideograph Romaji Kana				/* Split the Argument string */
 
@@ -81,6 +84,38 @@ WriteOutputEntries: PROCEDURE EXPOSE datadir
 	End;Else If Open(ROMAJIFH,Romaji,WRITE) Then Do				/* If the File Didn't exist...create it, and add the first entry */
 		WriteLn(ROMAJIFH,Romaji||'='||Kana||'0A'x||Ideograph);
 		Close(ROMAJIFH);
+	End;
+	Pragma(D,CWD);
+
+	return rc;
+
+WriteChineseData: PROCEDURE EXPOSE datadir
+	Options Results
+	Parse Arg Vector /*ariant Codepoint Ideograph Romaji Kana  Split the Argument string ???*/
+
+	CWD=Pragma(D,datadir||'/Hanzi');
+	If Open(HANZIFH,CodePoint,APPEND) Then Do
+		WriteLn(HANZIFH,Kana||'='||Reading);
+		Close(HANZIFH);
+	End;Else If Open(HANZIFH,CodePoint,WRITE) Then Do
+		WriteLn(HANZIFH,Ideograph||'='||Reading);
+		Close(HANZIFH);
+	End;
+	Pragma(D,CWD);
+
+	return rc;
+
+WriteKoreanData: PROCEDURE EXPOSE datadir
+	Options Results
+	Parse Arg Vector /*ariant Codepoint Ideograph Romaji Kana  Split the Argument string ???*/
+
+	CWD=Pragma(D,datadir||'/Hangul');
+	If Open(HANGULFH,CodePoint,APPEND) Then Do
+		WriteLn(HANGULFH,'='||Reading||' '||Unknown);
+		Close(HANGULFH);
+	End;Else If Open(HANGULFH,CodePoint,WRITE) Then Do
+		WriteLn(HANGULFH,Ideograph||'0A'x||'='||Reading||' '||Unknown);
+		Close(HANGULFH);
 	End;
 	Pragma(D,CWD);
 
