@@ -44,9 +44,9 @@ If Open(DBFH,ucodedata,READ) Then Do
 					If Length(Kana)>MRL Then MRL=Length(Kana);
 					WriteJapaneseData(Reading);
 				End;
-				When dbEntryType='kMandarin' Then WriteChineseData('M '||Vector);
-				When dbEntryType='kCantonese' Then WriteChineseData('C '||Vector);
-				When dbEntryType='kHangul' Then WriteKoreanData('H '||Vector);
+				When dbEntryType='kMandarin' Then WriteChineseData('M '||CodePoint||' '||Glyph||' '||Vector);
+				When dbEntryType='kCantonese' Then WriteChineseData('C '||CodePoint||' '||Glyph||' '||Vector);
+				When dbEntryType='kHangul' Then WriteKoreanData('H '||CodePoint||' '||Glyph||' '||Vector);
 				OtherWise NOP;
 			End;
 		End;
@@ -61,23 +61,30 @@ End;
 /**/
 Exit(0);
 
-WriteJapaneseData: PROCEDURE EXPOSE datadir
+WriteChineseData: PROCEDURE EXPOSE datadir
 	Options Results
-	Parse Arg Variant Codepoint Ideograph Romaji Kana				/* Split the Argument string */
+	Parse Arg Variant Codepoint Ideograph Vector /* Split the Argument string */
+	FNAME='zh_Chinese.txt'
 
-	Echo '['||CodePoint||'] '||Romaji
-
-	CWD=Pragma(D,datadir||'/Kanji');								/* Go to the Kanji Storage Directory */
-	If Open(KANJIFH,CodePoint,APPEND) Then Do						/* If the File Exists, add a new line */
-		WriteLn(KANJIFH,Reading||'='||Kana);
-		Close(KANJIFH);
-	End;Else If Open(KANJIFH,CodePoint,WRITE) Then Do				/* If the File Didn't exist...create it, and add the first entry */
-		WriteLn(KANJIFH,Ideograph||'0A'x||Reading||'='||Kana);
-		Close(KANJIFH);
+	CWD=Pragma(D,datadir);
+	If Variant='C' Then FNAME='zh_Cantonese.txt'
+	If Variant='M' Then FNAME='zh_Mandarin.txt'
+	If Open(HANZIFH,FNAME,APPEND) Then Do
+		WriteLn(HANZIFH,'['||Codepoint||'='||Ideograph||']'||Vector);
+		Close(HANZIFH);
+	End;Else If Open(HANZIFH,FNAME,WRITE) Then Do
+		WriteLn(HANZIFH,'['||Codepoint||'='||Ideograph||']'||Vector);
+		Close(HANZIFH);
 	End;
 	Pragma(D,CWD);
 
-	CWD=Pragma(D,datadir||'/Readings');								/* Go to the Readings Storage Directory */
+	return rc;
+
+WriteJapaneseData: PROCEDURE EXPOSE datadir
+	Options Results
+	Parse Arg Variant Codepoint Ideograph Romaji Kana			/* Split the Argument string */
+
+	CWD=Pragma(D,datadir||'/Kana');								/* Go to the Readings Storage Directory */
 	If Open(ROMAJIFH,Romaji,APPEND) Then Do						/* If the File Exists, add a new line */
 		WriteLn(ROMAJIFH,Ideograph);
 		Close(ROMAJIFH);
@@ -87,19 +94,13 @@ WriteJapaneseData: PROCEDURE EXPOSE datadir
 	End;
 	Pragma(D,CWD);
 
-	return rc;
-
-WriteChineseData: PROCEDURE EXPOSE datadir
-	Options Results
-	Parse Arg Vector /*ariant Codepoint Ideograph Romaji Kana  Split the Argument string ???*/
-
-	CWD=Pragma(D,datadir||'/Hanzi');
-	If Open(HANZIFH,CodePoint,APPEND) Then Do
-		WriteLn(HANZIFH,Kana||'='||Reading);
-		Close(HANZIFH);
-	End;Else If Open(HANZIFH,CodePoint,WRITE) Then Do
-		WriteLn(HANZIFH,Ideograph||'='||Reading);
-		Close(HANZIFH);
+	CWD=Pragma(D,datadir||'/Kanji');							/* Go to the Kanji Storage Directory */
+	If Open(KANJIFH,CodePoint,APPEND) Then Do					/* If the File Exists, add a new line */
+		WriteLn(KANJIFH,Reading||'='||Kana);
+		Close(KANJIFH);
+	End;Else If Open(KANJIFH,CodePoint,WRITE) Then Do			/* If the File Didn't exist...create it, and add the first entry */
+		WriteLn(KANJIFH,Ideograph||'0A'x||Reading||'='||Kana);
+		Close(KANJIFH);
 	End;
 	Pragma(D,CWD);
 
@@ -107,14 +108,15 @@ WriteChineseData: PROCEDURE EXPOSE datadir
 
 WriteKoreanData: PROCEDURE EXPOSE datadir
 	Options Results
-	Parse Arg Vector /*ariant Codepoint Ideograph Romaji Kana  Split the Argument string ???*/
+	Parse Arg Variant Codepoint Ideograph Vector /* Split the Argument string */
+	FNAME='ko_Hangul.txt'
 
-	CWD=Pragma(D,datadir||'/Hangul');
-	If Open(HANGULFH,CodePoint,APPEND) Then Do
-		WriteLn(HANGULFH,'='||Reading||' '||Unknown);
+	CWD=Pragma(D,datadir);
+	If Open(HANGULFH,FNAME,APPEND) Then Do
+		WriteLn(HANGULFH,'['||Codepoint||'='||Ideograph||']'||Vector);
 		Close(HANGULFH);
-	End;Else If Open(HANGULFH,CodePoint,WRITE) Then Do
-		WriteLn(HANGULFH,Ideograph||'0A'x||'='||Reading||' '||Unknown);
+	End;Else If Open(HANGULFH,FNAME,WRITE) Then Do
+		WriteLn(HANGULFH,'['||Codepoint||'='||Ideograph||']'||Vector);
 		Close(HANGULFH);
 	End;
 	Pragma(D,CWD);
