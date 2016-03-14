@@ -3,7 +3,7 @@
 LNAME	= japanese.language
 
 MAKE	= make
-CC		= gcc -N -q
+CC		= gcc -N
 STRIP	= strip
 COPY	= Copy
 RM		= Delete

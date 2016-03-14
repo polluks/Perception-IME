@@ -3,7 +3,7 @@
 LNAME	= chinese_iso-2022-cn.charset
 
 MAKE	= make
-CC		= gcc -N -q
+CC		= gcc -N
 STRIP	= strip
 COPY	= Copy
 RM		= Delete
