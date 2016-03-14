@@ -6,7 +6,7 @@ Parse Arg ArgVec
 /**/
 alpha='abcdefghijklmnopqrstuvwxyz'
 ucodedata='Unihan_Readings.txt'
-datadir=Pragma(D)||'Data'
+datadir=Pragma(D)||'/Data'
 /*
 	Clear the FileSystem storage location
 	and build the required "tree" arrangement
@@ -15,7 +15,7 @@ datadir=Pragma(D)||'Data'
 Address COMMAND
 'C:Makedir dummy'
 'C:Delete dummy '||datadir||' ALL QUIET FORCE'
-'C:Makedir '||datadir||'/Kana '||datadir||'/Kanji '||datadir||'/Hanzi '||datadir||'/Hangul '
+'C:Makedir '||datadir||' '||datadir||'/Kana '||datadir||'/Kanji '||datadir||'/Hanzi '||datadir||'/Hangul '
 Address
 /**/
 'Echo' 'Processing ...'
