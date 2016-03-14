@@ -3,7 +3,7 @@
 LNAME	= perception.library
 AUTODOC	= perception.doc
 
-CC		= gcc -N -q
+CC		= gcc -N
 STRIP	= strip
 RM		= Delete
 AD		= Autodoc
