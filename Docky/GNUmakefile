@@ -3,7 +3,7 @@
 LNAME	= perception.docky
 DRAWER	= Sys:WBStartup/Dockies
 
-CC		= gcc -N -q
+CC		= gcc -N
 STRIP	= strip
 RM		= Delete
 MAKE	= make
