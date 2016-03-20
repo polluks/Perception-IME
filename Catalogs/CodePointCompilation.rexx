@@ -5,20 +5,14 @@ Options Results
 Parse Arg ArgVec
 /**/
 alpha='abcdefghijklmnopqrstuvwxyz'
-ucodedata='Unihan_Readings.txt'
 datadir=Pragma(D)||'/Data'
 /*
 	Clear the FileSystem storage location
 	and build the required "tree" arrangement
 
 */
-Address COMMAND
-'C:Makedir dummy'
-'C:Delete dummy '||datadir||' ALL QUIET FORCE'
-'C:Makedir '||datadir||' '||datadir||'/Kana '||datadir||'/Kanji '||datadir||'/Hanzi '||datadir||'/Hangul '
-Address
 /**/
-'Echo' 'Filtering ...'
+'Echo' 'Compiling ...'
 /*
 	Some Initial Variables,  these are for a memory leak workaround and later printing of the MaximumReadingLength used
 */

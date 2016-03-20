@@ -3,15 +3,18 @@
 ##    I did try to explain what was essential and what was irrelevant...*sigh*
 ##
 import sys,os,time,unicodedata
+
 try:
 	import amiga
 except:
 	import posix
+##
+##	romkan IS broken!!!... It does NOT parse "fu" or anything with that in it...
+##		this needs to be replaced with a better implimentation for my purposes
 import romkan
 
 #
 #	I need to store Kanji recursively where each "syllable" of Japanese is a branch-key at each level
-#
 #
 #	the Japanese word "oyogu" requires "oyo" to hold a specific Kanji...and is two syllables
 #
